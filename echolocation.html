@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+    <script>
+        function toggle_submit(){
+            var textbox = document.getElementById('answer');
+            var d = document.getElementsByClassName("answer_checker")[0];
+            textbox.style.backgroundColor = "var(--nice-blue)";
+            textbox.style.color = "white";
+            textbox.value = "";
+            if (d.style.display === "block") {
+                d.style.display = "none";
+            } else {
+                d.style.display = "block";
+            }
+        }
+        function check_answer() {
+            var textbox = document.getElementById('answer');
+            var answer = "BATARANG";
+            var called_in = textbox.value.replace(/[^a-zA-Z]/gmi, "").replace(/\s+/g, "").toUpperCase();
+            if (called_in === answer) {
+                textbox.style.backgroundColor = "#7dff97";
+                textbox.style.color = "black";
+            } else {
+                textbox.style.backgroundColor = "#f56464";
+            }
+        }
+
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>echolocation</title>
+</head>
+<body>
+    <navbar>
+        <a href="puzzle.html"><h1>↤ back to main ↦</h1></a>
+        <h1 onclick="toggle_submit()">↤ call in answer ↦</h1>
+    </navbar>
+    <div class="answer_checker">
+        call in answer:
+        <input type="text" id="answer">
+        <input type="submit" onclick="check_answer()">
+    </div>
+    <div class="puzzle_title">⊚ echolocation ⊚</div>
+    <div class="content">
+        <div class="audio">
+        <audio controls>
+            <source src="media/echolocation.mp3">
+        </audio>
+        </div>
+        <ul>
+        <li>About 100m south of the parking lot roof he's standing on is a monument in a roundabout. Who is that monument dedicated to? (4, 7 | 5)</li>
+        <li>As they kiss, what's the structure visible behind them? (10, 3 | 7)</li>
+        <li>He keeps walking on the train tracks, in the same direction, until it intersects with a road. What's the name of that road? (8, 6 | 12)</li>
+        <li>It's not there anymore, but there used to be something above the tunnel they pass through. What was it called? (4, 4 | 6)</li>
+        <li>The name of the neighborhood they just passed in their Benz shares its name with a European gulf. What's the name of the neighbourhood? (13 | 8)</li>
+        <li>There's a building 50m northeast of that tower. What is the blue text on that building? (5 | 4)</li>
+        <li>Two architects helped design the fountain he's walking down. Which one of their names starts with J? (4, 6 | 5)</li>
+        <li>What precarious looking thing is she standing near? (6, 4 | 6)</li>
+        </ul>
+    </div>
+</body>
+</html>

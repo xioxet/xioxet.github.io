@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+    <script>
+
+        function toggle_submit(){
+            var textbox = document.getElementById('answer');
+            var d = document.getElementsByClassName("answer_checker")[0];
+            textbox.style.backgroundColor = "var(--nice-blue)";
+            textbox.style.color = "white";
+            textbox.value = "";
+            if (d.style.display === "block") {
+                d.style.display = "none";
+            } else {
+                d.style.display = "block";
+            }
+        }
+
+        function check_answer() {
+            var textbox = document.getElementById('answer');
+            var answer = "KILLSYOU";
+            var called_in = textbox.value.replace(/[^a-zA-Z]/gmi, "").replace(/\s+/g, "").toUpperCase();
+            if (called_in === answer) {
+                textbox.style.backgroundColor = "#7dff97";
+                textbox.style.color = "black";
+            } else {
+                textbox.style.backgroundColor = "#f56464";
+            }
+        }
+
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thing</title>
+</head>
+<body>
+    <navbar>
+        <a href="puzzle.html"><h1>↤ back to main ↦</h1></a>
+        <h1 onclick="toggle_submit()">↤ call in answer ↦</h1>
+    </navbar>
+    <div class="answer_checker">
+        call in answer:
+        <input type="text" id="answer">
+        <input type="submit" onclick="check_answer()">
+    </div>
+    <div class="puzzle_title">⎆ thinking with portals ⎆</div>
+    <div class="content">
+        <div style="text-align:center; padding-bottom:20px;">
+        <img id="portal_grid" src="media/portals.jpg">
+        </div>
+        <div class="cluebox">
+            <div class="clues">
+                <span class="cluehead">Across</span>
+                <ul>
+                    <li>4. The one millionth age of one of three furies</li>
+                    <li>11. Incomplete X-rated gesture gets you close to finishing, but not quite</li>
+                    <li>12. Encodes stuff remade by a Foley artist's work</li>
+                    <li>18. Grow and prosper, like something that rises by itself?</li>
+                    <li>21. Removing and taking off top while throwing up and drinking some tea</li>
+                    <li>22. What you might pay to drive to an island</li>
+                    <li>25. Full cover of song that might be of the heart?</li>
+                    <li>29. Sounds like defeat is free</li>
+                    <li>32. Allow some repetition in the French</li>
+                </ul>
+            </div>
+            <div class="clues">
+                <span class="cluehead">Down</span>
+                <ul>
+                    <li>1. Smallest compass point has iron heading</li>
+                    <li>2. Did a bone scan without what marks the spot while spread out like sunbeams</li>
+                    <li>3. Semitone of flutist never to be repeated again?</li>
+                    <li>4. Anime cuteness more expressed without adult rating!</li>
+                    <li>5. Rage madly before insult by relative</li>
+                    <li>14. Paid lipo operation while having double vision</li>
+                    <li>17. Shy Guy's kart flanked on both sides by two kart bumpers after getting in</li>
+                    <li>19. Punch boy before a hug and a kiss</li>
+                    <li>20. Some Karenina!?</li>
+                    <li>23. It's a must to unsharpen, say, a pointed object</li>
+                    <li>24. Dethorn, mix, and remove head of nightshade - like a chili pepper, for example</li>
+                    <li>26. Assistance in riding a horse left to gallop losing every round weaving in and out of Europe</li>
+                    <li>30. The very first girl day</li>
+                </ul>
+            </div>
+        </div>
+        <div class="clues" id="portals">
+            <span class="cluehead">Portals</span>
+            <ul>
+                <li>Experiment with theatrics, right to the heart of key artistic principle</li>
+                <li>It could be lead east, then north, then east, after a plot</li>
+                <li>Method of cooking meat products results in burn wound at the emergency room, for example</li>
+                <li>Movies about emotions engulfing one man suffering loss</li>
+                <li>No need to fret! Down to try shuffling, after making shirt red</li>
+                <li>Oh goodness! Around Grand, he was like one who sat on a wall and had a big fall</li>
+                <li>The plan is to down drink filled with some rum</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
