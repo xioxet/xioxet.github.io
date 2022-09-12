@@ -238,3 +238,118 @@ ul {
 #a_link:hover {
     color:red;
 }
+
+.slidecontainer {
+    width: 100%; 
+  }
+  
+.slider {
+    margin-top:25px;
+    -webkit-appearance: none; 
+    appearance: none;
+    width: 100%; 
+    height: 25px; 
+    background: #d3d3d3; 
+    outline: none; 
+    opacity: 0.7; 
+    -webkit-transition: .2s; 
+    transition: opacity .2s;
+}
+  
+
+.slider:hover {
+    opacity: 1; 
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; 
+    appearance: none;
+    width: 25px; 
+    height: 25px;
+    background: var(--nice-blue);
+    cursor: pointer;
+}
+  
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px; 
+    background: var(--nice-blue);
+    cursor: pointer
+}
+
+.slidecontainer {
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+}
+
+#grid {
+    text-align:center;
+    margin:auto;
+    margin-top:25px;
+}
+
+#grid tr {
+    height:27px;
+}
+
+#grid td {
+    width:25px;
+    background-color:black;
+}
+
+.automaton-button {
+    font-family:'Inconsolata';
+    font-size:25px;
+    background-color:var(--nice-blue);
+    color:white;
+    border:none;
+    border-radius:10px;
+    padding:10px;
+    margin-top:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.automaton-button:hover{
+    background-color:lightskyblue;
+    color:black;
+}
+
+#automaton-final {
+    margin:auto;
+    margin-top:-10px;
+    font-size:30px;
+    font-weight:bold;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#automaton-final img {
+    margin-top:20px;
+}
+
+#automaton-final ul {
+    text-align:left;
+}
+
+#automaton-header {
+    font-size:30px;
+    font-weight:bold;
+    text-align:center;
+    margin:auto;
+}
+
+.wrap {
+    word-break:break-all;
+    font-weight:lighter;
+    font-size:15px;
+}
+
+#state_text {
+    text-align:center;
+    margin-top:10px;
+    margin-bottom:-10px;
+
+}
