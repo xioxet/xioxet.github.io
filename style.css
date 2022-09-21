@@ -353,3 +353,18 @@ ul {
     margin-bottom:-10px;
 
 }
+
+#vowel-clues {
+    display:flex;
+    font-size:25px;
+    margin:auto;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+#vowel-clues span {
+    background-color:skyblue;
+    padding:10px;
+    margin:10px;
+    border-radius:15px;
+}

@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+    
+    <script>
+        function toggle_submit(){
+            var textbox = document.getElementById('answer');
+            var d = document.getElementsByClassName("answer_checker")[0];
+            textbox.style.backgroundColor = "var(--nice-blue)";
+            textbox.style.color = "white";
+            textbox.value = "";
+            if (d.style.display === "block") {
+                d.style.display = "none";
+            } else {
+                d.style.display = "block";
+            }
+        }
+        function check_answer() {
+            var textbox = document.getElementById('answer');
+            var answer = "DISEMVOWELMENT";
+            var called_in = textbox.value.replace(/[^a-zA-Z]/gmi, "").replace(/\s+/g, "").toUpperCase();
+            if (called_in === answer) {
+                textbox.style.backgroundColor = "#7dff97";
+                textbox.style.color = "black";
+            } else {
+                textbox.style.backgroundColor = "#f56464";
+            }
+        }
+
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nl cnnct</title>
+    <link rel="icon" type="image/x-icon" href="media/icon.png">
+</head>
+<body>
+    <navbar>
+        <a href="puzzle.html"><h1>↤ back to main ↦</h1></a>
+        <h1 onclick="toggle_submit()">↤ call in answer ↦</h1>
+    </navbar>
+    <div class="answer_checker">
+        call in answer:
+        <input type="text" id="answer">
+        <input type="submit" onclick="check_answer()">
+    </div>
+    <div class="puzzle_title">🗙 nl cnnct 🗙</div>
+    <div class="content">
+        <i style="text-align:center; margin:auto; display:flex; justify-content:center;margin-bottom:20px;">y is counted as a vowel.</i>
+        <div id="vowel-clues">
+            <span>BTTRS</span>
+            <span>CLMNT</span>
+            <span>DRWN</span>
+            <span>MSTRD</span>
+            <span>NTHRN</span>
+            <span>NTRL</span>
+            <span>PRNT</span>
+            <span>PRRS</span>
+            <span>PRSTS</span>
+            <span>SLVS</span>
+            <span>STRN</span>
+            <span>SWSH</span>
+            <span>TRMS</span>
+        </div>
+        <hr style="width:100%; background-color:black; color: black;">
+        <ul>
+            <li style="font-weight:bold;">1. Catwoman or Veronica Sawyer, but not Huckleberry Finn</li>
+            <li style="font-weight:bold;">2. Beekeepers</li>
+            <li style="font-weight:bold;">3. WJSN song</li>
+            <li style="font-weight:bold;">4. Thoughts' companion</li>
+            <li style="font-weight:bold;">5. Fugazi song off of Instrument Soundtrack</li>
+            <li style="font-weight:bold;">6. Slaughterhouses</li>
+            <li style="font-weight:bold;">7. One asking for something that belongs to them</li>
+            <li style="font-weight:bold;">8. Unpaid workers</li>
+            <li style="font-weight:bold;">9. He has some finches</li>
+            <li style="font-weight:bold;">10. Completely</li>
+            <li style="font-weight:bold;">11. Fighting call</li>
+            <li style="font-weight:bold;">12. One from Graz, maybe</li>
+            <li style="font-weight:bold;">13. Give money to a landlord</li>
+            <li >Among other things</li>
+            <li>Attracted (to)</li>
+            <li>Benzene derivative</li>
+            <li>Blonde cartoon character</li>
+            <li>Canned fuel</li>
+            <li>Chases</li>
+            <li>Come to a head</li>
+            <li>Crown</li>
+            <li>"Crucify" singer-songwriter</li>
+            <li>Finishes a puzzle</li>
+            <li>Flour mixtures</li>
+            <li>Hotdog condiment</li>
+            <li>i, for example</li>
+            <li>Impartial</li>
+            <li>Italian dessert</li>
+            <li>Leeches and mistletoes</li>
+            <li>Like someone who uses Ed Galbraith's vacuum service</li>
+            <li>Nike logo</li>
+            <li>NYT Bestseller adjective, hyph.</li>
+            <li>People who adhere strictly to the rules</li>
+            <li>Percentages of empty space</li>
+            <li>Pleasant, as weather</li>
+            <li>Result of prolonged computer use</li>
+            <li>Sauvignon Blanc or Pinot Grigio, for one</li>
+            <li>Screen in a baseball stadium</li>
+            <li>Shirt parts</li>
+            <li>Singapore MRT station on the Green Line</li>
+            <li>Speaks like this, he does</li>
+            <li>Spill on the floor, to honor someone</li>
+            <li>Stat!</li>
+            <li>Summoned, as courage</li>
+            <li>They can come in A, AA, or AAA sizes</li>
+            <li>Use a Brother device, maybe</li>
+            <li>Very funny</li>
+            <li>Vocalizes like a cat</li>
+            <li>What bites the dust, according to a song</li>
+            <li>Where Paris is, according to Lauv</li>
+        </ul>
+    </div>
+</body>
+</html>
