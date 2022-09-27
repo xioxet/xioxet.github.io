@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>199</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../prism.css">
+    <link rel="icon" type="image/x-icon" href="../media/icon.png">
+    <script>
+        function showCode() {
+            var codeblock = document.getElementById("codeblock");
+            if (codeblock.style.display === "block") {
+                codeblock.style.display = "none";
+            } else {codeblock.style.display = "block";}
+        }
+    </script>   
+</head>
+<body>
+    <script src="../prism.js"></script>
+    <navbar>
+        <a href="../index.html"><h1>↤ back to main ↦</h1></a>
+        <a href="../projeul.html"><h1>↤ back to project euler ↦</h1></a>
+    </navbar>
+    <header>↤ 199: ↦</header>
+    <h2>Iterative circle packing <a href="https://projecteuler.net/problem=199">🔗</a></h2>
+    <hr>
+    <div class="main">
+        <div class="writeup-container">
+        <div class="writeup">       
+            <div><img class=projeul-img style="display:float; float:right; padding:10px;" src="../media/199.gif"></div>
+            &nbsp;&nbsp; this one should not have taken me as long as it did! going into it, i was aware
+            of <a href="https://https://en.wikipedia.org/wiki/Descartes%27_theorem" class="a-link">descartes theorems</a>
+            on how to calculate the curvature of a circle tangent to three others, as when i was like 13 
+            i went down a big rabbit hole of wanting to draw one in geogebra or something. i always faced difficulty with deriving
+            the centers of the circles, and this time around i did manage to find <a href="https://arxiv.org/pdf/math/0101066v1.pdf" class="a-link"> a paper</a>
+            on it, but i got confused as to how to use it and couldn't make any good visualizations myself.<br><br>
+            &nbsp;&nbsp; you don't even need the centers anyway, just a way to recursively calculate the curvatures of each circle. it took me a very long time
+            to figure out how to recursively calculate them! like. way too long. i kept overshooting the mark and ending up with way more circles than i should've, 
+            but i got it eventually. the way my code works is it starts off with four circles, and the circles are stored as a list.<br><br>
+            &nbsp;&nbsp;the list consists of three items: a set of the other circles it's tangent to, its curvature, and the iteration at which it was generated.
+            we need to keep track of the iteration to prevent over-counting: to 'fill in the gaps' with new circles, we should only consider new circles that will be 
+            tangent to circles generated at the previous step.<br><br>
+            &nbsp;&nbsp;another problem is speed. my code, for some reason, takes way too long to generate the circles, even though there shouldn't be that many. i'm really
+            not sure why this is, and if you look at my code you can probably see some of the functions i used to try and speed it up but alas. i'm really not sure where the 
+            bottleneck is, like at all, but i figured i'd just keep the code running instead of trying to optimize it further. it only took like ten minutes, regardless.<br><br>
+            &nbsp;&nbsp;either way, i thought this was really fun! i love the geometry questions, they lend themselves to some very pretty pictures.<br><br>
+        </div>
+        </div>
+        <button class="show-code-center" onclick="showCode()">show full code</button>
+        <pre id="codeblock" style="display:none;">
+            <code class="language-python">
+from decimal import getcontext, Decimal as d
+getcontext().prec = 15
+
+c = d(3 + 2 * d(3).sqrt()) / d(3)
+
+circles = {
+    0: [{1, 2, 3}, 1, -1],
+    1: [{0, 2, 3}, 1, c],
+    2: [{0, 1, 3}, 1, c],
+    3: [{0, 1, 2}, 1, c]
+}
+
+def get_curvature(k1, k2, k3):
+    k_a = k1 + k2 + k3
+    k_b = 2 * d(k1 * k2 + k2 * k3 + k3 * k1).sqrt()
+    if k_a + k_b > 0:
+        return k_a + k_b
+    else:
+        return k_a - k_b
+
+def filter_keys(iter_count):
+    keys = list()
+    for i in circles:
+        if circles[i][1] == iter_count:
+            keys.append(i)
+    return keys
+
+def iterate():
+    iter_count = circles[len(circles)-1][1]
+    trips = list()
+    curvatures = list()
+    keys = filter_keys(iter_count)
+    for tc1 in keys:
+        c1 = circles[tc1]
+        if c1[1] == iter_count:
+            for tc2 in c1[0]:
+                if tc2 != tc1:
+                    c2 = circles[tc2]
+                    for tc3 in c2[0]:
+                        if tc3 != tc2 and tc3 != tc1:
+                            c3 = circles[tc3]
+                            if tc3 in c1[0] and tc1 in c2[0] and tc1 in c3[0] and tc2 in c3[0]:
+                                k1, k2, k3 = c1[2], c2[2], c3[2]
+                                trip = {tc1, tc2, tc3}
+                                if trip not in trips:
+                                    trips.append(trip)
+                                    if len(trips) % 1000 == 0: print(len(trips))
+                                    curvatures.append(get_curvature(k1, k2, k3))
+    i = len(circles)
+    for trip, curvature in zip(trips, curvatures):
+        circles[i] = [trip, iter_count + 1, curvature]
+        for c in trip:
+            circles[c][0].add(i)
+        i += 1
+
+def iterate_x(x):
+    for i in range(x):
+        iterate()
+        print(i)
+    area = 1
+    for c in circles:
+        r_c = 1 / circles[c][2]
+        if r_c != -1:
+            area -= r_c ** 2
+    print(area)
+
+iterate_x(10)
+            </code>
+        </pre>
+    </div>
+    <div class="logo">⫍⫍</div>
+</body>
+</html>

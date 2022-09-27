@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>144</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../prism.css">
+    <link rel="icon" type="image/x-icon" href="../media/icon.png">
+    <script>
+        function showCode() {
+            var codeblock = document.getElementById("codeblock");
+            if (codeblock.style.display === "block") {
+                codeblock.style.display = "none";
+            } else {codeblock.style.display = "block";}
+        }
+    </script>   
+</head>
+<body>
+    <script src="../prism.js"></script>
+    <navbar>
+        <a href="../index.html"><h1>↤ back to main ↦</h1></a>
+        <a href="../projeul.html"><h1>↤ back to project euler ↦</h1></a>
+    </navbar>
+    <header>↤ 144: ↦</header>
+    <h2>Investigating multiple reflections of a laser beam <a href="https://projecteuler.net/problem=144">🔗</a></h2>
+    <hr>
+    <div class="main">
+        <div class="writeup-container">
+        <div class="writeup">
+            &nbsp;&nbsp;this problem involved having to calculate the reflections of a laser beam, and then figuring out when it would exit the ellipse at a given 'hole'. i did a bit
+            of researching and googling to find out how to a) find the intersection of a line with an ellipse and b) how to reflect a line across another a line, which is
+            really all you need to solve this problem. the function <span class="inline-code">intersection()</span> takes parameters <span class='inline-code'>m, b, x_o</span>
+            where m and b are the gradient and the y-intercept of the line respectively, and x_o is the old "reflection point" so we know to discard it. it then uses <span class="inline-code">reflect()</span> 
+            to calculate the gradient and y-intercept of the line reflected in the ellipse. my code spits out a series of lines you can plug into desmos for some neat visualizations.<br><br>
+            &nbsp;&nbsp;since it only takes <span class="blurred-eul">no more than 500</span> reflections to get the answer, a simple brute-force solution is sufficient. <a class="a-link" href="https://www.desmos.com/calculator/h4ucbcxqxu">here's</a>
+            a link to my neat little desmos visualization, and an image of the graph is shown to the right here.<br><br>
+            &nbsp;&nbsp;at the time of solving this, it was my hardest-rated problem solved, but it was comparatively pretty easy to the other problems, i felt. the calculations aren't too difficult and it's 
+            fun to figure out how to get the reflected lines. i guess it also helps that i really enjoy these geometry problems, they're very neat!
+        </div>
+        <div><img class=projeul-img src="../media/144.jpg"></div>
+        </div>
+        <button class="show-code-center" onclick="showCode()">show full code</button>
+        <pre id="codeblock" style="display:none;">
+            <code class="language-python">
+from math import sqrt
+def estimate(a, b):
+    return abs(a - b) < 0.001
+
+def intersection(m, b, x_o):
+    x1, x2 = (2 * sqrt(-b**2 + 25 * m**2 + 100) - b * m) / (m**2 + 4), 
+             (2 * -sqrt(-b**2 + 25 * m**2 + 100) - b * m) / (m**2 + 4)
+    y1, y2 = m * x1 + b, m * x2 + b
+    if estimate(x_o, x1): return (x2, y2)
+    else: return (x1, y1)
+
+def get_bounds(m, b):
+    x1, x2 = (2 * sqrt(-b**2 + 25 * m**2 + 100) - b * m) / (m**2 + 4), 
+             (2 * -sqrt(-b**2 + 25 * m**2 + 100) - b * m) / (m**2 + 4)
+    if x1 > x2: return x2, x1
+    else:
+        return x1, x2
+
+def reflect(m1, b1, x_o):
+    x2, y2 = intersection(m1, b1, x_o)
+    m2, b2 = -4 * (x2/y2), 100/y2
+    m3 = ((2 * m2) + (m1 * m2 * m2 - m1)) / (2 * m2 * m1 - m2 * m2 +1)
+    b3 = y2 - m3 * x2
+    return m3, b3, x2, m2, b2
+
+m, b = -197/14, 10.1
+x_o = 0
+i = 0
+while True:
+    m, b, x_o, m2, b2 = reflect(m, b, x_o)
+    x1, x2 = get_bounds(m, b)
+    i += 1  
+    print(f"y = {m:.10f}x + {b:.10f} \\left\\{{{x1:.10f} &lt; x &lt; {x2:.5f}\\right\\}}")
+    if x_o &lt;= 0.01 and x_o >= -0.01:
+        if m * x_o + b > 0:
+            print(i)
+            break                 
+            </code>
+        </pre>
+    </div>
+    <div class="logo">⫍⫍</div>
+</body>
+</html>

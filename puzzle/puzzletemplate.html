@@ -1,5 +1,6 @@
 <html lang="en">
 <head>
+    
     <script>
         function toggle_submit(){
             var textbox = document.getElementById('answer');
@@ -12,42 +13,40 @@
             } else {
                 d.style.display = "block";
             }
-            
         }
-
         function check_answer() {
             var textbox = document.getElementById('answer');
-            var answer = "CROSSEYED";
+            var answer = "ANSWER";
             var called_in = textbox.value.replace(/[^a-zA-Z]/gmi, "").replace(/\s+/g, "").toUpperCase();
             if (called_in === answer) {
                 textbox.style.backgroundColor = "#7dff97";
                 textbox.style.color = "black";
             } else {
-                textbox.style.backgroundColor = "red";
+                textbox.style.backgroundColor = "#f56464";
             }
         }
 
     </script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>angry</title>
-    <link rel="icon" type="image/x-icon" href="media/icon.png">
+    <title>thing</title>
+    <link rel="icon" type="image/x-icon" href="../media/icon.png">
 </head>
 <body>
     <navbar>
-        <a href="puzzle.html"><h1>↤ back to main ↦</h1></a>
+        <a href="../puzzle.html"><h1>↤ back to main ↦</h1></a>
         <h1 onclick="toggle_submit()">↤ call in answer ↦</h1>
     </navbar>
     <div class="answer_checker">
         call in answer:
         <input type="text" id="answer">
-        <input type="submit" id="submit" onclick="check_answer()">
+        <input type="submit" onclick="check_answer()">
     </div>
-    <div class="puzzle_title">⚔ angry ⚔</div>
+    <div class="puzzle_title">puzzle title</div>
     <div class="content">
-        <i>author's note: this was written on Crosshare. access it <a id="a_link" href="https://crosshare.org/crosswords/jp2gWYyH2jjZNeItOci3/angry-meta-2">here.</a></i>   
+        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque eius suscipit iusto quo nobis eaque ea vitae optio ab! Eligendi maxime quaerat nihil totam excepturi officia dolor corrupti quas beatae.
     </div>
 </body>
 </html>

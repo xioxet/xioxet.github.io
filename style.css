@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Inconsolata');
+@import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
 
 :root {
     --nice-blue: rgb(50, 120, 125);
@@ -17,6 +18,7 @@ body {
     text-align:center;
     margin-bottom:-20px;
 }
+
 .main {
     margin: auto;
     font-size: 30px;
@@ -42,7 +44,7 @@ navbar {
     display: flex;
 }
 
-h1 {
+h1, h3 {
     margin-inline:10px;
     background-color: var(--nice-blue);
     color: white;
@@ -52,7 +54,7 @@ h1 {
     cursor: pointer;
 }
 
-h1:hover {
+h1:hover, h3:hover {
     background-color: rgb(231, 229, 229);
     color: var(--nice-blue);
     filter: drop-shadow(1 1 1 1 black);
@@ -104,6 +106,11 @@ hr {
 a {
     color: inherit;
     text-decoration: inherit;
+}
+
+.a-link {
+    color:black;
+    text-decoration:underline;
 }
 
 .blurred {
@@ -367,4 +374,129 @@ ul {
     padding:10px;
     margin:10px;
     border-radius:15px;
+}
+
+.projeul-main {
+    margin: auto;
+    font-size: 20px;
+    text-align: center;
+    width: 75%;
+}
+
+.projeul-list {
+    text-align:left;
+    color:black;
+    width:max-content;
+    margin:auto;
+    margin-top:15px;
+}
+
+.projeul-list li {
+    background-color:rgb(236, 236, 236);
+    padding:10px;
+    transition:0.3s;
+    cursor:pointer;
+    border: 1px solid black;
+    border-bottom:none;
+}
+
+.projeul-list li:nth-child(odd){
+    background-color:rgb(253, 253, 253);
+}
+
+.projeul-list li:first-child{
+    background-color:var(--nice-blue);
+    color:white;
+    pointer-events:none;
+    text-align:center;
+    padding-block:5px;
+}
+
+.projeul-list li:last-child{
+    border-bottom:1px solid black;
+}
+
+.projeul-list li:hover {
+    background-color:bisque;
+}
+
+pre {
+    width:75%;
+    margin-top:20px;
+}
+
+.show-code, .show-code-center {
+    font-family:'Inconsolata';
+    font-size:25px;
+    background-color:var(--nice-blue);
+    color:white;
+    border:none;
+    margin-left:35%;
+    border-radius:10px;
+    padding:10px;
+    margin-top:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.show-code:hover, .show-code-center:hover{
+    background-color:lightskyblue;
+    color:black;
+}
+
+h2 {
+    font-weight:bold;
+    font-size:30px;
+    text-align:center;
+    margin:auto;
+}
+
+.writeup {
+    font-size:22px;
+    text-align:left;
+}
+
+.blurred-eul {
+    background-color:black;
+    transition: 0.3s;
+    display: inline-block;
+    color:black;
+}
+
+.blurred-eul:hover{
+    background-color:white;
+    color:var(--nice-blue);
+    text-shadow: none;
+
+}
+
+.inline-code {
+    background-color: rgb(16, 15, 15);
+    padding-inline:5px;
+    color:rgb(252, 225, 183);
+    border-radius:5px;
+}
+
+.projeul-img {
+    max-height:400px;
+    min-height:100px;
+    margin:auto;
+    padding:10px;
+}
+
+.writeup-container {
+    display:flex;
+}
+
+.show-code-center {
+    margin:auto;
+    text-align:center;
+    width:auto;
+}
+
+h3 {
+    text-align:center;
+    width:fit-content;
+    margin:auto;
+    margin-top:15px;
 }

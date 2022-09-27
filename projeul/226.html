@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>226</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../prism.css">
+    <link rel="icon" type="image/x-icon" href="../media/icon.png">
+    <script>
+        function showCode() {
+            var codeblock = document.getElementById("codeblock");
+            if (codeblock.style.display === "block") {
+                codeblock.style.display = "none";
+            } else {codeblock.style.display = "block";}
+        }
+    </script>   
+</head>
+<body>
+    <script src="../prism.js"></script>
+    <navbar>
+        <a href="../index.html"><h1>↤ back to main ↦</h1></a>
+        <a href="../projeul.html"><h1>↤ back to project euler ↦</h1></a>
+    </navbar>
+    <header>↤ 226: ↦</header>
+    <h2>A scoop of blancmange <a href="https://projecteuler.net/problem=226">🔗</a></h2>
+    <hr>
+    <div class="main">
+        <div class="writeup-container">
+        <div class="writeup">
+            <div><img class=projeul-img style="display:float; float:right; padding:10px;" src="../media/224.png"></div>
+            &nbsp;&nbsp;more geometry! :D this one was really fun, and i feel like i learned a lot.
+            the first step was to find that leftmost intersection point, we obviously can't differentiate 
+            the blancmange function so newton's method is out of the question. instead, i used <a href="https://en.wikipedia.org/wiki/Steffensen%27s_method" class="a-link">
+            this method,</a> made by a guy called steffensen. we'll need a good way to calculate <span class="inline-code">blanc(x)</span> first, so using
+            the Decimal class i kept going through the infinite sum until it converges to a suitable precision. it doesn't take that many steps, only sixty or so,
+            so calculating it is pretty fast. <span class="inline-code">circle(x)</span> is easy enough to implement too, taking only the bottom half of the circle.
+            then, we define <span class='inline-code'>f(x) = blanc(x) - circle(x)</span> and iterate steffensen's method a few times until getting our leftmost root. simple!<br><br>
+            &nbsp;&nbsp; i made heavy use of the Decimal class and set the precision to 20, this was probably overkill but it didn't slow things down too much. anyways, the only step left is to
+            numerically integrate, basically just summing up <span class="inline-code">f(x)</span> rectangles with <span class="inline-code">dx = 0.00001</span>. i originally tried 
+            using scipy's built-in integration functions, but that was no good and making one myself was better.
+        </div>
+        </div>
+        <br><button class="show-code-center" onclick="showCode()">show full code</button>
+        <pre id="codeblock" style="display:none;">
+            <code class="language-python">
+from math import asin, floor
+from decimal import Decimal as d
+from decimal import getcontext
+getcontext().prec = 20
+
+def s(x): # sawtooth wave
+    frac = x - floor(x)
+    if frac > 0.5:
+        return 1 - frac
+    elif frac &lt;= 0.5:
+        return frac
+
+def blanc(x): 
+    total = d(0)
+    n = 0
+    while True:
+        add = d(s(2 ** n * x)) / d((2 ** n))
+        if add &lt; d(0.0000000000001): break
+        total += add
+        n += 1
+    return total
+
+def circle(x): # this is only the bottom half of the circle
+    return d(0.5) * (1 - d(2).sqrt() * d(x - 2 * x ** 2).sqrt())
+
+# root approximation functions, 
+def f(x):
+    return blanc(x) - circle(x)
+
+def g(x):
+    return d(f(d(x) + f(x))) / d(f(x)) - 1
+
+#x = d(0.0789)
+#for n in range(50):
+#    x -= f(x) / g(x)
+#    print(x)
+# root achieved = 0.078907787965353832596
+
+r1 = d(0.078907787965353832596)
+r2 = 0.5
+
+def n_int(function, step_size, r1, r2):
+    area = 0
+    i = r1
+    while i &lt; r2:
+        area += function(i) * step_size
+        i += step_size
+    return area
+
+print(n_int(f, d(0.00001), r1, r2))
+             
+            </code>
+        </pre>
+    </div>
+    <div class="logo">⫍⫍</div>
+</body>
+</html>
