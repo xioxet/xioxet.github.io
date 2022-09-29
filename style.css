@@ -38,7 +38,7 @@ header {
 navbar {
     font-size: 50%;
     margin: auto;
-    width: 50%;
+    width: fit-content;
     text-align: center;
     justify-content: center;
     display: flex;
@@ -51,6 +51,7 @@ h1, h3 {
     padding:10px;
     border-radius: 25px;
     transition: 0.3s;
+    width:fit-content;
     cursor: pointer;
 }
 
@@ -499,4 +500,29 @@ h3 {
     width:fit-content;
     margin:auto;
     margin-top:15px;
+}
+
+.bezier-gif {
+    margin:25px;
+    width: inherit;
+}
+
+.bezier-gif img {
+    width:100%;
+}
+
+.bezier-gif span {
+    color:white;
+    position:absolute;
+    padding-left:10px;
+    padding-top:10px;
+}
+
+.bezier-gifs {
+    width:fit-content;
+    display:flex;
+    margin:auto;
+    align-items:center;
+    justify-content:center;
+
 }
