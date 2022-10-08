@@ -1,0 +1,283 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>quiz</title>
+    <link href="style.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="media/icon.png">
+</head>
+<body>
+    <header>↤ emo or jazz? ↦</header>
+    <navbar>
+        <a href='index.html'><h1>↤ back to main ↦</h1></a>
+    </navbar>
+    <div class="question-main">
+        here you will answer the age old question: is this song title <b>20th century jazz</b> or <b>2000s emo?</b><br>
+        <button class="quiz-button" onclick="startQuiz()">click here to begin</button>
+    </div>
+    <div id="question-body">
+        <span id='question-number' style="font-size:25px; font-weight:bold;">question 1:</span><br><hr>
+        <span id="question-title"></span><br>
+        <button class="quiz-button" onclick="submitQuestion('Jazz')">Jazz</button>
+        <button class="quiz-button" onclick="submitQuestion('Emo')">Emo</button>
+        <button class="quiz-button" id="next-button" onclick="nextQuestion()">Next question</button>
+        <span id="question-answer"></span>
+        <iframe style="border-radius:12px" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" id="question-link"></iframe>
+    </div>
+    <div id="quiz-complete">
+        <span id="complete-str"></span>
+    </div>
+    </body>
+    <script>
+        var questions = [
+            {
+                "title":"You'll Know When You Get There",
+                "answer":"Jazz",
+                "artist":"Herbie Hancock",
+                "album":"Mwandishi",
+                "link":"https://open.spotify.com/embed/track/64l2PH3K4EO3iwDk86uaLY?utm_source=generator",
+            },
+            {
+                "title":"Life in Drag",
+                "answer":"Emo",
+                "artist":"The Hotelier",
+                "album":"Home, like Noplace is There",
+                "link":"https://open.spotify.com/embed/track/3On4kQk1QELCejP5LD0SC5?utm_source=generator",
+            },
+            {
+                "title":"I Can Hear Your Footsteps Just Outside Camp - a Sah, Sah, Sah...",
+                "answer":"Emo",
+                "artist":"The Newfound Interest in Connecticut",
+                "album":"Tell Me About the Long Dark Path Home",
+                "link":"https://open.spotify.com/embed/track/3Cpzp0AWUTk7gWc9CcNrU9?utm_source=generator"
+            },
+            {
+                "title":"The Chill of Death",
+                "answer":"Jazz",
+                "artist":"Charles Mingus",
+                "album":"Let My Children Hear Music",
+                "link":"https://open.spotify.com/embed/track/104C16Y0cXHAFoRvMyACsa?utm_source=generator"
+            },
+            {
+                "title":"Zombie",
+                "answer":"Jazz",
+                "artist":"Fela Kuti",
+                "album":"Zombie",
+                "link":"https://open.spotify.com/embed/track/3RZoPvPHZsPTTc94DfWSCL?utm_source=generator"
+            },
+            {
+                "title":"Mouths Like Sidewinder Missiles",
+                "answer":"Emo",
+                "artist":"The Fall of Troy",
+                "album":"The Fall of Troy",
+                "link":"https://open.spotify.com/embed/track/0AlCpQIejCPdDNo4TCdVVq?utm_source=generator"
+            },
+            {
+                "title":"Stopover Bombay",
+                "answer":"Jazz",
+                "artist":"Alice Coltrane",
+                "album":"Journey in Satchidananda",
+                "link":"https://open.spotify.com/embed/track/7hZEgSe3xmIE7YSaNsj678?utm_source=generator",
+            },
+            {
+                "title":"A Map Of The Stars",
+                "answer":"Emo",
+                "artist":"The Brave Little Abacus",
+                "album":"Masked Dancers",
+                "link":"https://open.spotify.com/embed/track/0mCXZfEyBa7rNrcbLHAg8M?utm_source=generator"
+            },
+            {
+                "title":"Everytime We Say Goodbye",
+                "answer":"Jazz",
+                "artist":"John Coltrane",
+                "album":"My Favorite Things",
+                "link":"https://open.spotify.com/embed/track/7tZDxcJeLzyjBKYc7TWbsr?utm_source=generator"
+            },
+            {
+                "title":"Between the Devil and the Deep Blue Sea",
+                "answer":"Jazz",
+                "artist":"Thelonious Monk",
+                "album":"Straight, No Chaser",
+                "link":"https://open.spotify.com/embed/track/33vcuPi3HWgf8APeJMYYoz?utm_source=generator"
+            },
+            {
+                "title":"If You Don't, Don't",
+                "answer":"Emo",
+                "artist":"Jimmy Eat World",
+                "album":"Bleed American",
+                "link":"https://open.spotify.com/embed/track/5prYdqVZFzoOBj33WFTdJu?utm_source=generator",       
+            },
+            {
+                "title":"Committed to the Con",
+                "answer":"Emo",
+                "artist":"Alexisonfire",
+                "album":"Otherness",
+                "link":"https://open.spotify.com/embed/track/5gZ29XT8xSsdCEflTfWUyy?utm_source=generator",       
+            },
+            {
+                "title":"The Blankets Were The Stairs",
+                "answer":"Emo",
+                "artist":"Sunny Day Real Estate",
+                "album":"Diary",
+                "link":"https://open.spotify.com/embed/track/0UJrVU9h8FuwlLTnwX560V?utm_source=generator",       
+            },
+            {
+                "title":"A Lotus on Irish Streams",
+                "answer":"Jazz",
+                "artist":"Mahavishnu Orchestra",
+                "album":"The Inner Mounting Flame",
+                "link":"https://open.spotify.com/embed/track/3odTQxlfUKBKnyDIhrug8T?utm_source=generator",       
+            },
+            {
+                "title":"Cast Your Fate To The Wind",
+                "answer":"Jazz",
+                "artist":"Vince Guaraldi",
+                "album":"Jazz Impressions of Black Orpheus",
+                "link":"https://open.spotify.com/embed/track/2Uyv4IymecQUPjKchJKC3R?utm_source=generator",       
+            },
+            {
+                "title":"Brother Trying To Catch A Cab (On The East Side) Blues",
+                "answer":"Jazz",
+                "artist":"Branford Marsalis",
+                "album":"I Heard You Twice The First Time",
+                "link":"https://open.spotify.com/embed/track/6fkCmWi6CBcwzZKWRJ2v3Y?utm_source=generator",       
+            },
+            {
+                "title":"Begin the Beguine",
+                "answer":"Jazz",
+                "artist":"Cole Porter",
+                "album":"none",
+                "link":"https://open.spotify.com/embed/track/6A0XYRVq2qhCm8yuETUzdm?utm_source=generator",       
+            },
+            {
+                "title":"Ra Patera Dance",
+                "answer":"Emo",
+                "artist":"The World Is A Beautiful Place And I Am No Longer Afraid To Die",
+                "album":"Harmlessness",
+                "link":"https://open.spotify.com/embed/track/5BFrtCfvO3s9sxHppD45sa?utm_source=generator",       
+            },
+            {
+                "title":"As Far As You Can Throw Me",
+                "answer":"Emo",
+                "artist":"Gospel",
+                "album":"The Moon Is a Dead World",
+                "link":"https://open.spotify.com/embed/track/34Li083i2KdBPKPy6uEeSB?utm_source=generator",       
+            },
+            {
+                "title":"Make Everyone Happy / Mechanical Birds",
+                "answer":"Emo",
+                "artist":"Modest Mouse",
+                "album":"This Is a Long Drive for Someone With Nothing to Think About",
+                "link":"https://open.spotify.com/embed/track/0PlnyEdmQp2iIf6qAiWOgO?utm_source=generator",       
+            },
+        ]
+
+        var quiz_started = false;
+        var question_num = 1;
+        var picked_qns = [];
+        var ind = 0;
+        var score = 0;
+        var current_question;
+        var submitted = false;
+
+        var title = document.getElementById('question-title');
+        var q_answer = document.getElementById('question-answer');
+        var next_button = document.getElementById('next-button');
+        var q_body = document.getElementById('question-body');
+        var q_number = document.getElementById('question-number');
+        var q_link = document.getElementById('question-link');
+        var q_complete = document.getElementById('quiz-complete');
+        var s_span = document.getElementById('complete-str')
+
+        function resetVars() {
+            quiz_started = false;
+            question_num = 1;
+            picked_qns = [];
+            ind = 0;
+            score = 0;
+            current_question;
+            submitted = false;
+            q_body.style.backgroundColor = "#EEEEEE";
+            q_complete.style.display = "none";
+            q_answer.style.display = "none";
+            next_button.style.display = "none";
+            q_link.style.display = "none";
+        }
+
+        function startQuiz() {
+            resetVars();
+            if (!quiz_started) {
+                quiz_started = true;
+                var question_body = document.getElementById('question-body')
+                question_body.style.display = "block";
+                getQuestion();
+                setQuestion();
+            }
+        }
+        
+        function getQuestion() {
+            if (picked_qns.length == questions.length) {return;}
+            while (true) {
+                ind = Math.floor((Math.random() * questions.length));
+                console.log(ind);
+                if (!picked_qns.includes(ind)) {break;}
+            }
+            picked_qns.push(ind);
+            current_question = questions[ind];
+        }
+
+        function setQuestion() {
+            title.innerHTML = current_question.title;
+            q_number.innerHTML = `question ${question_num}`
+        }
+
+        function submitQuestion(answer) {
+            if (!submitted) {
+                submitted = true;
+                console.log(answer);
+                var ans_text = ""
+                title.style.fontWeight = "bold";
+                if (current_question.answer == answer) {
+                    q_body.style.backgroundColor = '#daf5d0';
+                    ans_text += "You were correct! ";
+                    score++;
+                }
+                else {
+                    q_body.style.backgroundColor = '#ffc4c4';
+                    ans_text += "You were wrong! ";
+                }
+                var s_title = current_question.title;
+                var s_artist = current_question.artist;
+                var s_album = current_question.album;
+
+                if (s_album != 'none') {
+                    ans_text += `${s_title} is a song by ${s_artist} on the album ${s_album}.`
+                } else {ans_text += `${s_title} is a song by ${s_artist}.`}
+                q_answer.innerHTML = ans_text;
+                q_answer.style.display = "block";
+                q_link.src = current_question.link;
+                q_link.style.display = "block";
+                next_button.style.display = "block";
+            }
+        }
+
+        function nextQuestion() {
+            question_num++;
+            if (question_num <= 10) {
+                getQuestion();
+                setQuestion();
+                q_answer.style.display = "none";
+                next_button.style.display = "none";
+                q_body.style.backgroundColor = "#EEEEEE";
+                q_link.style.display = "none";
+                submitted = false;
+            } else {
+                q_body.style.display = "none";
+                q_complete.style.display = "block";
+                s_span.innerHTML = `You scored a total of ${score} out of 10! Click the button above to have another round.`
+                quiz_started = false;
+            }
+        }
+    </script> 
+</html>

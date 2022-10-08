@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
 
 :root {
-    --nice-blue: rgb(50, 120, 125);
+    --nice-blue: rgb(63, 107, 166);
 }
 
 body {
@@ -306,7 +306,7 @@ ul {
     background-color:black;
 }
 
-.automaton-button {
+.automaton-button, .quiz-button {
     font-family:'Inconsolata';
     font-size:25px;
     background-color:var(--nice-blue);
@@ -319,7 +319,7 @@ ul {
     transition:0.3s;
 }
 
-.automaton-button:hover{
+.automaton-button:hover, .quiz-button:hover{
     background-color:lightskyblue;
     color:black;
 }
@@ -525,4 +525,41 @@ h3 {
     align-items:center;
     justify-content:center;
 
+}
+
+#question-body, .question-main, #quiz-complete {
+    width:50%;
+    text-align:center;
+    margin:auto;
+    font-size:20px;
+}
+
+#question-body, #quiz-complete {
+    margin-top:20px;
+    background-color:#EEEEEE;
+    padding:25px;
+    display:none;
+}
+
+#question-title {
+    font-size:25px;
+}
+
+.quiz-button {
+    font-size:20px;
+}
+
+#question-answer, #question-link {
+    display:none;
+    margin-top:10px;
+}
+
+#next-button {
+    display:none;
+    margin:auto;
+    margin-top:10px;
+}
+
+#quiz-complete {
+    display:none;
 }
