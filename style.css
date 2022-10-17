@@ -563,3 +563,17 @@ h3 {
 #quiz-complete {
     display:none;
 }
+
+#random-color {
+    position:absolute;
+    top:10;
+    right:30;
+    background-color:var(--nice-blue);
+    font-family:'Inconsolata';
+    color:white;
+    border:none;
+    font-size:20px;
+    padding:10px;
+    border-radius:15px;
+    cursor:pointer;
+}
