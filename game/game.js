@@ -131,10 +131,15 @@ function submit() {
                     c++;
                 }
             }
-            score += c * input.length;
-            game_score.innerHTML = `score: ${score}`;
-            word_history.push([input, c * input.length]);
-            game_input.value = "";
+            if (c == 0) {
+                game_text.innerHTML = 'no matches!';
+                game_input.style.color = "red";
+            } else {
+                score += c * input.length;
+                game_score.innerHTML = `score: ${score}`;
+                word_history.push([input, c * input.length]);
+                game_input.value = "";
+            }
         } else {
             game_text.innerHTML = 'invalid word!';
             game_input.style.color = "red";
