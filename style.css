@@ -306,7 +306,7 @@ ul {
     background-color:black;
 }
 
-.automaton-button, .quiz-button {
+.automaton-button, .quiz-button, .g-button {
     font-family:'Inconsolata';
     font-size:25px;
     background-color:var(--nice-blue);
@@ -319,7 +319,7 @@ ul {
     transition:0.3s;
 }
 
-.automaton-button:hover, .quiz-button:hover{
+.automaton-button:hover, .quiz-button:hover, .g-button:hover{
     background-color:lightskyblue;
     color:black;
 }
@@ -685,4 +685,29 @@ h3 {
     margin:20px;
     border-radius:5px;
     color:white;
+}
+
+.g-button {
+    display:none;
+}
+
+#options {
+    display:none;
+    margin:auto;
+    margin-top:25px;
+    margin-bottom:25px;
+    width:50%;
+    padding:50px;
+    background:#EEEEEE;
+}
+
+.game-options {
+    margin-top:10px;
+    margin-bottom:25px;
+}
+
+.word-history {
+    display: none;
+    font-size:15px;
+    color: var(--nice-blue);
 }

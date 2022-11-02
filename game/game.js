@@ -28,12 +28,31 @@ var game_input = document.getElementById('game-input');
 var game_submit = document.getElementById('game-submit');
 var game_board = document.getElementById('cell-board');
 var ending = document.getElementById('ending');
-var time_delay = 2000;
+var initial_delay_slider = document.getElementById('initial-delay')
+var initial_delay = initial_delay_slider.value;
+var speedup_delay_slider = document.getElementById('speedup-delay')
+var speedup_delay = speedup_delay_slider.value;
 var solution_limit = 450;
 var count = 0;
 var input_length = 0;
 var score = 0;
 var speed_up;
+var options = document.getElementById('options');
+var word_history = [];
+var history_element = document.getElementById('word-history');
+
+function slider_update(id_label, id_slider) {
+    var label = document.getElementById(id_label);
+    label.innerHTML = `${id_label} = ${document.getElementById(id_slider).value}`
+}
+
+function toggle_options() {
+    if (options.style.display == "none") {
+        options.style.display = "block"
+    } else {
+        options.style.display = "none"
+    }
+}
 
 function generate_prompts() {
     for (const word of wordlist) {
@@ -53,19 +72,20 @@ function generate_prompts() {
 function game_over() {
     var inactive_cells = get_inactive_cells();
     if (inactive_cells.length == 0) {
+        history_element.innerHTML = ""
+        for (const word in word_history) {
+            var li = document.createElement("li");
+            li.innerHTML = `${word_history[word][0]} for ${word_history[word][1]} points`;
+            history_element.append(li);
+        }
         ending.style.display = "block";
+        history_element.style.display = "block";
         clearInterval(game_timer);
         clearInterval(speed_up);
         document.documentElement.style.setProperty('--nice-blue', '#BB0000');
         ending.style.display = "block";
         ending.innerHTML = `game over! your final score was ${score}. click above to play again.`
         game = false;
-    }
-}
-
-function set_cells(color) {
-    for (const cell of cells) {
-        cell.style.backgroundColor = color;
     }
 }
 
@@ -101,26 +121,31 @@ function random_cell() {
 
 function submit() {
     input = game_input.value.toLowerCase();
-    if (wordlist.has(input)) {
-        score += c * input_length;
-        game_score.innerHTML = `score: ${score}`
-        game_input.value = "";
-        for (const cell of cells) {
-            if (cell.classList.contains('active')) {
-                if (input.includes(cell.innerHTML)) {
-                    cell.classList.remove('active');
-                    console.log(prompts[cell.innerHTML]);
-                    cell.innerHTML = "";
+    if (game) {
+        if (wordlist.has(input)) {
+            score += c * input_length;
+            word_history.push([input, c * input_length]);
+            game_score.innerHTML = `score: ${score}`
+            game_input.value = "";
+            for (const cell of cells) {
+                if (cell.classList.contains('active')) {
+                    if (input.includes(cell.innerHTML)) {
+                        cell.classList.remove('active');
+                        console.log(prompts[cell.innerHTML]);
+                        cell.innerHTML = "";
+                    }
                 }
             }
+        } else {
+            game_text.innerHTML = 'invalid word!';
+            game_input.style.color = "red";
         }
-    } else {
-        game_text.innerHTML = 'invalid word!';
     }
 }
 
 function update_on_press() {
     c = 0;
+    game_input.style.color = "var(--nice-blue)"
     input = game_input.value.toLowerCase();
     input_length = input.length;
     for (const cell of cells) {
@@ -146,29 +171,37 @@ game_input.addEventListener("keypress", function(event) {
 )
 
 function make_faster() {
-    if (time_delay > 500) {
-        time_delay -= 100;
+    if (initial_delay > 500) {
+        initial_delay -= 100;
     }
     clearInterval(game_timer);
-    game_timer = window.setInterval(assign_prompt, time_delay);
-    console.log(time_delay)
+    game_timer = window.setInterval(assign_prompt, initial_delay);
+    assign_prompt();
+    console.log(initial_delay)
 }
 
 function set_game() {
     if (!game) {
         ending.style.display = "none";
+        history_element.style.display = "none";
         document.documentElement.style.setProperty('--nice-blue', 'rgb(63, 107, 166)');
         score = 0;
-        time_delay = 2000;
+        game_input.value = "";
+        initial_delay = initial_delay_slider.value;
         game_display.style.display = "block";
         game_score.innerHTML = `score: ${score}`
-        game = true;    
-        game_timer = window.setInterval(assign_prompt, time_delay);
-        speed_up = window.setInterval(make_faster, 5000);
+        game = true;
+        word_history = [];
+        window.location.href = "#input";
+        game_timer = window.setInterval(assign_prompt, initial_delay);
+        speed_up = window.setInterval(make_faster, speedup_delay);
         for (const cell of cells) {
             cell.innerHTML = "";
             if (cell.classList.contains('active')) {
                 cell.classList.remove('active')
+            } 
+            if (cell.classList.contains('selected')) {
+                cell.classList.remove('selected')
             }
         }
         assign_prompt()
