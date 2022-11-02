@@ -125,7 +125,6 @@ function submit() {
     if (game) {
         if (wordlist.has(input)) {
             game_score.innerHTML = `score: ${score}`
-            game_input.value = "";
             for (const cell of cells) {
                 if (input.includes(cell.innerHTML)) {
                     cell.classList.remove('active');
@@ -136,6 +135,7 @@ function submit() {
             }
             score += c * input_length;
             word_history.push([input, c * input_length]);
+            game_input.value = "";
         } else {
             game_text.innerHTML = 'invalid word!';
             game_input.style.color = "red";
