@@ -151,6 +151,7 @@ function make_faster() {
     }
     clearInterval(game_timer);
     game_timer = window.setInterval(assign_prompt, time_delay);
+    console.log(time_delay)
 }
 
 function set_game() {
@@ -163,12 +164,11 @@ function set_game() {
         game_score.innerHTML = `score: ${score}`
         game = true;    
         game_timer = window.setInterval(assign_prompt, time_delay);
-        speed_up = window.setInterval(make_faster, 2000);
+        speed_up = window.setInterval(make_faster, 5000);
         for (const cell of cells) {
             cell.innerHTML = "";
             if (cell.classList.contains('active')) {
                 cell.classList.remove('active')
-                console.log('yes')
             }
         }
         assign_prompt()
