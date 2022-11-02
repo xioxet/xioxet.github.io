@@ -1,19 +1,19 @@
 var w = "";
 var wordlist = new Set();
-var qb = document.getElementById('game-button')
-var loading = document.getElementById('loading')
+var qb = document.getElementById('game-button');
+var loading = document.getElementById('loading');
 
 function get_words() {
     fetch("https://raw.githubusercontent.com/xioxet/xioxet.github.io/main/game/words.json")
-    .then((res) => res.json())
-    .then((data) => {
-        console.log('done');
-        w = data['words'];
-        wordlist = new Set(w);
-        generate_prompts();
-        loading.style.display = "none";
-        qb.style.display = "inline-block";
-    });
+        .then((res) => res.json())
+        .then((data) => {
+            console.log('done');
+            w = data['words'];
+            wordlist = new Set(w);
+            generate_prompts();
+            loading.style.display = "none";
+            qb.style.display = "inline-block";
+        });
 }
 
 get_words();
@@ -28,13 +28,12 @@ var game_input = document.getElementById('game-input');
 var game_submit = document.getElementById('game-submit');
 var game_board = document.getElementById('cell-board');
 var ending = document.getElementById('ending');
-var initial_delay_slider = document.getElementById('initial-delay')
+var initial_delay_slider = document.getElementById('initial-delay');
 var initial_delay = initial_delay_slider.value;
-var speedup_delay_slider = document.getElementById('speedup-delay')
+var speedup_delay_slider = document.getElementById('speedup-delay');
 var speedup_delay = speedup_delay_slider.value;
 var solution_limit = 450;
 var count = 0;
-var input_length = 0;
 var score = 0;
 var speed_up;
 var options = document.getElementById('options');
@@ -43,14 +42,14 @@ var history_element = document.getElementById('word-history');
 
 function slider_update(id_label, id_slider) {
     var label = document.getElementById(id_label);
-    label.innerHTML = `${id_label} = ${document.getElementById(id_slider).value}`
+    label.innerHTML = `${id_label} = ${document.getElementById(id_slider).value}`;
 }
 
 function toggle_options() {
     if (options.style.display == "none") {
-        options.style.display = "block"
+        options.style.display = "block";
     } else {
-        options.style.display = "none"
+        options.style.display = "none";
     }
 }
 
@@ -63,7 +62,7 @@ function generate_prompts() {
             }
             prompts[prompt]++;
             if (prompts[prompt] > solution_limit && !suitable_prompts.includes(prompt)) {
-                suitable_prompts.push(prompt)
+                suitable_prompts.push(prompt);
             }
         }
     }
@@ -72,7 +71,7 @@ function generate_prompts() {
 function game_over() {
     var inactive_cells = get_inactive_cells();
     if (inactive_cells.length == 0) {
-        history_element.innerHTML = ""
+        history_element.innerHTML = "";
         for (const word in word_history) {
             var li = document.createElement("li");
             li.innerHTML = `${word_history[word][0]} for ${word_history[word][1]} points`;
@@ -84,7 +83,7 @@ function game_over() {
         clearInterval(speed_up);
         document.documentElement.style.setProperty('--nice-blue', '#BB0000');
         ending.style.display = "block";
-        ending.innerHTML = `game over! your final score was ${score}. click above to play again.`
+        ending.innerHTML = `game over! your final score was ${score}. click above to play again.`;
         game = false;
     }
 }
@@ -106,7 +105,7 @@ function get_inactive_cells() {
             inactive_cells.push(cell);
         }
     }
-    return inactive_cells
+    return inactive_cells;
 }
 
 function random_cell() {
@@ -114,19 +113,18 @@ function random_cell() {
     if (inactive_cells.length == 0) {
         return 0;
     } else {
-    var cell = inactive_cells[Math.floor(Math.random() * inactive_cells.length)];
-    return cell;
+        var cell = inactive_cells[Math.floor(Math.random() * inactive_cells.length)];
+        return cell;
     }
 }
 
 function submit() {
-    input = game_input.value.toLowerCase();
+    input = game_input.value.toLowerCase().replace(/[^a-z]/g, '');
     c = 0;
     if (game) {
         if (wordlist.has(input)) {
-            game_score.innerHTML = `score: ${score}`
             for (const cell of cells) {
-                if (input.includes(cell.innerHTML)) {
+                if (input.includes(cell.innerHTML) && cell.classList.contains('active')) {
                     cell.classList.remove('active');
                     console.log(prompts[cell.innerHTML]);
                     cell.innerHTML = "";
@@ -134,6 +132,7 @@ function submit() {
                 }
             }
             score += c * input.length;
+            game_score.innerHTML = `score: ${score}`;
             word_history.push([input, c * input.length]);
             game_input.value = "";
         } else {
@@ -146,7 +145,7 @@ function submit() {
 function update_on_press() {
     c = 0;
     game_input.style.color = "var(--nice-blue)"
-    input = game_input.value.toLowerCase();
+    input = game_input.value.toLowerCase().replace(/[^a-z]/g, '');
     for (const cell of cells) {
         if (cell.classList.contains('selected')) {
             cell.classList.remove('selected');
@@ -158,10 +157,10 @@ function update_on_press() {
             }
         }
     }
-    game_text.innerHTML = `${c} * ${input.length} = ${c * input.length}`
+    game_text.innerHTML = `${c} * ${input.length} = ${c * input.length}`;
 }
 
-game_input.addEventListener("keypress", function(event) {
+game_input.addEventListener("keypress", function (event) {
     if (event.key === "Enter") {
         event.preventDefault();
         game_submit.click();
@@ -176,7 +175,7 @@ function make_faster() {
     clearInterval(game_timer);
     game_timer = window.setInterval(assign_prompt, initial_delay);
     assign_prompt();
-    console.log(initial_delay)
+    console.log(initial_delay);
 }
 
 function set_game() {
@@ -188,7 +187,7 @@ function set_game() {
         game_input.value = "";
         initial_delay = initial_delay_slider.value;
         game_display.style.display = "block";
-        game_score.innerHTML = `score: ${score}`
+        game_score.innerHTML = `score: ${score}`;
         game = true;
         word_history = [];
         window.location.href = "#input";
@@ -197,13 +196,13 @@ function set_game() {
         for (const cell of cells) {
             cell.innerHTML = "";
             if (cell.classList.contains('active')) {
-                cell.classList.remove('active')
-            } 
+                cell.classList.remove('active');
+            }
             if (cell.classList.contains('selected')) {
-                cell.classList.remove('selected')
+                cell.classList.remove('selected');
             }
         }
-        assign_prompt()
-        assign_prompt()
+        assign_prompt();
+        assign_prompt();
     }
 }
