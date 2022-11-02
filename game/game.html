@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>griddle</title>
     <link rel="stylesheet" href="../style.css">
+    <link rel="icon" type="image/x-icon" href="../media/icon.png">
 </head>
 <body>
     <header>↤ griddle ↦</header>
@@ -14,9 +15,12 @@
     <hr>
     <div class="game-bio">
         the goal of this game is to find english words that contain the substrings that show up in the grid. see how long you can last before the entire grid fills up.
-        <button class="quiz-button" onclick="set_game()">click here to begin</button>  
+        <br><hr>
+        <span id="loading">loading..</span>
+        <button id="game-button" class="quiz-button" onclick="set_game()">click here to begin</button>  
     </div>
     <div id="game">
+        <div id="ending">game over!</div>
         <div id="score">score: 0</div>
         <div id="cell-board">
             <div class="cell"></div>
@@ -36,10 +40,10 @@
             <div class="cell"></div>
             <div class="cell"></div>
         </div>
-        <input type="text" id="game-input" onkeyup="update_color()">
+        <input type="text" id="game-input" onkeyup="update_on_press()">
         <button id="game-submit" onclick="submit()">submit</button>
         <div id="game-text"></div>
     </div>
 </body>
-<script type="module" src="game.js"></script>
+<script src="game.js"></script>
 </html>
