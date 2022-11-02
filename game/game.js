@@ -127,13 +127,11 @@ function submit() {
             game_score.innerHTML = `score: ${score}`
             game_input.value = "";
             for (const cell of cells) {
-                if (cell.classList.contains('active')) {
-                    if (input.includes(cell.innerHTML)) {
-                        cell.classList.remove('active');
-                        console.log(prompts[cell.innerHTML]);
-                        cell.innerHTML = "";
-                        c++;
-                    }
+                if (input.includes(cell.innerHTML)) {
+                    cell.classList.remove('active');
+                    console.log(prompts[cell.innerHTML]);
+                    cell.innerHTML = "";
+                    c++;
                 }
             }
             score += c * input_length;
