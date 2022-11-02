@@ -133,8 +133,8 @@ function submit() {
                     c++;
                 }
             }
-            score += c * input_length;
-            word_history.push([input, c * input_length]);
+            score += c * input.length;
+            word_history.push([input, c * input.length]);
             game_input.value = "";
         } else {
             game_text.innerHTML = 'invalid word!';
