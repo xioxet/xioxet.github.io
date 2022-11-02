@@ -577,3 +577,102 @@ h3 {
     border-radius:15px;
     cursor:pointer;
 }
+
+#game {
+    display: none;
+    margin:auto;
+    min-height: 500px;
+    width:50%;
+    margin-top:25px;
+    border: 10px solid var(--nice-blue);
+    padding:25px;
+}
+
+#cell-board {
+    margin:auto;
+    min-height:500px;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr 1fr;
+    grid-template-rows:1fr 1fr 1fr 1fr;
+    grid-gap:10px;
+}
+
+.cell {
+    display:flex;
+    border: 1px solid black;
+    border-radius:25px;
+    text-align:center;
+    font-size:45px;
+    justify-content:center;
+    align-items:center;
+}
+
+@keyframes fade-in-active {
+    from {background-color: white; color:var(--nice-blue);}
+    to {background-color: var(--nice-blue); color:white;}
+}
+
+.active {
+    animation-name: fade-in-active;
+    animation-duration:0.2s;
+    background-color:var(--nice-blue);
+    color:white;
+}
+
+#game-input {
+    margin:auto;
+    width:50%;
+    margin-top:20px;
+    height:50px;
+    border:3px solid var(--nice-blue);
+    font-size:25px;
+    font-family:'Inconsolata';
+}
+
+#game-submit {
+    width:25%;
+    margin-left:20px;
+    height:45px;
+    font-size:25px;
+    font-family:'Inconsolata';
+    background-color:var(--nice-blue);
+    color:white;
+    border-radius:20px;
+    border:none;
+    transition:0.3s;
+    cursor:pointer;
+}
+
+#game-submit:hover {
+    background-color:white;
+    color:var(--nice-blue);
+    border:1px solid black;
+}
+
+.selected {
+    background-color:antiquewhite;
+    color:black;
+}
+
+#score {
+    font-size:25px;
+    text-align:center;
+    padding:10px;
+    margin-bottom:20px;
+    background-color:var(--nice-blue);
+    color:white;
+    border-radius: 3px;
+}
+
+#game-text {
+    font-size:25px;
+    margin-top:5px;
+    font-style:italic;
+}
+
+.game-bio {
+    font-size:25px;
+    width:65%;
+    margin:auto;
+    text-align:center;
+}
