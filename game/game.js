@@ -121,11 +121,9 @@ function random_cell() {
 
 function submit() {
     input = game_input.value.toLowerCase();
-    input_length = input.length;
+    c = 0;
     if (game) {
         if (wordlist.has(input)) {
-            score += c * input_length;
-            word_history.push([input, c * input_length]);
             game_score.innerHTML = `score: ${score}`
             game_input.value = "";
             for (const cell of cells) {
@@ -134,9 +132,12 @@ function submit() {
                         cell.classList.remove('active');
                         console.log(prompts[cell.innerHTML]);
                         cell.innerHTML = "";
+                        c++;
                     }
                 }
             }
+            score += c * input_length;
+            word_history.push([input, c * input_length]);
         } else {
             game_text.innerHTML = 'invalid word!';
             game_input.style.color = "red";
@@ -148,7 +149,6 @@ function update_on_press() {
     c = 0;
     game_input.style.color = "var(--nice-blue)"
     input = game_input.value.toLowerCase();
-    input_length = input.length;
     for (const cell of cells) {
         if (cell.classList.contains('selected')) {
             cell.classList.remove('selected');
@@ -160,7 +160,7 @@ function update_on_press() {
             }
         }
     }
-    game_text.innerHTML = `${c} * ${input_length} = ${c * input_length}`
+    game_text.innerHTML = `${c} * ${input.length} = ${c * input.length}`
 }
 
 game_input.addEventListener("keypress", function(event) {
