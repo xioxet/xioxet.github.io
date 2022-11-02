@@ -121,6 +121,7 @@ function random_cell() {
 
 function submit() {
     input = game_input.value.toLowerCase();
+    input_length = input.length;
     if (game) {
         if (wordlist.has(input)) {
             score += c * input_length;
