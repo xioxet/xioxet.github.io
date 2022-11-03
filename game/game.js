@@ -15,8 +15,10 @@ function get_words() {
     fetch("https://raw.githubusercontent.com/xioxet/xioxet.github.io/main/game/prompts.json")
         .then((res) => res.json())
         .then((data) => {
-            console.log('prompts done');
-            prompts = new Set(data); 
+            console.log('prompts done');    
+            generate_prompts(data);
+            loading.style.display = "none";
+            qb.style.display = "inline-block";
         });
 }
 
@@ -56,17 +58,10 @@ function toggle_options() {
     }
 }
 
-function generate_prompts() {
-    for (const word of wordlist) {
-        for (var i = 0; i < word.length - 2; i++) {
-            var prompt = (word.slice(i, i + 3));
-            if (!prompts.hasOwnProperty(prompt)) {
-                prompts[prompt] = 0;
-            }
-            prompts[prompt]++;
-            if (prompts[prompt] > solution_limit && !suitable_prompts.includes(prompt)) {
-                suitable_prompts.push(prompt);
-            }
+function generate_prompts(prompts) {
+    for (const [key, value] of Object.entries(prompts)) {
+        if (value > solution_limit) {
+            suitable_prompts.push(key);
         }
     }
 }
