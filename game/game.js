@@ -1,18 +1,22 @@
 var w = "";
 var wordlist = new Set();
 var qb = document.getElementById('game-button');
+var prompts = new Set();
 var loading = document.getElementById('loading');
 
 function get_words() {
     fetch("https://raw.githubusercontent.com/xioxet/xioxet.github.io/main/game/words.json")
         .then((res) => res.json())
         .then((data) => {
-            console.log('done');
+            console.log('words done');
             w = data['words'];
             wordlist = new Set(w);
-            generate_prompts();
-            loading.style.display = "none";
-            qb.style.display = "inline-block";
+        });
+    fetch("https://raw.githubusercontent.com/xioxet/xioxet.github.io/main/game/prompts.json")
+        .then((res) => res.json())
+        .then((data) => {
+            console.log('prompts done');
+            prompts = new Set(data); 
         });
 }
 
@@ -21,7 +25,6 @@ var game = false;
 var game_display = document.getElementById('game');
 var game_text = document.getElementById('game-text');
 var game_score = document.getElementById('score')
-var prompts = {};
 var suitable_prompts = [];
 var cells = document.getElementsByClassName('cell');
 var game_input = document.getElementById('game-input');
