@@ -194,6 +194,7 @@ function set_game() {
         game = true;
         word_history = [];
         window.location.href = "#input";
+        game_input.focus();
         game_timer = window.setInterval(assign_prompt, initial_delay);
         speed_up = window.setInterval(make_faster, speedup_delay);
         for (const cell of cells) {
