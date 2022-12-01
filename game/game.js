@@ -164,7 +164,7 @@ function update_on_press() {
 }
 
 game_input.addEventListener("keypress", function (event) {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" || event.key === "Spacebar") {
         event.preventDefault();
         game_submit.click();
     }
