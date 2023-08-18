@@ -8,6 +8,7 @@ var wordList = [
 ]
 const rowDivs = gameContainer.querySelectorAll('.row');
 var tickCount = 0;
+var gameInterval;
 
 // give all row characters their own span tag
 rowDivs.forEach(rowDiv => {
@@ -20,21 +21,24 @@ rowDivs.forEach(rowDiv => {
 });
 
 
+var gameTable = []
+gameContainer.querySelectorAll('div').forEach(row =>
+    gameTable.push(row.children)
+)
+
 function getCoordinates(x, y) {
-    var row = gameContainer.querySelector(`.row:nth-child(${y})`)
-    if (row) {
-        const spanTags = row.querySelectorAll('span');
-        return spanTags[(x - 1) % rowLength];
+    x--;
+    y--;
+    if ((y < gameTable.length) && (x < gameTable[0].length)) {
+        return gameTable[y][x]
     }
-    console.log(x, y);
     return null;
 }
 
 function setWord(wordObject) {
     for (var i = wordObject.x; i < wordObject.x + wordObject.word.length; i++) {
         var spanTag = getCoordinates(i, wordObject.y)
-        if (typeof(spanTag) == "undefined")
-            {console.log(wordObject)}
+        console.log(wordObject)
         var letter = wordObject.word[i - wordObject.x]
         spanTag.innerText = letter;
         if (wordObject.dead) 
@@ -69,7 +73,6 @@ function addWord() {
         'dead': false,
     }
     activeWords.push(wordObject);
-    activeWords.sort((a, b) => a.y  - b.y)
 }
 
 
@@ -83,12 +86,8 @@ function willCollide(wordObject) {
     activeWords
     .filter(w => w.y == wordObject.y + 1)
     .forEach(activeWord => {
-        console.log(activeWord);
         for (var i = activeWord.x; i < activeWord.x + activeWord.word.length; i++) {
             var coords = JSON.stringify([i, activeWord.y]);
-            console.log(cellsBelowWord);
-            console.log(coords);
-            console.log(cellsBelowWord.indexOf(coords));
             if (cellsBelowWord.indexOf(coords) != -1) {
                 found = true;
             }
@@ -102,6 +101,12 @@ function iterate() {
         var activeWord = activeWords[i];
         if (activeWord.y == gameHeight || willCollide(activeWord)) {
             activeWord.dead = true
+            if (activeWord.y == 1) {
+                // trigger game end
+                alert('Game ended!');
+                activeWords = [];
+                clearInterval(gameInterval);
+            }
         } else {
             activeWord.y = activeWord.y + 1
         }
@@ -112,9 +117,11 @@ function iterate() {
     })
 }
 
-var gameInterval = setInterval(function() {
-    tickCount++;
-    console.log(tickCount);
-    if (tickCount % 2 == 0) {addWord()}
-    iterate()
-}, 500)
+function start() {
+    gameInterval = setInterval(function() {
+        tickCount++;
+        console.log(tickCount);
+        if (tickCount % 2 == 0) {addWord()}
+        iterate()
+    }, 500)
+}
