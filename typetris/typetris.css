@@ -2,11 +2,35 @@
     font-size: 25px;
 }
 
+.gameContainer {
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    width: 50%;
+    margin-top: 20px;
+}
+
+.gameInfo {
+    margin-left:0;
+    border-radius: 2px dotted black;
+    padding-inline: 20px;
+    padding-block: 5px;
+    height: fit-content;
+    text-align: left;
+    font-size: 15px;
+    font-family:'Verdana';
+    width: 80%;
+}
+
+.gameInfo > label {
+    font-weight: bold;
+    text-decoration:underline;
+}
+
 #game {
     border: 1px dotted black;
     border-radius: 5px;
     width: fit-content;
-    margin: auto;
     padding: 20px;
     font-family: 'Consolas';
 }
@@ -33,4 +57,15 @@ h1 {
     margin-bottom: 10px; 
     font-family:'Consolas'; 
     cursor:pointer;
+    transition: 0.3s;
+}
+
+#startButton:hover {
+    background-color: gray;
+    color:black;
+}
+
+#kiaiInfo {
+    font-weight: bold;
+    font-size: 20px;
 }

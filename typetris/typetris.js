@@ -6,6 +6,7 @@ var gameHeight;
 var loadingInfo;
 var gameInput; 
 var rowDivs;
+var gameInfo;
 
 
 // game variables 
@@ -14,14 +15,17 @@ var tickCount = 0;
 var gameInterval;
 var gameTable = [];
 var wordList = [];
-var tickInterval = 500;
-
-function processWords(array) {
-    return array
-            .filter(str => 7 > str.length && str.length >= 4)
-            .map(str => str.toUpperCase())
-            .filter(str => /^[A-Z*$]/.test(str))
-}
+var tickInterval = 300;
+var minLength = 4;
+var maxLength = 7;
+var score = 0;
+var combo = 0;
+var kiais = [
+    "GOOD!",
+    "GREAT!",
+    "AWESOME!",
+    "MARVELOUS!",
+]
 
 async function loadEnglishText() {
     try {
@@ -30,8 +34,7 @@ async function loadEnglishText() {
         throw new Error('Network response was not ok');
       }
       const fileContent = await response.json();
-      console.log(fileContent, typeof(fileContent))
-      return processWords(fileContent);
+      return fileContent;
     } catch (error) {
       console.error('Error loading English text:', error);
       return null;
@@ -70,6 +73,18 @@ window.onload = function () {
                 submit(gameInput.value);
             }
         })
+
+        // initialize gameInfo object
+
+        gameInfo = {
+            "score": document.getElementById('scoreInfo'),
+            "speed": document.getElementById('speedInfo'),
+            "min": document.getElementById('minInfo'),
+            "max": document.getElementById('maxInfo'),
+            "level": document.getElementById('levelInfo'),
+            "kiai": document.getElementById('kiaiInfo'),
+            "combo": document.getElementById('comboInfo')
+        }
 
         loadingInfo.innerText = "finished loading!";
     }
@@ -122,8 +137,15 @@ function resetBoard() {
     }
 }
 
+function getRandomWord() {
+    var randomLength = (Math.floor(Math.random() * (maxLength + 1 - minLength))) + minLength
+    var randomWordList = wordList[randomLength]
+    var randomWord = randomWordList[Math.floor(Math.random() * randomWordList.length)]
+    return randomWord
+}
+
 function addWord() {
-    var randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+    var randomWord = getRandomWord()
     var randomX = Math.floor(Math.random() * rowLength);
     if (randomX + randomWord.length > rowLength) {
         randomX = randomX - randomWord.length;
@@ -199,21 +221,86 @@ function start() {
         if (tickCount % 2 == 0) {addWord()}
         iterate()
     }, tickInterval)
+
+    // show info
+    gameInfo.score.innerText = score;
+    gameInfo.min.innerText = minLength;
+    gameInfo.max.innerText = maxLength;
+    gameInfo.speed.innerText = `${tickInterval / 1000}.s`
 }
 
 function stop() {
     clearInterval(gameInterval);
 }
 
+
 function submit(wordInput) {
     wordInput = wordInput.toUpperCase();
+    var found = false;
+
+    // iterate through all words and find matches
     for (var i = 0; i < activeWords.length; i++) {
         var activeWord = activeWords[i]
         console.log(activeWord)
         if (activeWord.word == wordInput && !activeWord.dead) {
             activeWords.splice(i, 1)
+            found = true;
+
+            // calculate score
+            combo++;
+            var wordScore = activeWord.word.length;
+            if (activeWord.y < 4) {
+                var heightBonus = true; wordScore = Math.floor(wordScore * 1.5);
+            } else { var heightBonus = false; }
+            var comboMultiplier = 1 + (0.5 * Math.floor(combo / 10))
+            wordScore = Math.floor(wordScore * comboMultiplier);
+            score += wordScore;
+            gameInfo.score.innerText = score;
+            gameInfo.combo.innerText = combo;
+
+            // generate kiai
+            var kiaiText = `WORD: ${activeWord.word}!\nBASE SCORE: ${activeWord.word.length}`
+            if (heightBonus) {
+                kiaiText += `\nHEIGHT BONUS! x1.5`
+            }
+            if (comboMultiplier > 1) {
+                kiaiText += `\nCOMBO BONUS! x${comboMultiplier}`
+            }
+            kiaiText += `\nTOTAL SCORE: ${wordScore}!`
+            if (wordScore < 5) {
+                kiaiText += `\n${kiais[0]}`
+                gameInfo.kiai.style.color = '';
+            }
+            if (5 <= wordScore && wordScore < 10) {
+                kiaiText += `\n${kiais[1]}`; 
+                gameInfo.kiai.style.color = 'red';
+            }
+            if (10 <= wordScore && wordScore < 15) {
+                kiaiText += `\n${kiais[2]}`;
+                gameInfo.kiai.style.color = 'green';
+            }
+            if (15 <= wordScore) {
+                kiaiText += `\n${kiais[3]}`;
+                gameInfo.kiai.style.color = 'gold';
+            }
+            gameInfo.kiai.innerText = kiaiText
             resetWord(activeWord)
         }
+    }
+
+    console.log(found);
+    // if no word found, turn input border red, otherwise turn it green
+    if (found) {
+        gameInput.style.backgroundColor = "green";
+        gameInput.style.border = "2px solid black";
+        gameInput.style.color = "white";
+    } else {
+        gameInput.style.backgroundColor = "red"
+        gameInput.style.border = "2px solid black";
+        gameInput.style.color = "white";
+        combo = 0;
+        gameInfo.kiai.innerText = "COMBO BROKEN!"
+        gameInfo.kiai.style.color = "maroon";
     }
     gameInput.value = "";
 }
