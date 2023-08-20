@@ -9,6 +9,9 @@
 <body>
     <br>
     <h1>typetris</h1>
+    <h2 id="loadingInfo">loading wordlist..</h2>
+    <button id="startButton" onClick="start()">start</button>
+    <br>
     <div id="game">
         <div class="row" id="1">....................</div>
         <div class="row" id="2">....................</div>
@@ -26,11 +29,8 @@
         <div class="row" id="14">....................</div>
         <div class="row" id="15">....................</div>
         <div class="row" id="16">....................</div>
-        <div class="row" id="17">....................</div>
-        <div class="row" id="18">....................</div>
-        <button onclick="iterate()">Iterate</button>
-        <button onclick="addWord()">Add word</button>
-        <button onclick="start()">Start</button>
+        <br>
+        <input type='text' id='gameInput' style="border: 3px solid #386fa4;  width: 90%; font-size: 20px; font-family:'Consolas';">
     </div>
     <script src="typetris.js" type="application/javascript">
     </script>

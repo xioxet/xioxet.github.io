@@ -1,23 +1,20 @@
-var gameContainer = document.getElementById('game');
-var rowLength = document.getElementsByClassName('row')[0].innerHTML.length;
-var gameHeight = document.getElementsByClassName('row').length
+// doc elements
+
+var gameContainer;
+var rowLength;
+var gameHeight;
+var loadingInfo;
+var gameInput; 
+var rowDivs;
+
+
+// game variables 
 var activeWords = [];
-const rowDivs = gameContainer.querySelectorAll('.row');
 var tickCount = 0;
 var gameInterval;
 var gameTable = [];
 var wordList = [];
-
-// give all row characters their own span tag
-rowDivs.forEach(rowDiv => {
-    gameTable.push(rowDiv.children);
-    const rowText = rowDiv.textContent;
-    const newRowContent = rowText
-        .split('')
-        .map(char => `<span>${char}</span>`)
-        .join('');
-    rowDiv.innerHTML = newRowContent;
-});
+var tickInterval = 500;
 
 function processWords(array) {
     return array
@@ -41,13 +38,43 @@ async function loadEnglishText() {
     }
 }
 
-(async () => {
-  const englishText = await loadEnglishText();
-  if (englishText) {
-    wordList = englishText;
-    console.log(wordList);
-  }
-})();
+window.onload = function () {
+    (async () => {
+    const englishText = await loadEnglishText();
+    if (englishText) {
+        wordList = englishText;
+        console.log(wordList);
+
+        // load all elements 
+
+        loadingInfo = document.getElementById('loadingInfo');
+        gameContainer = document.getElementById('game');
+        rowLength = document.getElementsByClassName('row')[0].innerHTML.length;
+        gameHeight = document.getElementsByClassName('row').length;
+        rowDivs = document.querySelectorAll('.row');
+        gameInput = document.getElementById('gameInput')
+
+        rowDivs.forEach(rowDiv => {
+            gameTable.push(rowDiv.children);
+            const rowText = rowDiv.textContent;
+            const newRowContent = rowText
+                .split('')
+                .map(char => `<span>${char}</span>`)
+                .join('');
+            rowDiv.innerHTML = newRowContent;
+        });
+
+        gameInput.addEventListener('keypress', function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                submit(gameInput.value);
+            }
+        })
+
+        loadingInfo.innerText = "finished loading!";
+    }
+    })();
+}
 
 function getCoordinates(x, y) {  
     x--;
@@ -79,16 +106,19 @@ function getCellsCoveredByWord(word) {
     return cellsList
 }
 
+function resetWord(word) {
+    for (const coords of getCellsCoveredByWord(word)) {
+        var [x, y] = coords;
+        if (y > 0) {
+            var spanTag = getCoordinates(x, y);
+            spanTag.innerText = ".";
+            spanTag.classList = "";
+        }
+    }
+}
 function resetBoard() {
     for (const word of activeWords) {
-        for (const coords of getCellsCoveredByWord(word)) {
-            var [x, y] = coords;
-            if (y > 0) {
-                var spanTag = getCoordinates(x, y);
-                spanTag.innerText = ".";
-                spanTag.classList = "";
-            }
-        }
+        resetWord(word);
     }
 }
 
@@ -155,13 +185,35 @@ function iterate() {
 
 
 function start() {
+    // reset everything
+    activeWords = [];
+    for (const row of gameTable) {
+        for (const cell of row) {
+            cell.classList = "";
+            cell.innerText = ".";
+        }
+    }
+    //
     gameInterval = setInterval(function() {
         tickCount++;
         if (tickCount % 2 == 0) {addWord()}
         iterate()
-    }, 500)
+    }, tickInterval)
 }
 
 function stop() {
     clearInterval(gameInterval);
+}
+
+function submit(wordInput) {
+    wordInput = wordInput.toUpperCase();
+    for (var i = 0; i < activeWords.length; i++) {
+        var activeWord = activeWords[i]
+        console.log(activeWord)
+        if (activeWord.word == wordInput && !activeWord.dead) {
+            activeWords.splice(i, 1)
+            resetWord(activeWord)
+        }
+    }
+    gameInput.value = "";
 }

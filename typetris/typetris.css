@@ -22,3 +22,15 @@ h1 {
 .black {
     color: black;
 }
+
+
+#startButton {
+    background-color: #386fa4; 
+    border: none; 
+    color: white; 
+    font-size: 20px; 
+    padding:5px; margin-top: -10px;
+    margin-bottom: 10px; 
+    font-family:'Consolas'; 
+    cursor:pointer;
+}
