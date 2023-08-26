@@ -15,11 +15,15 @@ var tickCount = 0;
 var gameInterval;
 var gameTable = [];
 var wordList = [];
-var tickInterval = 300;
+var tickInterval = 500;
 var minLength = 4;
 var maxLength = 7;
+var maxCap = 15;
+var timeCap = 300;
 var score = 0;
 var combo = 0;
+var level = 1;
+var wordCount = 0;
 var kiais = [
     "GOOD!",
     "GREAT!",
@@ -215,6 +219,11 @@ function start() {
             cell.innerText = ".";
         }
     }
+
+    score = 0;
+    combo = 0;
+    tickInterval = 500;
+    wordCount = 0;
     //
     gameInterval = setInterval(function() {
         tickCount++;
@@ -227,6 +236,7 @@ function start() {
     gameInfo.min.innerText = minLength;
     gameInfo.max.innerText = maxLength;
     gameInfo.speed.innerText = `${tickInterval / 1000}.s`
+    gameInfo.kiai.innerText = '';
 }
 
 function stop() {
@@ -248,6 +258,7 @@ function submit(wordInput) {
 
             // calculate score
             combo++;
+            wordCount++;
             var wordScore = activeWord.word.length;
             if (activeWord.y < 4) {
                 var heightBonus = true; wordScore = Math.floor(wordScore * 1.5);
@@ -269,38 +280,80 @@ function submit(wordInput) {
             kiaiText += `\nTOTAL SCORE: ${wordScore}!`
             if (wordScore < 5) {
                 kiaiText += `\n${kiais[0]}`
-                gameInfo.kiai.style.color = '';
+                gameInfo.kiai.style.color = 'black';
+                gameContainer.style.border = "2px dotted black";
             }
             if (5 <= wordScore && wordScore < 10) {
                 kiaiText += `\n${kiais[1]}`; 
-                gameInfo.kiai.style.color = 'red';
+                gameInfo.kiai.style.color = '#CD7F32';
+                gameContainer.style.border = "2px dotted #CD7F32";
             }
             if (10 <= wordScore && wordScore < 15) {
                 kiaiText += `\n${kiais[2]}`;
-                gameInfo.kiai.style.color = 'green';
+                gameInfo.kiai.style.color = '#C0C0C0';
+                gameContainer.style.border = "2px dotted #CD7F32";
             }
             if (15 <= wordScore) {
                 kiaiText += `\n${kiais[3]}`;
-                gameInfo.kiai.style.color = 'gold';
+                gameInfo.kiai.style.color = '#FFD700';
+                gameContainer.style.border = "2px dotted #FFD700"
             }
+
+            if (combo % 10 == 0) {
+                kiaiText += `\nCOMBO BONUS INCREASED!`
+            }
+
+            if (wordCount % 10 == 0) {
+                kiaiText += `\nTHE GAME JUST GOT HARDER!`
+            }
+            if (wordCount % 20 == 0) {
+                kiaiText += `\nTHE GAME JUST GOT FASTER!`
+            }
+
+            console.log(wordCount)
             gameInfo.kiai.innerText = kiaiText
             resetWord(activeWord)
+
+            // leveling - 1 level per 10 words
+            level = Math.ceil(wordCount / 10);
+
+            console.log(level);
+            if (wordCount % 10 == 0 && maxLength < maxCap) {
+                maxLength++;
+                gameInfo.max.innerText = maxLength;
+            }
+
+            if (wordCount % 20 == 0) { 
+                if (tickInterval > timeCap) {
+                    clearInterval(gameInterval);
+                    tickInterval = tickInterval - 50;
+                    gameInterval = setInterval(function() {
+                        tickCount++;
+                        if (tickCount % 2 == 0) {addWord()}
+                        iterate()
+                    }, tickInterval)
+                    gameInfo.level.speed = `${tickInterval / 1000}s`
+                }   
+                if (minLength < maxLength - 2) {
+                    minLength++;
+                    gameInfo.min.innerText = minLength;
+                }
+            }
+            gameInfo.level.innerText = level;
+
         }
     }
 
     console.log(found);
     // if no word found, turn input border red, otherwise turn it green
-    if (found) {
-        gameInput.style.backgroundColor = "green";
-        gameInput.style.border = "2px solid black";
-        gameInput.style.color = "white";
-    } else {
+    if (!found) {
         gameInput.style.backgroundColor = "red"
         gameInput.style.border = "2px solid black";
         gameInput.style.color = "white";
         combo = 0;
         gameInfo.kiai.innerText = "COMBO BROKEN!"
         gameInfo.kiai.style.color = "maroon";
+        gameContainer.style.border = "2px dotted maroon";
     }
     gameInput.value = "";
 }

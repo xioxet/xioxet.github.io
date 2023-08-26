@@ -3,15 +3,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="index.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".center-image").click(function() {
+                $(this).toggleClass("inverted");
+            });
+        });
+    </script>
     <title>xioxet</title>
 </head>
 <body>
     <br>
-    <h1>˚✧₊:･༚･゜.⁎⁺˳༚ landing page ₊.*༚･༚･*⁎⁺˳:✧༚･</h1>
-    <marquee behavior="alternate" width=500 height=500 style="border: 1px solid black;" scrollamount=10 scrolldelay="6">
-        <marquee behavior="alternate" height=500 direction="down" scrollamount=12 scrolldelay=6>
-            <img src="media/main/cat-jam.gif" width="100" height="100">
+    <h1 class="one">WHAT HUGE IMAGO MADE A PSYCHOPATHIC GOD?</h1>
+    <h1 class="two">WHAT HUGE IMAGO MADE A PSYCHOPATHIC GOD?</h1>
+    <h1 class="three">WHAT HUGE IMAGO MADE A PSYCHOPATHIC GOD?</h1>
+    <h1 class="four">WHAT HUGE IMAGO MADE A PSYCHOPATHIC GOD?</h1>
+    <div class="center-image-container">
+        <img src="media/main/rotating.gif" alt="Center Image" class="center-image">
+        <div class="overlay-text">
+            Had Moses seen how my friend's face blushes when he is drunk, and his beautiful curls and wonderful hands, he would not have written in his Torah: do not lie with a man.
+        </div>
+        <div class="banner"></div>
+    </div>
+
+    <br><br>
+
+    <div class="p-para" data-value="We'd sit next to each other, a vanishing distance apart, and the distance would grow and splinter, and spread throughout the countryside like the arms of a tumor reaching into healthy tissue, undying, leeching, free.">
+        We'd sit next to each other, a vanishing distance apart, and the distance would grow and splinter, and spread throughout the countryside like the arms of a tumor reaching into healthy tissue, undying, leeching, free.
+    </div>
+
+    <br><br><br>
+    <div class="footer">
+        <marquee scrolldelay=60 scrollamount=5>
+            When I put my hands on your body on your flesh I feel the history of that body. Not just the beginning of its forming in that distant lake but all the way beyond its ending. I feel the warmth and texture and simultaneously I see the flesh unwrap from the layers of fat and disappear. I see the fat disappear from the muscle. I see the muscle disappearing from around the organs and detaching iself from the bones. I see the organs gradually fade into transparency leaving a gleaming skeleton gleaming like ivory that slowly resolves until it becomes dust. I am consumed in the sense of your weight, the way your flesh occupies momentary space the fullness of it beneath my palms. I am amazed at how perfectly your body fits to the curves of my hands. If I could attach our blood vessels so we could become each other I would. If I could attach our blood vessels in order to anchor you to the earth to this present time I would. If I could open up your body and slip inside your skin and look out your eyes and forever have my lips fused with yours I would. It makes me weep to feel the history of your flesh beneath my hands in a time of so much loss. It makes me weep to feel the movement of your flesh beneath my palms as you twist and turn over to one side to create a series of gestures to reach up around my neck to draw me nearer. All these memories will be lost in time like tears in the rain.
         </marquee>
-    </marquee>
+    </div>
+
+    <script>
+        const letters = "qwertyuiopasdfghjklzxcvbnm";
+
+        let interval = null;
+
+        document.querySelector(".p-para").onmouseover = event => {  
+        let iteration = 0;
+        
+        clearInterval(interval);
+        
+        interval = setInterval(() => {
+            event.target.innerText = event.target.innerText
+            .split("")
+            .map((letter, index) => {
+                if(index < iteration || letter == " ") {
+                return event.target.dataset.value[index];
+                }
+            
+                return letters[Math.floor(Math.random() * 26)]
+            })
+            .join("");
+            
+            if(iteration >= event.target.dataset.value.length){ 
+            clearInterval(interval);
+            }
+            
+            iteration += 1;
+        }, 30);
+        }
+    </script>
 </body>
 </html>
