@@ -1,25 +1,25 @@
-.row {
-    font-size: 25px;
+body {
+    background-color: black;
+    color: white;
 }
 
 .gameContainer {
     display: flex;
     margin: auto;
-    justify-content: center;
-    width: 50%;
+    justify-content: space-between;
+    width: 45%;
     margin-top: 20px;
+    
 }
 
 .gameInfo {
-    margin-left:0;
-    border-radius: 2px dotted black;
     padding-inline: 20px;
     padding-block: 5px;
     height: fit-content;
     text-align: left;
     font-size: 15px;
     font-family:'Verdana';
-    width: 80%;
+    width: 50%;
 }
 
 .gameInfo > label {
@@ -28,15 +28,22 @@
 }
 
 #game {
-    border: 1px dotted black;
+    border: 1px dotted white;
     border-radius: 5px;
     width: fit-content;
     padding: 20px;
+    margin-inline: 20px;
     font-family: 'Consolas';
+    font-size: 20px;
 }
 
 h1 {
     font-size: 50px;
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
 }
 
 .red {
@@ -44,7 +51,7 @@ h1 {
 }
 
 .black {
-    color: black;
+    color: white;
 }
 
 
@@ -53,19 +60,24 @@ h1 {
     border: none; 
     color: white; 
     font-size: 20px; 
-    padding:5px; margin-top: -10px;
-    margin-bottom: 10px; 
+    padding:5px;
     font-family:'Consolas'; 
     cursor:pointer;
     transition: 0.3s;
+    background-color: white;
+    color: black;
+    margin-inline: 50%;
+    transform: translate(-50%, 0);
 }
 
 #startButton:hover {
     background-color: gray;
-    color:black;
+    color:white;
 }
 
 #kiaiInfo {
     font-weight: bold;
     font-size: 15px;
 }
+
+\

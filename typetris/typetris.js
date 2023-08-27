@@ -135,9 +135,10 @@ function resetWord(word) {
         }
     }
 }
+
 function resetBoard() {
     for (const word of activeWords) {
-        resetWord(word);
+        if (!word.dead) {resetWord(word);}
     }
 }
 

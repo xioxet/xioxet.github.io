@@ -43,6 +43,7 @@ h1 {
     left: -300;
     color: rgba(255, 255, 255, 0.1);
 }
+
 .center-image-container {
     width: 100%;
     margin: auto;
@@ -55,6 +56,10 @@ h1 {
     width: 45%;
     border-radius: 1000px;
     cursor: pointer;
+}
+
+.center-image:hover {
+    border: 2px solid red;
 }
 
 .overlay-text {
@@ -141,29 +146,4 @@ marquee {
     color: red;
     border: 2px solid red;
     cursor: default;
-}
-
-
-.diamond {
-    background-color: white;
-    width: 200px;
-    height: 200px;
-    transform: rotate3d(0,0,1,45deg) skew(10deg,10deg) translate(-75%, -50%);
-    margin: auto;
-    margin-block: 250px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-}
-
-.diamond-container {
-    position: relative;
-    margin: auto;
-}
-
-.diamond-text {
-    position: absolute;
-    color: red;
-    left: 50%;
-    top: 50%;
 }
