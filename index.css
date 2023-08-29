@@ -4,11 +4,18 @@
   }
 
 
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     text-align: center;
     background-color: black;
     color:white;
     font-family: 'Courier New';
+    overflow-y: hidden;
 }
 
 h1 {
@@ -47,15 +54,16 @@ h1 {
 .center-image-container {
     width: 100%;
     margin: auto;
-    margin-top: 100px;
+    margin-top: 150px;
     position: relative;
     pointer-events: none;
 }
 
 .center-image {
-    width: 45%;
+    width: 40%;
     border-radius: 1000px;
     cursor: pointer;
+    filter: invert(1);
 }
 
 .center-image:hover {
@@ -146,4 +154,69 @@ marquee {
     color: red;
     border: 2px solid red;
     cursor: default;
+}
+
+.white-body {
+    background-color: white;
+    color: black;
+    width: 100%;
+    height: 450px;
+    margin-top: 50px;
+    position: relative;
+    font-family: 'Title';
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+}
+
+.white-body-para {
+    text-transform:lowercase;
+    text-align: right;
+    align-self: flex-end;
+    margin-left: auto;
+    margin-right: 20px;
+
+}
+
+.white-body-para-overlay {
+    text-transform:lowercase;
+    position: absolute;
+    text-align: right;
+    right: 5%;
+    bottom: 5%;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.cupid {
+    position:absolute;
+    height: 150%;
+    left: -7%; 
+    top: -25%;
+}
+
+.cupid-overlay {
+    position: absolute;
+    height: 150%;
+    left: -6.5%;
+    top: -24.5%;
+    transition: 0.3s;
+    filter: invert(16%) sepia(94%) saturate(6519%) hue-rotate(358deg) brightness(125%) contrast(114%);
+}
+
+.cupid-overlay:hover {
+    opacity: 1;
+}
+
+
+.about-me {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: black;
+    color: white;
+    padding: 50px;
+    font-size: 20px;
+    width: 25%;
+    border-right: 5px solid gray;
+    border-bottom: 5px solid gray;
 }
