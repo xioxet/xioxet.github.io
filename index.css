@@ -135,7 +135,7 @@ h1 {
     background: linear-gradient(transparent 0%, black 100%);
 }
 
-marquee {
+.bottom-marquee {
     text-transform: uppercase;
     padding:5px 0 2px;
 }
@@ -212,11 +212,19 @@ marquee {
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    background-color: black;
-    color: white;
+    border: 2px solid black;
     padding: 50px;
     font-size: 20px;
     width: 25%;
-    border-right: 5px solid gray;
-    border-bottom: 5px solid gray;
+}
+
+.angel-marquee {
+    position: absolute;
+    left: 5%;
+    top: 50%;
+    transform: rotate(-30deg);
+    background-color: black;
+    color: white;
+    width: 125%;
+    overflow-y: hidden;
 }
