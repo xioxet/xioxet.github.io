@@ -158,6 +158,7 @@ h1 {
 
 .white-body {
     background-color: white;
+    background-image: url('media/main/sticks.gif');
     color: black;
     width: 100%;
     height: 450px;
@@ -212,19 +213,113 @@ h1 {
     position: absolute;
     left: 50%;
     transform: translate(-50%, 0);
-    border: 2px solid black;
-    padding: 50px;
+    background-color:red;
+    color: white;
     font-size: 20px;
-    width: 25%;
+    padding: 10px;
+    z-index: 3;
 }
 
 .angel-marquee {
     position: absolute;
-    left: 5%;
-    top: 50%;
+    overflow-y: hidden;
+    height:fit-content;
+    width: calc(450px / sin(30deg) + 250px);
+    margin-top: calc(450px / 2); 
     transform: rotate(-30deg);
+    font-family:'Georgia';
     background-color: black;
     color: white;
-    width: 125%;
-    overflow-y: hidden;
+}
+
+.a-1 {
+    margin-left: -25%;
+}
+
+.a-2 {
+    margin-left: -20%;
+}
+
+.a-3 {
+    margin-left: -15%;
+}
+
+.angel-marquee-container > div {
+    position: relative;
+}
+
+.angel-marquee-container {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+}
+
+.black-para-container {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+.black-para {
+    width: 25%;
+    text-align: left;
+    margin-top: -20px;
+    position: absolute;
+    left: 25px;
+    font-family: 'Consolas';
+}
+
+
+.cudgels-container {
+    width: 45%;
+    margin: auto;
+    margin-left: 3%;
+    margin-top: 50px;
+    position: relative;
+}
+
+.cudgels {
+    width: 100%;
+}
+
+.cudgel-caption {
+    position: absolute;
+    left: 50%;
+    bottom: -5%;
+    z-index: 2;
+    height: fit-content;
+    width: 50%;
+    background-color: rgba(255, 255, 255, 0.7);
+    text-align: left;
+    overflow: scroll;
+    color: black;
+    padding: 20px;
+    font-weight: bold;
+}
+
+.lying-figure {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    height: 75%;
+}
+
+.eva {
+    margin-top: 20px;
+    text-align: left;
+    font-family: 'Times New Roman';
+    font-weight: bold;
+    transform: scaleX(79%);
+    max-width: 75%;
+    margin: auto;
+}
+
+.eva-header {
+    font-size: 125px;
 }
