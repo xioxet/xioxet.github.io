@@ -19,7 +19,7 @@ body {
 }
 
 h1 {
-    font-size: 5vw;
+    font-size: 10vw;
     font-family:'Title';
     position: absolute;
     white-space: nowrap;
@@ -28,25 +28,25 @@ h1 {
 }
 
 .one {
-    top: -10vh;
+    top: -25vh;
     left: -225;
     color: white;
 }
 
 .two {
-    top: -5vh;
+    top: -20vh;
     left: -250;
     color: rgba(255, 255, 255, 0.7);
 }
 
 .three {
-    top: 0vh;
+    top: -15vh;
     left: -275;
     color: rgba(255, 255, 255, 0.4);
 }
 
 .four {
-    top: 5vh;
+    top: -10vh;
     left: -300;
     color: rgba(255, 255, 255, 0.1);
 }
@@ -218,6 +218,13 @@ h1 {
     font-size: 20px;
     padding: 10px;
     z-index: 3;
+    box-sizing: border-box;
+    border: 5px solid rgba(0, 0, 0, 0.0);
+}
+
+.about-me:hover {
+    border: 5px solid black;
+    cursor: pointer;
 }
 
 .angel-marquee {
@@ -318,8 +325,29 @@ h1 {
     transform: scaleX(79%);
     max-width: 75%;
     margin: auto;
+    position: relative;
 }
 
 .eva-header {
     font-size: 125px;
+}
+
+.more-about {
+    width: 30%;
+    display: none;
+    position: absolute;
+    height: 0px;
+    left: 75%;
+    top: 50%;
+    background-color: black;
+    color: white;
+    border: 5px solid red;
+    overflow: hidden;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    padding: 20px;
+    font-size: 15px;
+    text-align: justify;
+    font-family: 'Arial';
+    font-weight: bold;
 }

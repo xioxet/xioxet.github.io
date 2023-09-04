@@ -3,14 +3,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="index.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $(".center-image").click(function() {
-                $(this).toggleClass("inverted");
-            });
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <title>xioxet</title>
 </head>
 <body>
@@ -35,6 +28,11 @@
 
     <div class="white-body">
         <p class="about-me">emilia v. // 17<br>a girl is a gun</p>
+        <div class="more-about">
+            &nbsp;&nbsp;welcome to my website ! i hope you like how it looks. hobbies include compsci, tetris, trying to learn more about web design and making something new. i like writing and there is some of my writing featured on this page. key inspirations include <i>the cyclops</i> by odilon redon, david wojnarowicz, jack lance, god, dan barrett, @hostagekiller on twitter, chris sawyer, arnell's manual on the pepsi logo, kevin shields, hyperplexed + kevin powell on youtube, slime from the yard, and the "hypothetical explanations for the paradox" section on the wikipedia article for the fermi paradox. <br><br>
+
+            &nbsp;&nbsp;i am currently studying. i hope that when i die my hero's death, as foreseen by the fates, i will leave behind a body of work i'll feel proud to call my own.
+        </div>
         <p class="white-body-para">
             Angels singing in a choir<br>
             Oh my Lord, I am on fire<br>
@@ -107,6 +105,37 @@
             iteration += 2;
         }, 30);
         }
+
+        document.getElementsByClassName('about-me')[0].addEventListener('click', function() {
+            var more_about = document.getElementsByClassName('more-about')[0];
+
+            if (more_about.style.display === "none" || more_about.style.display === "") {
+                anime({
+                targets: ".more-about",
+                height: "75%", // 25% of viewport height
+                padding: "20px",
+                border: "5px solid red",
+                duration: 1000, // Animation duration in milliseconds
+                easing: "easeOutExpo", // Easing function for smooth animation
+                begin: function () {
+                    more_about.style.display = "block"; // Show div2 before the animation
+                },
+                });
+            } else {
+                // If div2 is visible, hide it
+                anime({
+                targets: ".more-about",
+                height: 0,
+                padding: 0,
+                duration: 1000,
+                border: "0px solid red",
+                easing: "easeOutExpo",
+                complete: function () {
+                    more_about.style.display = "none"; // Hide div2 after the animation
+                },
+                })
+            };
+        });
     </script>
 </body>
 </html>
