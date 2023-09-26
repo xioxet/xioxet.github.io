@@ -327,10 +327,59 @@ h1 {
     max-width: 75%;
     margin: auto;
     position: relative;
+    text-shadow: 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+.eva-gif {
+    position: absolute;
+    z-index: -1000;
+}
+
+.eva-gif-1 {
+    left: 50%;
+    top: 50%;
+    transform: rotateX(27deg);
+}
+
+.eva-gif-2 {
+    left:20%;
+    top: 25%;
+}
+
+.eva-gif-3 {
+    left: 80%;
+    top: 25%;
+}
+
+.eva-gif-4 {
+    top: 35%;
+}
+
+.eva-gif-5 {
+    left: 42%;
+    top: 8%;
+}
+
+.eva-gif-6 {
+    left: 74%;
+    top: 65%;
+    filter: invert(1);
 }
 
 .eva-header {
     font-size: 125px;
+    color: transparent;
+    background-size: cover;
+    background: url('media/main/200w.gif');
+    background-clip: text;
+}
+
+.eva-subheader-1 {
+    color: transparent;
+    background-size: cover;
+    background: url('media/main/200w.gif');
+    background-clip: text;
+
 }
 
 .more-about {
@@ -450,7 +499,19 @@ h1 {
     font-size: 1.3rem;
     text-align: left;
 }
+
 .sliders {
+    position: relative;
+}
+
+.slider-banner {
+    position: absolute;
+    width: 100%;
+    background-color: rgba(50, 50, 50, 0.5);
+    height: 250px;
+    top: 50%;
+    transform: translate(0, -50%);
+    background-image: url('media/main/static.gif');
 }
 
 .ba-slider {
@@ -644,4 +705,8 @@ h1 {
     margin: -16px 0 0 -16px;
     line-height:34px;
     font-size:20px;
+}
+
+tspan {
+    fill: white;
 }
