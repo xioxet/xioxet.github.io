@@ -1,24 +1,15 @@
-import json
+d = [
+    "Phrase introduced in Thomas Kuhn's The Structure of Scientific Revolutions Operation to provide ventilatory support also known as electrophenic respiration",
+    "Rodential metaphor for corporate life that requires intensive, grueling competition Overly sentimental film or book meant to evoke strong emotion",
+    "Second song on Tyler the Creator's critically acclaimed breakup album Industrial Revolution era invention by Richard Arkwright and John Kay",
+    "Separate a deck into halves and interleave each half together Having all that one needs to live securely and comfortably",  
+    "Mental illness that Karen Carpenter fell victim to in 1983 Alfred Nobel invention that's not dynamite, but just as explosive",
+    "Devised set of procedures on how to execute a plan What the policeman said in a Philip K. Dick novel",
+    "Williams' algorithm and Floyd's algorithm are two implementations of this Morph like Beast Boy, or like water in different containers",
+    "Documentary about prominent Malaysian fugitive who is still at large Diagonal band running down the middle of a Hertzsprung-Russell diagram",
+    "Taylor Swift song where the haters gonna hate hate hate Sudden attacks or violent outbursts characteristic of intermittent explosive disorder"
+]
 
-# Read the input text file
-input_file_path = 'english.txt'  # Update with the actual file path
-with open(input_file_path, 'r') as file:
-    words = file.read().splitlines()
-
-# Convert all words to uppercase
-uppercase_words = [word.upper() for word in words]
-
-# Organize words into arrays by their length
-max_word_length = max(len(word) for word in uppercase_words)
-organized_words = [[] for _ in range(max_word_length + 1)]
-
-for word in uppercase_words:
-    word_length = len(word)
-    organized_words[word_length].append(word)
-
-# Save the organized words in a JSON file
-output_file_path = 'english.json'  # Update with the desired output file path
-with open(output_file_path, 'w') as json_file:
-    json.dump(organized_words, json_file, indent=4)
-
-print("Words organized and saved to JSON file.")
+for y in d:
+    y = sorted([x.lower() for x in y.split(" ")])
+    print(" ".join(y))

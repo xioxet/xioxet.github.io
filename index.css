@@ -710,3 +710,34 @@ h1 {
 tspan {
     fill: white;
 }
+
+.work {
+    background-color: white;
+    color: black;
+    padding: 20px;
+    margin: auto;
+    width: 50%;
+    font-family: 'Consolas';
+    text-align:left;
+}
+
+.raw {
+    background-image: url('media/main/roach.gif');
+    background-repeat: repeat;
+    background-clip: text;
+    color: transparent;
+    width: 80%;
+    padding: 20px;
+    margin: auto;
+    text-align: justify;
+    font-size: 35px;
+    font-family: 'Georgia';
+    font-weight: bold;
+    filter: invert(1);
+}
+
+.raw-background {
+    background-color: white;
+    margin-top: 20px;
+    background-image: url('media/main/roach.gif');
+}
