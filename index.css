@@ -741,3 +741,17 @@ tspan {
     margin-top: 20px;
     background-image: url('media/main/roach.gif');
 }
+
+#anon { 
+    text-align: justify;
+    padding-inline: 35px;
+    cursor: default;
+}
+
+.blackText {
+    color: black;
+}
+
+.redText{
+    color:red;
+}

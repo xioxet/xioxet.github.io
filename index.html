@@ -85,7 +85,7 @@
         </marquee>
     </div>
 
-    <div style="width:50%; margin: auto;">they haven't figured out to kill people nice yet. leave the wrists in the bag and keep your eyes about you. they've seen guillotined heads blink, pens writing by themselves hanging from the tub. keep your eyes about you now.</div>
+    <div style="width:50%; margin: auto;">I WILL DO ANYTHING FOR YOU I WILL DO IT</div>
 
     <br><br>
     <div class="sliders">
@@ -134,8 +134,10 @@
         </div>
     </div>
 
-    <div class="anon">
-        i'll do anything that you want i'll do it i'll do it i'll do it i'll do it
+    <div id="anon">
+        my love is the andromeda galaxy 2.537 million light years away. he's got a single eye that cuts like highbeams through fog and seven arms curled up around his body. i take the telescope out and stare at the flickering of his stars and the floating of the asteroids on his skin, an eyelid shutting and opening in the night. i stare and i stare and i stare and i fall asleep and collapse on the grass in the yard both eyes closed but still looking. i saw him at first, a nebulous piece, like scuffs on a lens, limbs that didn't look like limbs. carried to my bed by five of the seven arms, with constellations drawn in glow-in-the-dark chalk on the ceiling when i was seven, there's pisces, there's sagittarius, and there's you, just on top, drawn in red chalk instead of green. sometimes the dust falls in my mouth and i wake up choking.<br><br>
+
+        it's like there's lights in me and one's switched off and i remember what it felt like when it was on and i don't know how to switch it back on anymore. i can't reach behind my back can you please get it for me. can you please get it for me. can you please get it for me?
     </div>
 
     <div class="raw-background">
@@ -234,6 +236,30 @@
         //    'width':'0%',
         //    'duration':'25000',
         //})
+
+        document.addEventListener("DOMContentLoaded", function () {
+        var targetDiv = document.getElementById("anon");
+        var words = targetDiv.innerText.split(" ");
+
+        targetDiv.innerHTML = "";
+
+        var red = ["love ", "cuts ", "stare ", "please ", "mouth "]
+
+        for (var i = 0; i < words.length; i++) {
+            var wordSpan = document.createElement("span");
+            wordSpan.textContent = words[i] + " ";
+            if (red.includes(wordSpan.textContent)) {
+                wordSpan.addEventListener("mouseover", function() {
+                    this.classList.add("redText");
+                });
+            } else {
+                wordSpan.addEventListener("mouseover", function() {
+                    this.classList.add("blackText");
+                });
+            }
+            targetDiv.appendChild(wordSpan);
+        }
+});
 
 
     </script>
