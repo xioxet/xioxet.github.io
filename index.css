@@ -755,3 +755,58 @@ tspan {
 .redText{
     color:red;
 }
+
+.pictures {
+    margin: auto;
+    margin-top: 50px;
+}
+
+.pictures img {
+    height: 250px;
+    padding: 0px;
+}
+
+.p-abs {
+    position: relative;
+}
+
+.p-text {
+    position: absolute;
+    background-color: white;
+    color: black;
+    left: 20%;
+    top: 5%;
+    font-size:25px;
+    font-family:'Times New Roman';
+    padding-inline:5px;
+}
+
+.textb {
+    left: 50%;
+    top: 13%;
+}
+
+.form {
+    background-color: white;
+    color: black;
+    width: 50%;
+    margin: auto;
+    margin-block: 30px;
+    padding: 25px;
+    text-align: justify;
+    font-family: 'Times New Roman';
+}
+
+.question {
+    font-size: 30px;
+}
+
+.form b {
+    font-size: 25px;
+    color: black;
+}
+
+.form .answer {
+    font-size: 25px;
+    color: black;
+}
