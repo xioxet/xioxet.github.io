@@ -810,3 +810,27 @@ tspan {
     font-size: 25px;
     color: black;
 }
+
+.links {
+    background-color: red;
+    color: white;
+    font-family: 'Georgia';
+    width: fit-content;
+    margin-top: 20px;
+    padding: 20px;
+    transform: rotate(5deg);
+}
+
+.links > a {
+    font-size: 35px;
+}
+
+.links > h3 {
+    text-align: center;
+    font-size: 250px;
+    margin-block: -40px;
+}
+
+.links > a {
+    color: white;
+}
