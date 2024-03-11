@@ -1,0 +1,49 @@
+.main {
+    width: 40%;
+    margin: auto;
+    margin-top: 50px;
+}
+
+.header-img {
+    width: 100%;
+}
+
+body {
+    color: white;
+    background-repeat: repeat;
+    font-family: 'Georgia';
+    font-size: 20px;
+}
+
+.nathan {
+    color: rgb(255, 34, 34);
+    text-align: justify;
+    margin: 8px 0;
+}
+
+.alex {
+    text-align: justify;
+    color: rgb(79, 255, 79);
+    transform: translateX(10%);
+    margin: 8px 0;
+}
+
+.narration {
+    text-align: justify;
+    transform: translateX(20%);
+    margin: 8px 0;
+}
+
+
+.bright-hover {
+    filter: brightness(25%);
+    transition: 0.1s;
+}
+
+.bright-hover:hover {
+    filter:brightness(50%);
+}
+
+.white {
+    color: white;
+}
