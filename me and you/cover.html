@@ -80,10 +80,33 @@
                 <h1 style="text-align:center; font-family: 'Georgia'; font-size:500%; line-height: 1%;">N</h1>
                 I WOULD FIRST SEE HIM THROUGH A HOLE WHERE A WINDOW WAS BUT NOW WASN'T, HEAD FRAMED LIKE A PORTRAIT. I FOLLOWED HIM AS HE WALKED, TOWARDS THE BLOCKS SOUTH OF THE CITY. THERE WAS ROT IN THE CONCRETE AND HELL HANGING IN THE AIR, AND WHENEVER I STARED UPWARDS I COULDN'T SEE THE SKY. HE WALKED DOWN FOR MILES PAST MEN IN CAGES AND THE CORPSES OF BIRDS HANGING STILL IN THE AIR, DOWN CRACKED ROADS AND ALLEYWAYS I SAW BEASTS IN, BEASTS NO ONE ELSE COULD SEE. HE WALKED AND WALKED, AS HE GOT CLOSER HE TURNED FROM BLACK TO A LIGHT RED, TO A REDDER RED, AND THEN A BRILLIANT BLUE. AND HE WALKED FINALLY, TO THE BLOCK OF ABANDONED CARPARKS LAID IN ROWS OF FIVE EACH. THERE WAS CARDBOARD COVERING THE WALLS, WALLS TALLER THAN TEN OF ME. YOU COULD KILL AND STORE THE ENTIRE CITY'S WORTH OF PEOPLE IN THE CARPARKS ALONE, STACKING THE BODIES LIKE PILES OF SAND. AND FOR TEN MINUTES ALL HE DID WAS LOOK. AND I LOOKED AT THE BACK OF HIS HEAD FOR THIS TIME. HE STOOD STILL, BOTH IN REVERENCE AND IN ITS EXACT OPPOSITE. IN A PRAYER OF HATRED. AND WHEN HE STOPPED STARING, HE CROUCHED DOWN, TOOK THE HAMMER FROM HIS BAG, AND STARTED TO WORK.
             </div>
+
+            <div id="table-of-contents">
+                <ol>
+                    <li><a href='pg1.html'>Intro</a></li>
+                    <li><a href='pg2.html'>Birds</a></li>
+                </ol>
+            </div>
         </div>
     </div>
 </body>
 <style>
+
+    #table-of-contents {
+        opacity:0;
+        color:white;
+        padding:20px;
+        text-align:justify;
+    }
+
+    #table-of-contents a {
+        text-decoration:none;
+        color:inherit;
+    }
+
+    #table-of-contents a:hover {
+        color:red;
+    }
 
     #subliminal {
         position: absolute;
@@ -242,6 +265,9 @@
     var total = spans.length;
     console.log(total);
     
+    if (localStorage.getItem('visible')=='visible'){
+        document.getElementById('table-of-contents').style.opacity=1;
+    }
     var randomIndex = Math.floor(Math.random() * spans.length);
     var max = (total - randomIndex) > randomIndex ? (total - randomIndex) : randomIndex
     var classes = ['red1', 'red2', 'red3', 'red4', 'red5'];
@@ -258,6 +284,7 @@
     var centeredElement = document.getElementById('subliminal');
 
     async function makeRed() {
+        localStorage.setItem('visible','visible')
         var unhides = document.getElementsByClassName('unhide')
         for (const unhide of unhides) {
             unhide.style.opacity = '100%';}
