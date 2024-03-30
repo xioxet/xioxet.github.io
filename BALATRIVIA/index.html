@@ -199,7 +199,7 @@
 </style>
 <script>
     document.querySelector('.submit').addEventListener('click', function() {
-        let correctAnswers = document.querySelectorAll('input.correct:checked').length;
+        let correctAnswers = 15;
         let questions = document.querySelectorAll('.question');
             questions.forEach(function(question) {
                 let correctAnswer = question.querySelector('input.correct');
@@ -207,20 +207,25 @@
                 question.style.color='white';
                 if (selectedAnswer === correctAnswer) {
                     question.style.backgroundColor = 'green';
+                    
                 } else {
                     question.style.backgroundColor = 'red';
+                    correctAnswers-=1;
+                    console.log(correctAnswers);
                     correctAnswer.nextElementSibling.style.fontWeight = 'bold';
                     correctAnswer.nextElementSibling.style.color = 'green';
                 }
             });
         
         var rank;
-        if (correctAnswers < 3) {rank='Dunce'}
-        if (correctAnswers < 6) {rank='Fool'}
         if (correctAnswers < 9) {rank='Jester'}
-        if (correctAnswers < 12) {rank='Comedian'}
         if (correctAnswers < 15) {rank='Merrimaker'}
-        if (correctAnswers = 15) {rank='Joker'}
+        if (correctAnswers < 12) {rank='Comedian'}
+        if (correctAnswers < 9) {rank='Jester'}
+        if (correctAnswers < 6) {rank='Fool'}
+        if (correctAnswers < 3) {rank='Dunce'}
+        if (correctAnswers == 15) {rank='Joker'}
+        console.log(correctAnswers);
         document.getElementsByClassName('submit')[0].innerHTML=`Your score is ${correctAnswers}/15!<br>Your rank is ${rank}!`
     });
 </script>
