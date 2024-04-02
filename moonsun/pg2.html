@@ -96,7 +96,7 @@
         <br>
         <div class="cut" onclick="cut()">Take the rock.</div>
         <div id="cut-div">
-            <div id="finalshow">shit - are you ok? hey. are you there?</div>
+            <div id="finalshow">can you hear me? are you there? hey. hey. shit. ahh. shit.</div>
             <a id="next2" style='opacity:0' class="next" href="pg3.html">River</a>
             <div class="cut-container">
                 <div class="cut-text" style="top: -90; left:-20;">CONFUSION WILL BE MY EPITAPH<br>AS I CRAWL A CRACKED AND BROKEN PATH<br>IF WE MAKE IT WE CAN ALL SIT BACK AND LAUGH<br>BUT I FEAR TOMORROW I'LL BE CRYING<br></div>
@@ -120,6 +120,9 @@
                 <img src="media/redhands.gif" style="width:250;
                 position:absolute;right:3%;top:7%;z-index:0;">
                 <img id="appear-three" src="media/200w.gif" style="width:450;position:absolute;top:15%;left:5%;z-index:0; z-index:0; opacity:0;">
+                <img class="appear-four" src="media/200w.gif" style="width:450;position:absolute;top:-15%;right:25px;z-index:0; z-index:0; opacity:0;">
+                <img class="appear-four" src="media/200w.gif" style="width:450;position:absolute;top:-15%;;left:31%;z-index:0; z-index:0; opacity:0;">
+                <img class="appear-four" src="media/200w.gif" style="width:450;position:absolute;bottom:10%;left:44%;z-index:0; z-index:0; opacity:0;">
                 
                 <div id="appear-during-flash">HEAVEN IS A PLACE ON EARTH WITH YOU</div>
                 <img src="media/break.png" style="position:absolute;bottom:-5;right:30%;">
@@ -373,6 +376,12 @@ document.querySelector(".cuthack").onmouseover = event => {
         }
         if (cutvar == 3) {
             document.getElementById('appear-three').style.opacity='1';
+        }
+
+        if (cutvar == 4) {
+            for (const el of document.getElementsByClassName('appear-four')) {
+                el.style.opacity=1;
+            }
         }
         if (cutvar == 5) {
             cuts.parentNode.removeChild(cuts);

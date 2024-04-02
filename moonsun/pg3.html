@@ -364,12 +364,12 @@
     }
 
     async function lightsbackon() {
-      var graygifs = ['blackdead.gif','blackmilk.gif','blackwater.gif','blackstars.gif','blackhands.gif','blackwaves.gif','','',];
+      var graygifs = ['blackhands.gif','',];
       console.log('x')
       for (var i = 0; i<graygifs.length; i++) {
         console.log('xxx');
         document.body.style.backgroundImage=`url('media/${graygifs[i]}')`
-        await sleep(200);
+        await sleep(1000);
       }
         document.body.style.backgroundImage="url('media/blackdead.gif')";
         before.style.opacity='1';
