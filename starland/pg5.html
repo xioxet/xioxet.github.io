@@ -147,7 +147,7 @@
         
         <p class="xxx narration" style="color:lime; transform:translateX(-10px)">i'm in love with you. i'm in love with doing this with you, the long roads, the rivers. i can't say it yet. i can't even think it yet. but everything goes away when we are together, everything bad. i wish i could think of you without feeling sick and disgusting.</p>
 
-        <p class="narration" style="transform:translate(20%,-45px);">i stop looking. before i sleep i hold my arm up to the car light and look at what he's drawn in marker. it's a black fire, half the size of my  shoulder, feeding on feathers for fuel. the lines are delicate, small, unbroken. it's beautiful. i rub half of it off before i stop myself, turn the car light off, and go to sleep.</p>
+        <p class="narration" style="transform:translate(20%,-110px);">i stop looking. before i sleep i hold my arm up to the car light and look at what he's drawn in marker. it's a black fire, half the size of my  shoulder, feeding on feathers for fuel. the lines are delicate, small, unbroken. it's beautiful. i rub half of it off before i stop myself, turn the car light off, and go to sleep.</p>
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
@@ -177,15 +177,27 @@
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-
-        <img src="media/blackhands.gif" class="header-img bright-hover">
-    </div>  
-        <br><br><br>
+    </div>
+        <div id="hand-trigger" style="color:black;height:100px">.</div>
+        <br><br><br><br><br><br><br><br><br><br>
+        <img src="media/blackhands.gif" id="hands" class="full-width bright-hover">
+  
+        <br><br><br><br><br><br><br><br><br>
 </body>
 <style>
     
+    #hands {
+      opacity:0;
+      position:fixed;
+      top:0;
+      left:0;
+      z-index: -1;
+    }
+    .full-width {
+      width:100%;
+    }
     hr {
-
+      color:white;
     }
 
     .xxx{
@@ -343,14 +355,23 @@
         });
     })
 
+    
+    var hands = document.getElementById('hand-trigger');
+    var hands_img = document.getElementById('hands');
+
     window.addEventListener('scroll', function() {
     var targetDiv = document.getElementById('blacken');
     var targetDivPosition = targetDiv.getBoundingClientRect().top;
     var windowHeight = window.innerHeight;
 
-    if (targetDivPosition - windowHeight < 0) {
+    if (targetDivPosition - windowHeight < 50) {
         document.body.style.backgroundImage="";
         document.body.style.backgroundColor='black';
+    }
+
+    var hands_pos = hands.getBoundingClientRect().top;
+    if (hands_pos - windowHeight < 0) {
+      hands_img.style.opacity=1;          
     }
     });
 
