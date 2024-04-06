@@ -91,12 +91,11 @@
         <p class="alex">come, man. come.</p>
         <p class="nathan">i- i don't know.</p>
         <p class="alex">we're friends right? you trust me? yeah?</p>
+        <div class="cut" onclick="cut()">Take the rock.</div>
         </div>
         <br>
-        <div class="cut" onclick="cut()">Take the rock.</div>
         <div id="cut-div">
-            <div id="finalshow">can you hear me? are you there? hey. hey.</div>
-            <a id="next2" style='opacity:0' class="next" href="pg3.html">River</a>
+            <a id="next2" style='opacity:0;' class="next" href="pg3.html"><br><br><br>River</a>
             <div class="cut-container">
                 <div class="cut-text" style="top: -90; left:-20;">CONFUSION WILL BE MY EPITAPH<br>AS I CRAWL A CRACKED AND BROKEN PATH<br>IF WE MAKE IT WE CAN ALL SIT BACK AND LAUGH<br>BUT I FEAR TOMORROW I'LL BE CRYING<br></div>
                 <div class="cut-text" style="top: -88; left:-18; color:rgb(150, 0, 0);">CONFUSION WILL BE MY EPITAPH<br>AS I CRAWL A CRACKED AND BROKEN PATH<br>IF WE MAKE IT WE CAN ALL SIT BACK AND LAUGH<br>BUT I FEAR TOMORROW I'LL BE CRYING<br></div>
@@ -220,20 +219,19 @@
         }
 
         #cut-div {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        position: fixed;
+        left:-50;
+        top:-50;
         background-image:url('media/red_static.gif');
         background-repeat:repeat;
         font-size: 6vw;
-        z-index: 2;
-        width:102vw;
-        height:102vh;
+        width:110vw;
+        height:110vh;
         color:white;
         text-align:center;
         margin:auto;
         opacity:0;
-        z-index:-1;
+        z-index:-5;
         }
 
         .cut-container {
@@ -291,19 +289,8 @@ document.querySelector(".cuthack").onmouseover = event => {
     var centeredElement = document.getElementById('cut-div')
     var cuts = document.getElementsByClassName('cut-container')[0]
     var damage = document.getElementById('damage');
-    function updateCenteredElementPosition() {            
-            var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            var viewportHeight = window.innerHeight;
-            var elementHeight = centeredElement.offsetHeight;
-            var topOffset = (viewportHeight - elementHeight) / 2 + scrollTop;
+    var next2 = document.getElementById('next2');
 
-            centeredElement.style.top = topOffset + 'px';
-    }
-
-    window.addEventListener('resize', updateCenteredElementPosition);
-    window.addEventListener('scroll', updateCenteredElementPosition);
-
-    
     function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
     }
@@ -311,7 +298,8 @@ document.querySelector(".cuthack").onmouseover = event => {
     var damage_x = 50;
     var damage_y = 50;
     var cutvar = -1;
-    var cut_x = 50;
+    var cut_x = -50;
+    var cut_y=-50;
     var cut_counter = document.getElementById('cut-counter');
 
     var timeline = anime.timeline({
@@ -320,7 +308,9 @@ document.querySelector(".cuthack").onmouseover = event => {
 
     async function cut() {
         cutvar = cutvar + 1;
+        timeline.pause();
         document.getElementById('poggers').style.opacity='0';
+        document.body.style.backgroundImage="url('media/redwater2.gif')"
         cut_counter.innerHTML = `${cutvar}/5`
         centeredElement.style.opacity=1;
         centeredElement.style.zIndex=1;
@@ -336,17 +326,22 @@ document.querySelector(".cuthack").onmouseover = event => {
         
         damage.style.left = `${damage_x}%`
         damage.style.top = `${damage_y}%`
-        centeredElement.style.left = `${cut_x}%`
+        centeredElement.style.left = `${cut_x}`
+        centeredElement.style.top = `${cut_y}`
         setInterval(addX,500);
 
+        var offsetmove=25;
         damage_x = damage_x + Math.floor(Math.random() * (2 - -2 + 1)) + -2;
         damage_y = damage_y + Math.floor(Math.random() * (2 - -2 + 1)) + -2;
-        cut_x = cut_x + Math.floor(Math.random() * (5 - -5 + 1)) + -5;
+        cut_x = cut_x + Math.floor(Math.random() * (offsetmove - -offsetmove + 1)) + -offsetmove;
+        cut_y = cut_y + Math.floor(Math.random() * (offsetmove- -offsetmove+1)+-offsetmove);
         }
         document.getElementById('appear-during-flash').style.opacity='0';
         centeredElement.style.webkitFilter='';
-        centeredElement.style.left='50%'
-        cut_x=50;
+        centeredElement.style.left='-50'
+        centeredElement.style.top='-50'
+        cut_x=-50;
+        cut_y=-50;
         cuts.style.webkitFilter = `brightness(${1-cutvar*0.17})`
 
         if (cutvar == 4) {
@@ -384,18 +379,19 @@ document.querySelector(".cuthack").onmouseover = event => {
         }
         if (cutvar == 5) {
             cuts.parentNode.removeChild(cuts);
-            document.getElementById('finalshow').style.opacity=1;
             clearInterval(addX);
-            anime({
-                targets: '#finalshow',
-                opacity: 0,
-                duration: 5000, 
-                easing: 'easeInOutQuad'
-            });
+            timeline.pause();
+            centeredElement.style.backgroundImage='url()';
+            centeredElement.style.backgroundColor='black';
+            await sleep(1500);
+            centeredElement.style.backgroundImage='url("media/blackhands.gif")';
+            await sleep(1750);
+            centeredElement.style.backgroundImage='url()';
             timeline.pause();
             cuts.style.webkitFilter = `brightness(0.17)`
-            await sleep(7500);
-            document.getElementById('next2').style.opacity='1';}
+            await sleep(5000);
+            console.log('x');
+            next2.style.opacity='1'}
 };
 </script>
 
