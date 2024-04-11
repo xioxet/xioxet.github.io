@@ -283,6 +283,8 @@
     }
 
     #roaches-container {
+        opacity:0;
+        z-index:-100;
         background-image:url('media/cockroach.gif');
         position: fixed;
         top: 0;
@@ -390,6 +392,24 @@
     var got_bathroom_key = false;
 
 
+    window.addEventListener('scroll', function() {
+    var targetDiv = document.getElementById('roach-trigger');
+    var targetDivPosition = targetDiv.getBoundingClientRect().top;
+    var windowHeight = window.innerHeight;
+
+    if (targetDivPosition - windowHeight < 50) {
+        document.body.style.backgroundImage = 'url()';
+        document.body.style.backgroundColor = 'black';
+        change_location('nothing')
+        setTimeout(function() {
+            background.style.zIndex = 1;
+            background.style.opacity = 1;
+            change_location('bedroom');
+        }, 150)
+    }
+    });
+
+
     // keys
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', function() {
@@ -445,6 +465,12 @@
             'background_image': '',
             'textwall': '',
             'textbg': ''
+        },
+
+        'nothing':{
+            'background_image':'',
+            'textwall':'',
+            'textbg':'',
         }
     }
 
@@ -479,7 +505,7 @@
         setTimeout(function() {
             background.style.backgroundImage = `url("media/${location_object['background_image']}")`;
             xxx.style.opacity = 1;
-        }, 500)
+        }, 2500)
 
 
         // reset all gui stuff
@@ -492,7 +518,7 @@
             if (item.classList.contains(room) || item.classList.contains('gui')) {
                 item.style.zIndex = 4; item.style.opacity = 1;
                 if (item.classList.contains('gui')) {
-                    if (room != 'outside' && room != 'final_scene') {
+                    if (room != 'outside' && room != 'final_scene' && room != 'nothing') {
                         item.style.zIndex=5; item.style.opacity=1;
                     } else {
                         item.style.zIndex=-5; item.style.opacity=0;
@@ -553,9 +579,7 @@
         })
     })
 
-    document.addEventListener('mousemove', move_tooltips)
-    change_location('bedroom');
-    type_into_main('You just woke up from a nap. It was four hours long, dreamless. There are cockroaches everywhere. Find something to kill them with.')     
+    document.addEventListener('mousemove', move_tooltips)  
     </script>
 
 </html>
