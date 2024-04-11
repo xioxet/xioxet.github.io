@@ -390,6 +390,7 @@
     var bathroom_key = document.getElementById('bathroom_key');
     var outside_door = document.getElementById('outside_door');
     var got_bathroom_key = false;
+    var stopscroll = false;
 
 
     window.addEventListener('scroll', function() {
@@ -397,7 +398,8 @@
     var targetDivPosition = targetDiv.getBoundingClientRect().top;
     var windowHeight = window.innerHeight;
 
-    if (targetDivPosition - windowHeight < 50) {
+    if (targetDivPosition - windowHeight < 50 && !stopscroll) {
+        stopscroll = true;
         document.body.style.backgroundImage = 'url()';
         document.body.style.backgroundColor = 'black';
         change_location('nothing')

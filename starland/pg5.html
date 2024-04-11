@@ -181,10 +181,21 @@
         <div id="hand-trigger" style="color:black;height:100px">.</div>
         <br><br><br><br><br><br><br><br><br><br>
         <img src="media/blackhands.gif" id="hands" class="full-width bright-hover">
+        <a class='next' href='pg6.html'>Insecticide</a>
   
         <br><br><br><br><br><br><br><br><br>
 </body>
 <style>
+
+    .next {
+      opacity: 0;
+      z-index: -3;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      font-size:35px;
+    }
     
     #hands {
       opacity:0;
@@ -305,6 +316,7 @@
 <script>
     var xes = document.querySelectorAll('.xxx');
     var main = document.getElementsByClassName('main')[0];
+    var next_link = document.getElementsByClassName('next')[0];
 
     xes.forEach(function(x){
         x.addEventListener('mouseenter', function() {
@@ -371,7 +383,11 @@
 
     var hands_pos = hands.getBoundingClientRect().top;
     if (hands_pos - windowHeight < 0) {
-      hands_img.style.opacity=1;          
+      hands_img.style.opacity=1;
+      setTimeout(function() {
+        next_link.style.opacity = 1;
+        next_link.style.zIndex = 3;
+      }, 1000)       
     }
     });
 
