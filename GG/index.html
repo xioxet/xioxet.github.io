@@ -206,7 +206,7 @@ function levenshteinDistance(a, b) {
             if (input.toUpperCase() === expectedAnswer.toUpperCase()) {
                 return true;
             }
-            if (levenshteinDistance(input.toUpperCase(), expectedAnswer.toUpperCase()) <= 2) {
+            if (levenshteinDistance(input.toUpperCase(), expectedAnswer.toUpperCase()   ) <= 2) {
                 return true;
             }
         }
@@ -218,7 +218,7 @@ function levenshteinDistance(a, b) {
         ['CZECHIA', 'CZECH REPUBLIC'],
         ['COLOMBIA'],
         ['VICTORIA'],
-        ['NEWFOUNDLAND'],
+        ['NEWFOUNDLAND', 'NEWFOUNDLAND AND LABRADOR'],
         ['PHILIPPINES'],
         ['CROATIA'],
         ['MANITOBA'],
