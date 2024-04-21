@@ -88,11 +88,13 @@ var randomEntry;
 var score = 0;
 var go = document.getElementById('go-agane');
 var items = document.querySelectorAll('.option');
+var countries_list;
 fetch('entries.json')
   .then(response => response.json())
   .then(entrs => {
     entries = entrs;
     console.log(entrs);
+    countries_list =  [...new Set(entries.map(obj => obj.country))];
     populate();
   })
   .catch(error => console.error('Error fetching JSON:', error));
@@ -101,7 +103,11 @@ function get_name(obj) {
     return `${obj.city}, ${obj.country}`
 }
 function populate() {
-    randomEntry = entries[Math.floor(Math.random() * entries.length)];
+    // country random distribution because rahh
+    var randomCountry = countries_list[Math.floor(Math.random() * countries_list.length)]
+    new_entries = entries.filter(entry => {return entry.country == randomCountry})
+    console.log(new_entries);
+    randomEntry = new_entries[Math.floor(Math.random() * new_entries.length)];
     const countries = [randomEntry.country]
     const populationRange = randomEntry.population * 0.05;
     var filteredEntries = entries.filter(entry => {
