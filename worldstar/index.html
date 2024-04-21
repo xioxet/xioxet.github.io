@@ -5,47 +5,38 @@
     <title>SATGUESSR</title>
 </head>
 <body>
-    
+    <h1>SATGUESSR</h1>
+    <h2>what city is this?</h2>
+    <img id=image src="">
+    <button class="option" id="1"></button>
+    <button class="option" id="2"></button>
+    <button class="option" id="3"></button>
+    <button class="option" id="4"></button>
 </body>
+<style>
+    body {
+        font-family: 'Georgia';
+        background-image:url('blackwater.gif')
+    }
 
+    h1 {
+        text-align: center;
+        background-color: red;
+        padding: 10px;
+        width: fit-content;
+    }
+</style>
 <script>
-    // Function to fetch CSV file and convert to JSON
-function fetchCSVAndConvertToJSON(csvFile) {
-    return fetch(csvFile)
-        .then(response => response.text())
-        .then(csvText => {
-            // Split CSV text into lines
-            const lines = csvText.split('\n');
-            
-            // Get column headers from the first line
-            const headers = lines[0].split(',');
 
-            // Initialize array to store JSON data
-            const jsonData = [];
+var entries;
+fetch('entries.json')
+  .then(response => response.json())
+  .then(entrs => {
+    entries = entrs;
+    console.log(entrs);
+  })
+  .catch(error => console.error('Error fetching JSON:', error));
 
-            // Parse remaining lines into JSON objects
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',');
-                const obj = {};
-                for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = values[j];
-                }
-                jsonData.push(obj);
-            }
 
-            return jsonData;
-        });
-}
-
-const csvFile = 'worldcities.csv';  // Replace with the path to your CSV file
-fetchCSVAndConvertToJSON(csvFile)
-    .then(data => {
-        console.log('CSV data:', data);
-    })
-    .catch(error => {
-        console.error('Error fetching CSV:', error);
-    });
-
-console.log(data)
 </script>
 </html>
