@@ -1,41 +1,168 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SATGUESSR</title>
 </head>
 <body>
-    <h1>SATGUESSR</h1>
-    <h2>what city is this?</h2>
-    <img id=image src="">
-    <button class="option" id="1"></button>
-    <button class="option" id="2"></button>
-    <button class="option" id="3"></button>
-    <button class="option" id="4"></button>
+    <div class="main">
+        <br><br>
+        <h1>SATGUESSR</h1>
+        <h2>what city is this?</h2>
+        <img id=image src="">
+        <div class="buttons">
+        <br>
+        <button class="option" onclick='check(this)' id="1"></button>
+        <button class="option" onclick='check(this)' id="2"></button>
+        <button class="option" onclick='check(this)' id="3"></button>
+        <button class="option" onclick='check(this)' id="4"></button>
+        </div>
+        <button id="go-agane" onclick="go_agane()">go agane?</button>
+
+    </div>
 </body>
 <style>
+
+    #go-agane {
+        background-color: white;
+        color: black;
+        padding: 10px;
+        font-size: 15px;
+        opacity: 0;
+    }
     body {
         font-family: 'Georgia';
+        color: white;
         background-image:url('blackwater.gif')
     }
 
     h1 {
         text-align: center;
+        margin: auto;
         background-color: red;
         padding: 10px;
         width: fit-content;
+    }
+
+    .main {
+        min-width: 500px;
+        max-width: 50%;
+        margin: auto;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .buttons {
+        width: 100%;
+        display: block;
+    }
+
+    .option {
+        width: 50%;
+        margin-block: 5px;
+        background-color: black;
+        color: white;
+        overflow-y: auto;
+        cursor: pointer;
+        min-height: 50px;
+        font-size: 20px;
+    }
+
+    button:hover {
+        background-color: red;
+    }
+
+    #image {
+        width: 80%;
+        margin: auto;
+        text-align: center;
     }
 </style>
 <script>
 
 var entries;
+var image = document.getElementById('image');
+var randomEntry;
+var score = 0;
+var go = document.getElementById('go-agane');
+var items = document.querySelectorAll('.option');
 fetch('entries.json')
   .then(response => response.json())
   .then(entrs => {
     entries = entrs;
     console.log(entrs);
+    populate();
   })
   .catch(error => console.error('Error fetching JSON:', error));
+
+function get_name(obj) {
+    return `${obj.city}, ${obj.country}`
+}
+function populate() {
+    randomEntry = entries[Math.floor(Math.random() * entries.length)];
+    const countries = [randomEntry.country]
+    const populationRange = randomEntry.population * 0.05;
+    var filteredEntries = entries.filter(entry => {
+        return Math.abs(entry.population - randomEntry.population) <= populationRange &&
+        entry.country !== randomEntry.country;
+    });
+    const wrongEntries = [];
+    for (let i = 0; i < 3; i++) {
+        if (filteredEntries.length == 0) {
+            filteredEntries = entries;
+        }
+        var x = true;
+        var chosen;
+        y = 0;
+        const randomIndex = Math.floor(Math.random() * filteredEntries.length);
+        chosen = filteredEntries[randomIndex];
+        wrongEntries.push(chosen);
+        filteredEntries = filteredEntries.filter(entry => {
+            return entry.country !== chosen.country;
+        })
+        console.log(filteredEntries.length);
+    }
+    console.log(randomEntry, wrongEntries);
+
+    var right = Math.floor(Math.random() * 4);
+    var left = [0,1,2,3].filter(item => item !== right)
+
+    items[right].innerText = get_name(randomEntry);
+    for (var i = 0; i<3; i++) {
+        items[left[i]].innerText = get_name(wrongEntries[i])
+    }
+
+    image.src = `downloaded_files/${randomEntry.filename}`
+   
+}
+
+function check(clickedButton) {
+    const randomEntryName = get_name(randomEntry);
+
+    if (clickedButton.innerText === randomEntryName) {
+        score++;
+    } 
+
+    go.style.opacity = 1; 
+
+    for (const item of items) {
+        if (item.innerText === randomEntryName) {
+            item.style.backgroundColor = 'green';
+        } else {
+            item.style.backgroundColor = 'red';
+        }
+    }
+
+}
+
+function go_agane() {
+    populate();
+    for (const item of items) {
+        item.style.backgroundColor = 'black';
+    }
+}
 
 
 </script>
