@@ -6,11 +6,12 @@ x = open('worldcities.csv', encoding='utf-8').read().split('\n')
 filenames = os.listdir(os.getcwd() + directory)
 entries = []
 for filename in filenames:
-    cityname = filename.split(',')[0]
-    for i in x:
-        i = i.split(',')
-        try:
-            if i[0] == cityname:
+    try:
+        cityname, countryname = filename.split('.')[0].split(',')
+        cityname, countryname = cityname.strip(' '), countryname.strip(' ')
+        for i in x:
+            i = i.split(',')
+            if i[0] == cityname and i[-2] == countryname :
                 entry = {
                     'filename': filename,
                     'country': i[-2],
@@ -18,8 +19,9 @@ for filename in filenames:
                     'population': i[-1]
                 }
                 entries.append(entry)
-        except:
-            pass
+    except Exception:
+        print(Exception)
+        pass
 
 json_data = json.dumps(entries)
 x = open('entries.json', 'w')
