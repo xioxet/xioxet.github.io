@@ -2,273 +2,588 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="index.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    <link type="text/css" href="test_files/before-after.min.css" rel="stylesheet">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-    <script type="text/javascript" src="test_files/before-after.min.js"></script>
-    <title>xioxet</title>
+    <title>ROCKER</title>
 </head>
 <body>
-    <br>
-    <h1 class="one">ARE YOU SORRY? ARE YOU SORRY? ARE YOU SORRY?</h1>
-    <h1 class="two">ARE YOU SORRY? ARE YOU SORRY? ARE YOU SORRY?</h1>
-    <h1 class="three">ARE YOU SORRY? ARE YOU SORRY? ARE YOU SORRY?</h1>
-    <h1 class="four">ARE YOU SORRY? ARE YOU SORRY? ARE YOU SORRY?</h1>
-    <div class="center-image-container">
-        <img src="media/main/rotating.gif" alt="Center Image" class="center-image">
-        <div class="overlay-text">
-            Had Moses seen how my friend's face blushes when he is drunk, and his beautiful curls and wonderful hands, he would not have written in his Torah: do not lie with a man.
+    <ul id="main-menu">
+        <div class="yep">
+            <div id='what' class="test" data-debug='debug-menus' data-portal='starland/media/blackwater.gif' data-hover="see some stuff"><li>Wstr</li></div>
+            <div class="test" data-debug='debug-menus' data-portal='starland/media/bluenoise.gif' data-hover="about me"><li>About</li></div>
+            <div class="test" data-debug='debug-menus' data-portal='media/main/perlin.gif' data-hover="wip" onclick="password_open()"><li>Moonsun</li></div>
+            <div class="test" data-debug='debug-menus' data-portal='starland/media/pg6.gif' data-hover="see some items" style="margin-top: 25px;"><li>Other</li></div>
+            <div class="test" data-debug='debug-menus' data-portal='starland/media/red_static.gif' data-hover="find me" style="margin-top: 50px;"><li>Links</li></div>
         </div>
-        <div class="banner"></div>
+    </ul>
+
+    <div class="password">
+        <label>type 'password' below to access MOONSUN</label><br>
+        <input style='width:90%; height: 35px; font-size: 20px; margin-top:20px; color:black; font-family:"Consolas"' type=text id="passwordbox" onchange='password_change()' onkeypress="this.onchange()" oninput="this.onchange()" onpaste="return false"><br>
+        <button style='margin-top: 20px; width: 50px; height: 35px; color: white; background-color: black;border-radius: 10px;' onclick="closeit()">close</button>
     </div>
 
-    <br><br>
-    <div class="p-para" data-value="We'd sit next to each other, a vanishing distance apart, and the distance would grow and splinter, and spread throughout the countryside like the arms of a tumor reaching into healthy tissue, undying, leeching, free.">
-        We'd sit next to each other, a vanishing distance apart, and the distance would grow and splinter, and spread throughout the countryside like the arms of a tumor reaching into healthy tissue, undying, leeching, free.
+    <div class="sphere">
+        <div data-debug='debug-bigsphere' id="big-sphere"></div>
     </div>
 
-    <div class="white-body">
-        <p class="about-me">emilia v. // 18<br>a girl is a gun</p>
-        <div class="more-about">
-            &nbsp;&nbsp;welcome to my website ! i hope you like how it looks. hobbies include compsci, tetris, trying to learn more about web design and making something new. i like writing and there is some of my writing featured on this page. key inspirations include <i>the cyclops</i> by odilon redon, david wojnarowicz, jack lance, god, dan barrett, @hostagekiller on twitter, chris sawyer, arnell's manual on the pepsi logo, kevin shields, hyperplexed + kevin powell on youtube, slime from the yard, and the "hypothetical explanations for the paradox" section on the wikipedia article for the fermi paradox. <br><br>
-        </div>
-        <p class="white-body-para">
-            i dont remember anything from<br>
-            the ages of 14 to 16<br>
-        </p>
-        <p class="white-body-para-overlay">
-            i beat up a kid when i was 9<br>
-            i took him by the hand to the base<br>
-            and i smashed his head against the slide<br>
-        </p>
-        <div class="angel-marquee-container">
-            <div>
-                <marquee class="angel-marquee a-1" scrolldelay="60" scrollamount=10>nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here</marquee>
-                <marquee class="angel-marquee a-2" scrolldelay="60" scrollamount=10>nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here</marquee>
-                <marquee class="angel-marquee a-3" scrolldelay="60" scrollamount=10>nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here nobody here</marquee>
-            </div>
-        </div>
-        <div class="black-para-container">
-            <div class="black-para">
-                i'd take you up to the city sky and we'd stare at the cameras affixed to skyscrapers wondering who was on the other side. it's just us and the door i locked six times over, again, and again, and again, and i'd take the last train back home and travel back to how it used to be, dead, a cadaver with the heart excised, plates on the desk and hair stuck to the floors. i stopped saying it but there are lines drawn all over me and they haven't gone away. sometimes i wake up and 5 more appear, parallel like lights in a circuit. i am dead and waiting and i die every hour, my head in the canted sights on the third of may, hands up not in surrender but in reflex.
-            </div>
-        </div>
+    <div id="info"></div>
+    <div id="mouse-tracker"></div>
+    <div style='left: 1088px; top:210px; width:100px; height:100px;' class="disappearer disappearer-1">:|</div>
+    <div style='height:110px; width:110px; left:950px; top:125px;'class="disappearer disappearer-2">:3</div>
+    <div style='height:100px; width: 100px; left:1170px; top: 345px;'class="disappearer disappearer-3">:O</div>
+    <div style='height: 125px; width: 125px; left:1185px; top: 500px'class="disappearer disappearer-4">:P</div>
+
+    <img src="media/main/rotating_triangle.gif" class="floater">
+    <span style="text-align: center; position: absolute; top: 410px; left: 1392px; font-family:'Consolas';color: white;">moon-sun.xyz</span>
+
+    <span style="text-align: center; position: absolute; top: 240px; left: 1280px; font-family:'Consolas';color: white;">isn't it time..</span>
+
+
+    <span style="text-align: center; position: absolute; top: 90px; left: 1100px; font-family:'Consolas';color: white;">by <span data-debug="debug-em" style=" color: black; background-color: white;">nathan</span> ventura</span>
+
+    <div data-debug = 'debug-stickright' class="stickright">MOON-SUN</div>
+
+    <div data-debug='debug-box' id="box">
+        <div style="position: relative; transform:scale(1.1); outline: 2px solid red; height: 100%; width: 100%; line-height:10px; font-family:'Consolas'; background-blend-mode:color-burn">everytime i look in the mirror i feel nauseous you could lose yourself you could take that risk what would you ask if you had one wish if you had the chance would you choose something</div>
     </div>
 
-    <div style="height:50px; background-color:white; color:black;
-    font-family:'Georgia'; margin-top:20px; width:fit-content; font-size:50px;">
-        check starland out <a href="starland/cover.html">here</a>
+    <div id="dcont">
+        <div style='top:675px; left:1200px;' class='debug' id="debug-bigsphere">big nothing</div>
+        <div style='top:170px; left: 1233px;' class='debug' id="debug-em">emilia</div>
+        <div style='top:111px; left:900px' class='debug' id="debug-menus">click on me</div>
+        <div style='top: 20px; left: 1500px; font-size:15px;' class='debug' id="debug-stickright">the m disappears<br>that's so annoying</div>
+        <div style='top: 2000px; left:100px' class='debug' id="debug-box">window outside</div>
     </div>
 
-    <div class="eva">
-        <img class='eva-gif eva-gif-1' src="media/main/eva1.gif" width="250">
-        <img class='eva-gif eva-gif-2' src="media/main/eva2.gif" width="250">
-        <img class='eva-gif eva-gif-3' src="media/main/eva3.gif" width="250">
-        <img class='eva-gif eva-gif-4' src="media/main/eva4.gif" width="250">
-        <img class='eva-gif eva-gif-5' src="media/main/eva5.gif" width="350">
-        <img class='eva-gif eva-gif-6' src="media/main/eva6.gif" width="350">
-        <div class="eva-header">DRUNK</div>
-        <div class="eva-header" style="font-size:150px; line-height:100px; text-align:center;">GIRLS</div>
-        <div class="eva-subheader-1" style="font-size:80px; line-height:65px;margin-top:15px;">Drunk girls know that love is an astronaut.</div>
-        <div class="eva-subheader-1" style="font-size:80px; line-height:65px;margin-top:15px; text-align:right;">When it comes back, it's never the same.</div>
-    </div>
-    <br><br><br>
-    <div class="footer">
-        <marquee class="bottom-marquee" scrolldelay=60 scrollamount=5>
-            When I put my hands on your body on your flesh I feel the history of that body. Not just the beginning of its forming in that distant lake but all the way beyond its ending. I feel the warmth and texture and simultaneously I see the flesh unwrap from the layers of fat and disappear. I see the fat disappear from the muscle. I see the muscle disappearing from around the organs and detaching iself from the bones. I see the organs gradually fade into transparency leaving a gleaming skeleton gleaming like ivory that slowly resolves until it becomes dust. I am consumed in the sense of your weight, the way your flesh occupies momentary space the fullness of it beneath my palms. I am amazed at how perfectly your body fits to the curves of my hands. If I could attach our blood vessels so we could become each other I would. If I could attach our blood vessels in order to anchor you to the earth to this present time I would. If I could open up your body and slip inside your skin and look out your eyes and forever have my lips fused with yours I would. It makes me weep to feel the history of your flesh beneath my hands in a time of so much loss. It makes me weep to feel the movement of your flesh beneath my palms as you twist and turn over to one side to create a series of gestures to reach up around my neck to draw me nearer. All these memories will be lost in time like tears in the rain.
-        </marquee>
-    </div>
+    
+    <svg id="debugline-cont" xmlns="http://www.w3.org/2000/svg" width="1920px" height="3000px"></svg>
 
-    <div style="width:50%; margin: auto;">I WILL DO ANYTHING FOR YOU I WILL DO IT</div>
+    <div style='top:-25px; left:50%; 'id="debug-title" onclick="debug_toggle()">DEBUG MODE</div>
+</body>
+</html>
 
-    <div class="links">
-        <h3>X</h3>
-        <a href="bruh/heat.html">heat</a><br>
-        <a href="bruh/nathan.html">nathan</a><br>
-        <a href="bruh/underscores.html">underscores</a><br>
-        <a href="bruh/monster.html">monster</a><br>
-    </div>
+<style>
 
-    <br><br>
-    <div class="sliders">
-        <div class="slider-banner">
+    :root {
+        --debug-color: magenta;
+    }
 
-        </div>
-        <div class="ba-slider">
-            <div class="ba-resizable-former" style="width: 100%;">
-            <div class="ba-resizable-inner-one square-cover">
-                <div class="yellow-left">
-                    <p class="yellow-head">GOD IS<br><br><br>IT'S ALL GONE</p>
-                </div>
-                <div class="square-right">
-                    <div class="tmbtp">
-                        goes on
-                    </div>
-                    <div class="horizontal-text">
-                        If I speak in the tongues of men or of angels, but do not have love, I am only a resounding gong or a clanging cymbal. If I have the gift of prophecy and can fathom all mysteries and all knowledge, and if I have a faith that can move mountains, but do not have love, I am nothing. If I give all I possess to the poor and give over my body to hardship that I may boast, but do not have love, I gain nothing.
-        
-                        Love is patient, love is kind. It does not envy, it does not boast, it is not proud.  It does not dishonor others, it is not self-seeking, it is not easily angered, it keeps no record of wrongs. Love does not delight in evil but rejoices with the truth. It always protects, always trusts, always hopes, always perseveres.
-        
-                        Love never fails. But where there are prophecies, they will cease; where there are tongues, they will be stilled; where there is knowledge, it will pass away. For we know in part and we prophesy in part, but when completeness comes, what is in part disappears. When I was a child, I talked like a child, I thought like a child, I reasoned like a child. When I became a man, I put the ways of childhood behind me. For now we see only a reflection as in a mirror; then we shall see face to face. Now I know in part; then I shall know fully, even as I am fully known.
-        
-                        And now these three remain: faith, hope and love. But the greatest of these is love.
-                    </div>
-                </div>
-            </div>
-            </div>
-            <div class="resize" style="width: 0%; left: 0%;">
-                <div class="ba-resizable-inner square-cover">
-                    <div class="invert square-back">
-                        <div class="corinth-right">
-                            If I speak in the tongues of men or of angels, but do not have love, I am only a resounding gong or a clanging cymbal. If I have the gift of prophecy and can fathom all mysteries and all knowledge, and if I have a faith that can move mountains, but do not have love, I am nothing. If I give all I possess to the poor and give over my body to hardship that I may boast, but do not have love, I gain nothing.
-                    
-                                    Love is patient, love is kind. It does not envy, it does not boast, it is not proud.  It does not dishonor others, it is not self-seeking, it is not easily angered, it keeps no record of wrongs. Love does not delight in evil but rejoices with the truth. It always protects, always trusts, always hopes, always perseveres.
-                    
-                                    Love never fails. But where there are prophecies, they will cease; where there are tongues, they will be stilled; where there is knowledge, it will pass away. For we know in part and we prophesy in part, but when completeness comes, what is in part disappears. When I was a child, I talked like a child, I thought like a child, I reasoned like a child. When I became a man, I put the ways of childhood behind me. For now we see only a reflection as in a mirror; then we shall see face to face. Now I know in part; then I shall know fully, even as I am fully known.
-                    
-                                    And now these three remain: faith, hope and love. But the greatest of these is love.
-                        </div>
-                        <div class="tmbtp inverted">the heat</div>
-                    </div>
-                </div>
-            </div>
-            <span class="handle" style="left: 0%;"></span>
-        </div>
-    </div>
+    #debug-menus {
+        z-index: 100;
+    }
+    #debug-title {
+        cursor:pointer;
+        position: absolute;
+        transform: scaleX(1.5);
+        font-family:'Consolas';
+        color:white;
+        font-size: 50px;
+    }
 
-    <div class="p-abs">
-        <div class="pictures">
-            <img src="media/main/cremator.gif">
-            <img src="media/main/breadline.jpg">
-            <img src="media/main/hunting.jpeg">
-            <img src="media/main/eric.jpg">
-            <img src="media/main/3935.png">
-            <img src="media/main/orpheus.gif">
-            <img src="media/main/dag.jpg">
-            <img src="media/main/zapruder.png">
-            <img src="media/main/jd.jpg">
-        </div>
-    </div>
+    #debugline-cont{
+        pointer-events:none;
+        margin-top:-5px;
+        margin-left: -5px;
+    }
 
- 
-    <br><br><br>
-    <script type="text/javascript">
-        $('.ba-slider').beforeAfter();
-        $('.cb-slider').ceforeBfter();
-    </script>
+    .debug-line {
+        stroke: var(--debug-color);
+        stroke-width: 10;
+        z-index: 200;
+        stroke-dasharray: 20, 20;
+    }
 
-    <script>
-        const letters = "qwertyuiopasdfghjklzxcvbnm";
+    .debug {
+        position:absolute;
+        background-color:var(--debug-color);
+        font-family:'Consolas';
+        color:white;
+        font-size:20px;
+        cursor: pointer;
+    }
 
-        let interval = null;
+    #box::before {
+        display: inline-block;
+        transform: translate(-100px, -100px);
+        content: 'window outside';
+        color: white;
+        position: absolute;
+        font-size: 35px;
+    }
+    
+    #box {
+        overflow: hidden;
+        position: absolute;
+        left: 900px;
+        top: 800px;
+        background-image: url('media/main/shofl.gif');
+        width: 500px;
+        height: 250px;
+        filter: drop-shadow(0px 0px 10px white);
+        outline: 5px dashed var(--debug-color);
+    }
 
-        document.querySelector(".p-para").onmouseover = event => {  
-        let iteration = 0;
-        
-        clearInterval(interval);
-        
-        interval = setInterval(() => {
-            event.target.innerText = event.target.innerText
-            .split("")
-            .map((letter, index) => {
-                if(index < iteration || letter == " ") {
-                return event.target.dataset.value[index];
-                }
-            
-                return letters[Math.floor(Math.random() * 26)]
-            })
-            .join("");
-            
-            if(iteration >= event.target.dataset.value.length){ 
-            clearInterval(interval);
-            }
-            
-            iteration += 2;
-        }, 30);
+    .password {
+        position:fixed;
+        left:50vw;
+        top:50vh;
+        transform:translate(-50%,-50%);
+        padding:50px;
+        background-image:url('starland/media/blackshore.gif');
+        font-family:'Consolas';
+        z-index:20;
+        font-size:30px;
+        color:white;
+        z-index: -5;
+        opacity: 0;
+        background-size:cover;
+    }
+
+    .stickright {
+        position: fixed;
+        right: -20px;
+        top: 100px;
+        writing-mode:vertical-rl;
+        transform:scaleY(1.75);
+        font-size:75px;
+        color: white;
+        text-shadow: -2px 0px 0px red, -10px 0px 0px black;
+        outline: 5px dashed var(--debug-color);
+    }
+
+    .floater {
+        width: 250px;
+        position: absolute;
+        top: 780px;
+        left: 600px;
+        z-index: 0;
+    }
+    .zoomer {
+        position: absolute;
+        transform: rotateX(-20deg) rotateY(50deg);
+        top:200px;
+        left:567px;
+        font-size: 100px;
+        filter: drop-shadow(2px 2px 0px white);
+    }
+    .disappearer {
+        position:absolute;
+        background-image:url('starland/media/living_room.gif');
+        background-size:cover;
+        border-radius:1000px;
+        transform:translateX(-50%,-50%);
+        filter: drop-shadow(0px 0px 10px white);
+        text-align: center;
+        justify-content:center;
+        align-items:center;
+        display:flex;
+        font-size:25px;
+        color:white;
+    }
+
+    .disappearer::before {
+        content: '';
+        position: absolute;
+        border: 5px dashed var(--debug-color);
+        width: 100%;
+        height: 100%;
+        border-radius: 1000px;
+        animation: rotate 2.5s linear infinite;
+    }
+
+    
+    #big-sphere::before {
+        content: '';
+        position: absolute;
+        display: block;
+        outline: 10px dashed var(--debug-color);
+        width: 500px;
+        height: 500px;
+        border-radius: 1000px;
+        animation: rotate 5s linear infinite;
+        transform: translate(-20px, -20px);
+    }
+
+    @keyframes rotate {
+        0% {
+            transform: rotate(0deg)
         }
-
-        document.getElementsByClassName('about-me')[0].addEventListener('click', function() {
-            var more_about = document.getElementsByClassName('more-about')[0];
-            var about_me = document.getElementsByClassName('about-me')[0];
-            if (more_about.style.display === "none" || more_about.style.display === "") {
-                anime({
-                targets: ".more-about",
-                height: "75%", // 25% of viewport height
-                padding: "20px",
-                width: "30%",
-                border: "5px solid red",
-                opacity: 1,
-                duration: 1000, // Animation duration in milliseconds
-                easing: "easeOutExpo", // Easing function for smooth animation
-                begin: function () {
-                    more_about.style.display = "block"; // Show div2 before the animation
-                },
-                });
-            } else {
-                // If div2 is visible, hide it
-                anime({
-                targets: ".more-about",
-                height: 0,
-                width: 0,
-                padding: 0,
-                duration: 1000,
-                border: "0px solid red",
-                opacity: 0,
-                easing: "easeOutExpo",
-                complete: function () {
-                    more_about.style.display = "none"; // Hide div2 after the animation
-                },
-                })
-            };
-        });
-
-
-        //
-        const divOne = document.querySelector('.one');
-        const text = divOne.textContent.trim();
-        divOne.innerHTML = '';
-        const characters = text.split('');
-
-        characters.forEach(char => {
-            const span = document.createElement('span');
-            span.textContent = char;
-            divOne.appendChild(span);
-        });
-
-        //
-
-        //anime({
-        //    'targets':'.slider',
-        //    'width':'0%',
-        //    'duration':'25000',
-        //})
-
-        document.addEventListener("DOMContentLoaded", function () {
-        var targetDiv = document.getElementById("anon");
-        var words = targetDiv.innerText.split(" ");
-
-        targetDiv.innerHTML = "";
-
-        var red = ["love ", "cuts ", "stare ", "please ", "mouth "]
-
-        for (var i = 0; i < words.length; i++) {
-            var wordSpan = document.createElement("span");
-            wordSpan.textContent = words[i] + " ";
-            if (red.includes(wordSpan.textContent)) {
-                wordSpan.addEventListener("mouseover", function() {
-                    this.classList.add("redText");
-                });
-            } else {
-                wordSpan.addEventListener("mouseover", function() {
-                    this.classList.add("blackText");
-                });
-            }
-            targetDiv.appendChild(wordSpan);
+        100% {
+            transform: rotate(360deg);
         }
+    }
+    .disappearer-1{
+        animation: fadeoutagain 4130ms infinite;
+
+    }
+
+    .disappearer-2 {
+        animation: fadeoutagain 5000ms infinite;
+    }
+
+    .disappearer-3 {
+        animation: fadeoutagain 7270ms infinite;
+    }
+
+    .disappearer-4 {
+        animation: fadeoutagain 1201ms infinite;
+    }
+    #headlines {
+        font-weight:'bold'; 
+        max-width: 1920px;
+        color:transparent;
+        background-image:url('starland/media/blackmilk.gif');
+        background-clip:text;
+        font-size:100px;
+        position:absolute;
+        top:-50;
+        left:-5;
+        z-index:0;
+        transform-origin:0,0;
+        transform:scaleX(2);
+        filter:drop-shadow(-5px 5px 0px white);
+    }
+
+    #big-sphere {
+        filter: drop-shadow(0px 0px 10px white);
+        background: url('starland/media/living_room.gif');
+        width:500px;
+        height:500px;
+        border-radius:10000px;
+    }
+
+
+    .sphere {
+        position: absolute;
+        top:250px;
+        left:650px;
+    }
+    #info {
+        background-image:url('starland/media/blackwaves.gif');
+        color: white;
+        position: absolute;
+        top: 350px;
+        left: 790px;
+        border: 1px solid white;
+        padding: 10px;
+        transition: 0.3s;
+        width: 200px;
+        height:20px;
+        text-align:center;
+        justify-content:center;
+        align-items:center;
+        display:flex;
+        opacity:0;
+    }
+
+    .test {
+        background-image: url('starland/media/redwater2.gif');
+        outline: 10px dashed var(--debug-color);
+        filter: drop-shadow(5px 5px 5px black);
+    
+    }
+
+    @keyframes flickerflash {
+        0% {filter: invert(1)}
+        25% {filter: invert(0)}
+        50% {filter:invert(1)}
+        75% {filter: invert(0)}
+    }
+    body {
+        background-image: url('starland/media/pg2.gif');
+        background-attachment: fixed;
+        width: 1920px;
+        height:1250px;
+        font-family: 'Georgia';
+        font-weight:bold;
+        position:relative;
+        overflow: auto;
+    }
+
+    #main-menu {
+        user-select: none;
+        z-index:0;
+        position:absolute;
+        top: -30px;
+        left: -100px;
+        font-size: 150px;
+        color:white;
+        perspective: 13cm;
+        z-index:10;
+        width:1000px;
+    }
+
+    #main-menu .test {
+        line-height:150px;
+        list-style-type: none;
+        transition:0.3s;
+        width: fit-content;
+        position: relative;
+        transform-style: preserve-3d;
+        cursor: pointer;
+        pointer-events: all;
+        z-index:3;
+    }
+
+    .yep {
+        transform-style: preserve-3d;
+        transform: rotateX(-10deg) rotateY(30deg) rotateZ(-10deg) translate3d(100px, 100px, 50px);
+        z-index:1;
+        pointer-events: none;
+    }
+
+
+    @keyframes fadeoutagain {
+        0%{opacity:0;}
+        50%{opacity:1;}
+        100%{opacity:0;}
+    }
+
+    li {
+        color: transparent;
+        position: relative;
+        background-image: url('media/main/200w.gif');
+        background-clip: text;
+        -webkit-background-clip: text;
+        background-size:cover;
+        filter: drop-shadow(-10px 5px white);
+        z-index:3;
+        pointer-events: all;
+        font-variant: small-caps;
+    }
+
+
+    #main-menu .test:nth-child(1) {
+        transform: rotateX(-50deg)
+    }
+
+    #main-menu .test:nth-child(2) {
+        transform: rotateX(-25deg)
+    }
+
+    #main-menu .test:nth-child(3) {
+        transform: rotateX(-0deg) 
+    }
+
+    #main-menu .test:nth-child(4) {
+        transform: rotateX(25deg)
+    }
+
+    #main-menu .test:nth-child(5) {
+        transform: rotateX(50deg)
+    }
+
+    #main-menu .test:hover{
+        translate: 20%;
+    }
+
+    #main-menu li:hover{
+        background-image:url("starland/media/redwater.gif")
+    }
+
+    #mouse-tracker {
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        pointer-events: none;
+        z-index: 20;
+    }
+    
+</style>
+
+<script>
+const big_portal = document.getElementById('big-sphere')
+const portals = [big_portal, ...document.querySelectorAll('.disappearer')]
+const listItems = document.querySelectorAll('.test');
+const info = document.getElementById('info');
+const password = document.getElementsByClassName('password')[0];
+const passwordbox = document.getElementById('passwordbox');
+const debugs = document.getElementById('dcont')
+var animation_objects = [];
+
+
+function password_open() {
+    passwordbox.value = '';
+
+    password.style.opacity = 1;
+    password.style.zIndex = 10;
+}
+
+function closeit() {
+    console.log('y');
+    password.style.opacity = 0;
+    password.style.zIndex = -5;
+}
+
+function password_change() {
+    if (passwordbox.value.length > 1) {
+    passwordbox.value = passwordbox.value.slice(-1).repeat(passwordbox.value.length);
+    }
+}
+listItems.forEach(item => {
+  item.addEventListener('mouseenter', function() {
+    info.style.opacity = 1;
+    info.innerText = item.dataset.hover;
+    big_portal.src = item.dataset.portal;
+    item.style.backgroundImage = `url(${item.dataset.portal})`;
+    for (const portal of portals) {
+        portal.style.backgroundImage = `url(${item.dataset.portal})`
+    }
+  });
+  
+  item.addEventListener('mouseleave', function() {
+    info.style.opacity = 0;
+    info.innerText = '';
+    big_portal.src = "starland/media/living_room.gif"
+    for (const portal of portals) {
+        portal.style.backgroundImage = 'url("starland/media/living_room.gif")'
+    }
+    item.style.backgroundImage = 'url("starland/media/redwater2.gif")'
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var mouseTracker = document.getElementById("mouse-tracker");
+
+    function updateMouseTracker(event) {
+        var mouseX = event.clientX;
+        var mouseY = event.clientY;
+
+        mouseTracker.style.left = mouseX + "px";
+        mouseTracker.style.top = mouseY + "px";
+
+        mouseTracker.textContent = "X: " + mouseX + ", Y: " + mouseY;
+    }
+
+    document.addEventListener("mousemove", updateMouseTracker);
+});
+
+// debug effects
+
+function draw_line(elem1, elem2, line) {
+    var rect1 = elem1.getBoundingClientRect();
+    var rect2 = elem2.getBoundingClientRect();
+    var [x1, y1] = [(rect1.left + rect1.right) / 2 + window.pageXOffset, (rect1.top + rect1.bottom) / 2 + window.pageYOffset]
+    var [x2, y2] = [(rect2.left + rect2.right) / 2 + window.pageXOffset, (rect2.top + rect2.bottom) / 2 + window.pageYOffset]
+    line.setAttribute('x1', x1)
+    line.setAttribute('x2', x2)
+    line.setAttribute('y1', y1)
+    line.setAttribute('y2', y2)
+}
+
+const all_elems = document.querySelectorAll('*')
+const debugline_cont = document.getElementById('debugline-cont');
+for (const elem of all_elems) {
+    if (elem.dataset.debug != undefined) {
+        var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+        const debug_elem = document.getElementById(elem.dataset.debug);
+        var rect1 = elem.getBoundingClientRect();
+        var rect2 = debug_elem.getBoundingClientRect();
+        var [x1, y1] = [(rect1.left+rect1.right) / 2 + window.pageXOffset, (rect1.top + rect1.bottom) / 2 + window.pageYOffset]
+        var [x2, y2] = [(rect2.left+rect2.right) / 2 + window.pageXOffset, (rect2.top + rect2.bottom) / 2 + window.pageYOffset]
+        var svgline = document.createElementNS("http://www.w3.org/2000/svg", "line")
+        svgline.setAttribute('x1', x1)
+        svgline.setAttribute('x2', x2)
+        svgline.setAttribute('y1', y1)
+        svgline.setAttribute('y2', y2)
+        svgline.setAttribute('class', 'debug-line');
+        debugline_cont.appendChild(svgline);
+        animation_objects.push({
+            'elem1': elem,
+            'elem2': debug_elem,
+            'line': svgline,
+            'x1': x1,
+            'x2': x2,
+            'y1': y1,
+            'y2': y2,
+        })
+    }
+}
+
+var epsilon = 1;
+function change_lines() {
+    for (const object of animation_objects) {
+        var rect1 = object.elem1.getBoundingClientRect();
+        var rect2 = object.elem2.getBoundingClientRect();
+        var [x1, y1] = [(rect1.left + rect1.right) / 2 + window.pageXOffset, (rect1.top + rect1.bottom) / 2 + window.pageYOffset]
+        var [x2, y2] = [(rect2.left + rect2.right) / 2 + window.pageXOffset, (rect2.top + rect2.bottom) / 2 + window.pageYOffset]
+        if (Math.abs(x1 - object.x1) > epsilon || Math.abs(y1 - object.y1) > epsilon ||
+            Math.abs(x2 - object.x2) > epsilon || Math.abs(y2 - object.y2) > epsilon)  {
+            draw_line(object.elem1, object.elem2, object.line)
+        }
+        object.x1 = x1;
+        object.y1 = y1;
+    }
+}
+
+
+// ughhhhhhhhhhhhhh
+setInterval(change_lines, 50);
+
+// ts all gpted LMFAO idc im not doign this myself
+// Get all elements with the class 'draggable'
+const draggableElements = document.querySelectorAll('.debug');
+
+// Initialize variables to store mouse position and drag state for each element
+let offsetXArray = [], offsetYArray = [], isDraggingArray = [];
+
+// Function to handle mouse down event for a specific element
+function handleMouseDown(event, index) {
+    // Calculate the offset between the mouse position and the top-left corner of the draggable element
+    offsetXArray[index] = event.clientX - draggableElements[index].getBoundingClientRect().left;
+    offsetYArray[index] = event.clientY - draggableElements[index].getBoundingClientRect().top;
+
+    // Set the drag state to true
+    isDraggingArray[index] = true;
+
+    // Add event listeners for mouse move and mouse up events
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+}
+
+// Function to handle mouse move event for a specific element
+function handleMouseMove(event) {
+    for (let i = 0; i < draggableElements.length; i++) {
+        if (isDraggingArray[i]) {
+            // Calculate the new position of the draggable element based on the mouse position and offset
+            const newX = event.clientX - offsetXArray[i] + window.pageXOffset;
+            const newY = event.clientY - offsetYArray[i] + window.pageYOffset;
+
+            // Set the new position of the draggable element
+            draggableElements[i].style.left = newX + 'px';
+            draggableElements[i].style.top = newY + 'px';
+        }
+    }
+}
+
+// Function to handle mouse up event for a specific element
+function handleMouseUp() {
+    // Set the drag state to false for all elements
+    isDraggingArray.fill(false);
+
+    // Remove event listeners for mouse move and mouse up events
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+}
+
+// Add event listeners for mouse down event on each draggable element
+draggableElements.forEach((element, index) => {
+    element.addEventListener('mousedown', (event) => handleMouseDown(event, index));
 });
 
 
-    </script>
-</body>
-</html>
+function debug_toggle() {
+    var c = getComputedStyle(document.documentElement).getPropertyValue('--debug-color');
+    if (c == 'magenta') {
+        document.documentElement.style.setProperty('--debug-color', 'transparent')
+        debugs.style.opacity = 0;
+    } else {
+        document.documentElement.style.setProperty('--debug-color', 'magenta')
+        debugs.style.opacity = 1;
+    }
+}
+
+</script>
