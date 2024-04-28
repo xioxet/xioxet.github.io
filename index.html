@@ -490,13 +490,14 @@
         <div id="mouse-tracker"></div>
         <div style='top:675px; left:1200px;' class='debug' id="debug-bigsphere">big nothing</div>
         <div style='top:478px; left:1300px;' class='debug' id="debug-domain">drop the hyphen?</div>
-        <div style='top:170px; left: 1233px;' class='debug' id="debug-em">you're sure<br>about this one?</div>
+        <div style='top:170px; left: 1233px;' class='debug' id="debug-em">why not<br>the other one?</div>
         <div style='top:41px; left:650px' class='debug' id="debug-menus">why aren't these clickable</div>
         <div style='top: 20px; left: 1500px; font-size:15px;' class='debug' id="debug-stickright">the m disappears?</div>
         <div style='top: 2000px; left:100px' class='debug' id="debug-box">window outside</div>
         <div style='top: 900px; left:500px' class='debug' id="debug-floater">dad</div>
         <div class='boxmarker' data-headline='intended fx' id='intended-fx' style="left: 1290px; top: 361px; width: 220px; height: 150px;">..</div>
         <div class='boxmarker' data-headline='vanishing pt.' id='vanish' style="left: 1317px; top: 83px; width: 50px; height: 50px;">..</div>
+        <div class='boxmarker' data-headline='face' style="left:935px; top: 110px; width: 135px; height: 135px;">..</div>
         <div class='boxmarker' data-headline='his mattress in the mornings when i wake up' style="left: 123px; top: 2513px; width: 1000px; height: 250px;">..</div>
         <div class='boxmarker' data-headline='him' id='seeme' style="left: 500px; top: 1010px; width: 300px; height: 100px;">..</div>
         <div class='boxmarker' data-headline='where we first met' style="left: 984px; top: 1234px; width: 350px; height: 450px;">..</div>
@@ -636,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function() {
         mouseTracker.style.left = mouseX + "px";
         mouseTracker.style.top = mouseY + "px";
 
-        mouseTracker.textContent = "X: " + mouseX + ", Y: " + mouseY + ` + ${Math.round(window.pageYOffset)} = ${Math.round(window.pageYOffset + mouseY)}`;
+        mouseTracker.textContent = "X: " + `${Math.round(window.pageXOffset+mouseX)}` + ", Y: " + `${Math.round(window.pageYOffset + mouseY)}`;
     }
 
     document.addEventListener("mousemove", updateMouseTracker);
