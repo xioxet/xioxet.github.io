@@ -94,6 +94,15 @@
         font-size: 50px;
     }
 
+    #debug-title::before {
+        display: block;
+        content: 'click me ^';
+        position: absolute;
+        font-size: 20px;
+        top: 50px;
+        left: -10px;
+        font-family: 'Courier';
+    }
     #debug-title:hover{
         color:lime;
     }
@@ -112,18 +121,20 @@
 
     .debug-line {
         stroke: var(--debug-color);
-        stroke-width: 10;
+        stroke-width: 1;
         z-index: 200;
-        stroke-dasharray: 20, 20;
     }
 
     .debug {
         position:absolute;
-        background-color:var(--debug-color);
-        font-family:'Consolas';
-        color:white;
-        font-size:20px;
+        color: lime;
+        font-family:'Courier';
+        border: 1px dashed white;
+        background-color: black;
+        font-size:15px;
+        padding: 2px;
         cursor: pointer;
+        user-select: none;
     }
 
     #box::before {
@@ -144,7 +155,7 @@
         width: 500px;
         height: 250px;
         filter: drop-shadow(0px 0px 10px white);
-        outline: 5px dashed var(--debug-color);
+        outline: 2px dashed var(--debug-color);
     }
 
     .password {
@@ -155,7 +166,7 @@
         padding:50px;
         background-image:url('starland/media/blackshore.gif');
         font-family:'Consolas';
-        z-index:20;
+        z-index:100000;
         font-size:30px;
         color:white;
         z-index: -5;
@@ -172,7 +183,7 @@
         font-size:75px;
         color: white;
         text-shadow: -2px 0px 0px red, -10px 0px 0px black;
-        outline: 5px dashed var(--debug-color);
+        outline: 2px dashed var(--debug-color);
     }
 
     .floater {
@@ -208,7 +219,7 @@
     .disappearer::before {
         content: '';
         position: absolute;
-        border: 5px dashed var(--debug-color);
+        border: 2px dashed var(--debug-color);
         width: 100%;
         height: 100%;
         border-radius: 1000px;
@@ -220,7 +231,7 @@
         content: '';
         position: absolute;
         display: block;
-        outline: 10px dashed var(--debug-color);
+        outline: 2px dashed var(--debug-color);
         width: 500px;
         height: 500px;
         border-radius: 1000px;
@@ -343,7 +354,7 @@
         pointer-events: all;
         z-index:3;
         background-image: url('starland/media/redwater2.gif');
-        outline: 10px dashed var(--debug-color);
+        outline: 2px dashed var(--debug-color);
         filter: drop-shadow(5px 5px 5px black);
         background-size:cover;
         transition: 0.3s;
@@ -421,6 +432,8 @@
     <ul id="main-menu">
         <div class="yep">
             <div id='what' class="test" data-debug='debug-menus' data-portal='starland/media/blackwater.gif' data-hover="see some stuff"><li>Wstr</li>
+                <div style='top:0; left: 0' class="test-sw"></div>
+                <div style='top:0; right: 0' class="test-se"></div>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
@@ -478,7 +491,7 @@
         <div style='top:675px; left:1200px;' class='debug' id="debug-bigsphere">big nothing</div>
         <div style='top:478px; left:1300px;' class='debug' id="debug-domain">drop the hyphen?</div>
         <div style='top:170px; left: 1233px;' class='debug' id="debug-em">you're sure<br>about this one?</div>
-        <div style='top:41px; left:650px' class='debug' id="debug-menus">click on me</div>
+        <div style='top:41px; left:650px' class='debug' id="debug-menus">why aren't these clickable</div>
         <div style='top: 20px; left: 1500px; font-size:15px;' class='debug' id="debug-stickright">the m disappears?</div>
         <div style='top: 2000px; left:100px' class='debug' id="debug-box">window outside</div>
         <div style='top: 900px; left:500px' class='debug' id="debug-floater">dad</div>
