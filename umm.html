@@ -8,20 +8,21 @@
 
     .test-sw {
         position: absolute;
+        content: 'abcdefgh';
         left: 0;
         bottom :0;
-        width: 1px;
-        height: 1px;
-        color: purple;
+        width: 25px;
+        height: 25px;
+        background-color: purple;
     }
 
     .test-se {
         position: absolute;
         right: 0;
         bottom: 0;
-        width: 1px;
-        height: 1px;
-        color: purple;
+        width: 25px;
+        height: 25px;
+        background-color: purple;
         z-index: 2000;
     }
     .convo {
@@ -61,7 +62,6 @@
 
     #seeme::before {
         width: 250px;
-        transform:translate(100%, 125px);
     }
 
     #vanish::before {
@@ -93,7 +93,6 @@
         font-family:'Consolas';
         color:white;
         font-size: 50px;
-        z-index: 200;
     }
 
     #debug-title::before {
@@ -168,7 +167,7 @@
         padding:50px;
         background-image:url('starland/media/blackshore.gif');
         font-family:'Consolas';
-        z-index:100000 !important;
+        z-index:100000;
         font-size:30px;
         color:white;
         z-index: -5;
@@ -283,7 +282,7 @@
 
     #big-sphere {
         filter: drop-shadow(0px 0px 10px white);
-        background-image: url('starland/media/living_room.gif');
+        background: url('starland/media/living_room.gif');
         width:500px;
         height:500px;
         border-radius:10000px;
@@ -322,7 +321,6 @@
     }
 
     body {
-        background-image: url('starland/media/pg2.gif');
         background-color: black;
         background-attachment: fixed;
         width: 1920px;
@@ -355,20 +353,20 @@
         cursor: pointer;
         pointer-events: all;
         z-index:3;
-        background-image: url('starland/media/redwater2.gif');
-        outline: 2px dashed var(--debug-color);
-        filter: drop-shadow(5px 5px 5px black);
+        outline: 2px dashed lime;
         background-size:cover;
         transition: 0.3s;
+        background-color:rgba(255,255,255,0.3);
     }
 
     .yep {
         transform-style: preserve-3d;
-        transform: rotateX(-10deg) rotateY(30deg) rotateZ(-10deg) translate3d(100px, 100px, 50px);
+        transform: rotateX(-10deg) rotateY(30deg) rotateZ(-10deg) translate3d(100px, 100px, 50px);  
         z-index:1;
         pointer-events: none;
-    }
+        background-color:rgba(255,0,0,0.5);
 
+    }
 
     @keyframes fadeoutagain {
         0%{opacity:0;}
@@ -377,17 +375,13 @@
     }
 
     li {
-        color: transparent;
         position: relative;
-        background-image: url('media/main/200w.gif');
-        background-clip: text;
-        -webkit-background-clip: text;
-        background-size:cover;
-        filter: drop-shadow(-10px 5px white);
-        z-index:3;
+        color: white;
+        z-index:0;
         pointer-events: all;
         font-variant: small-caps;
     }
+
 
     #main-menu .test:nth-child(1) {
         transform: rotateX(-50deg) translateZ(100px) translateY(-60px);
@@ -409,13 +403,8 @@
         transform: rotateX(50deg) translateZ(100px) translateY(80px);
     }
 
-
     #main-menu .test:hover{
         translate: 20%;
-    }
-
-    #main-menu li:hover{
-        background-image:url("starland/media/redwater.gif")
     }
 
     #mouse-tracker {
@@ -428,150 +417,39 @@
         pointer-events: none;
         z-index: 20;
     }
-
-    .plainbg {
-        background-image: none !important;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: black;
-    }
     
 </style>
 <body>
-    <ul id="main-menu">
+    <ul id="main-menu" style="margin-left:200px">
         <div class="yep">
-            <div id='what' class="test" data-debug='debug-menus' data-portal='starland/media/blackwater.gif' data-hover="see some stuff"><li>Wstr</li>
+            <div id='what' class="test"  data-portal='starland/media/blackwater.gif' data-hover="see some stuff"><li>alpha</li>
                 <div style='top:0; left: 0' class="test-sw"></div>
                 <div style='top:0; right: 0' class="test-se"></div>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
-            <div class="test" data-debug='debug-menus' data-portal='starland/media/bluenoise.gif' data-hover="about me"><li>About</li>
+            <div class="test"  data-portal='starland/media/bluenoise.gif' data-hover="about me"><li>beta</li>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
-            <div class="test" data-debug='debug-menus' data-portal='media/main/perlin.gif' data-hover="wip" onclick="password_open()"><li>Moonsun</li>
+            <div class="test"  data-portal='media/main/perlin.gif' data-hover="wip" onclick="password_open()"><li>gamma</li>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
-            <div class="test" data-debug='debug-menus' data-portal='starland/media/pg6.gif' data-hover="see some items"><li>Other</li>
+            <div class="test"  data-portal='starland/media/pg6.gif' data-hover="see some items"><li>phi</li>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
-            <div class="test" data-debug='debug-menus' data-portal='starland/media/red_static.gif' data-hover="find me"><li>Links</li>
+            <div class="test"  data-portal='starland/media/red_static.gif' data-hover="find me"><li>omega</li>
                 <div class="test-sw"></div>
                 <div class="test-se"></div>
             </div>
         </div>
     </ul>
 
-    <div class="password">
-        <label>type 'password' below to access MOONSUN</label><br>
-        <input style='width:90%; height: 35px; font-size: 20px; margin-top:20px; color:black; font-family:"Consolas"' type=text id="passwordbox" onchange='password_change()' onkeypress="this.onchange()" oninput="this.onchange()" onpaste="return false"><br>
-        <button style='margin-top: 20px; width: 50px; height: 35px; color: white; background-color: black;border-radius: 10px;' onclick="closeit()">close</button>
-    </div>
-
-    <div class="sphere">
-        <div data-debug='debug-bigsphere' id="big-sphere"></div>
-    </div>
-
-    <div id="info"></div>
-    <div style='left: 1088px; top:210px; width:100px; height:100px;' class="disappearer disappearer-1">:|</div>
-    <div style='height:110px; width:110px; left:950px; top:125px;'class="disappearer disappearer-2">:3</div>
-    <div style='height:100px; width: 100px; left:1170px; top: 345px;'class="disappearer disappearer-3">:O</div>
-    <div style='height: 125px; width: 125px; left:1185px; top: 500px'class="disappearer disappearer-4">:P</div>
-
-    <img data-debug='debug-floater' src="media/main/rotating_triangle.gif" class="floater">
-    <span style="text-align: center; position: absolute; top: 410px; left: 1392px; font-family:'Consolas';color: white;">moon<span data-debug='debug-domain' style="background-color:white; color:black;">-</span>sun.xyz</span>
-
-    <span style="text-align: center; position: absolute; top: 240px; left: 1280px; font-family:'Consolas';color: white;">isn't it time..</span>
-
-
-    <span style="text-align: center; position: absolute; top: 90px; left: 1100px; font-family:'Consolas';color: white;">by <span data-debug="debug-em" style=" color: black; background-color: white;">nathan</span> v.</span>
-
-    <div data-debug = 'debug-stickright' class="stickright">MOON-SUN</div>
-
-    <div data-debug='debug-box' id="box">
-        <div style="position: relative; transform:scale(1.1); outline: 2px solid red; height: 100%; width: 100%; line-height:10px; font-family:'Consolas'; background-blend-mode:color-burn">everytime i look in the mirror i feel nauseous you could lose yourself you could take that risk what would you ask if you had one wish if you had the chance would you choose something</div>
-    </div>
-
-    <div id="dcont" style="opacity:0">
-        <div id="mouse-tracker"></div>
-        <div style='top:675px; left:1200px;' class='debug' id="debug-bigsphere">circle</div>
-        <div style='top:478px; left:1300px;' class='debug' id="debug-domain">drop the hyphen?</div>
-        <div style='top:170px; left: 1233px;' class='debug' id="debug-em">and me too, right? :P <br><span class='nathan'>yeah, of course alex</span></div>
-        <div style='top:41px; left:650px' class='debug' id="debug-menus">why aren't these clickable</div>
-        <div style='top: 20px; left: 1500px; font-size:15px;' class='debug' id="debug-stickright">the m disappears?</div>
-        <div style='top: 2000px; left:100px' class='debug' id="debug-box">window outside</div>
-        <div style='top: 1000px; left:800px' class='debug' id="debug-floater">dad</div>
-        <div class='boxmarker' data-headline='intended fx' id='intended-fx' style="left: 1290px; top: 361px; width: 220px; height: 150px;">..</div>
-        <div class='boxmarker' data-headline='vanishing pt.' id='vanish' style="left: 1317px; top: 50px; width: 50px; height: 50px;">..</div>
-        <div class='boxmarker' data-headline='face' style="left:935px; top: 110px; width: 135px; height: 135px;">..</div>
-        <div class='boxmarker' data-headline='his mattress in the mornings when i wake up' style="left: 123px; top: 2513px; width: 650px; height: 450px;">..</div>
-        <div class='boxmarker' data-headline='him' id='seeme' style="left: 500px; top: 1110px; width: 300px; height: 100px;">..</div>
-        <div class='boxmarker' data-headline='where we first met' style="left: 984px; top: 1234px; width: 350px; height: 450px;">..</div>
-        <div class='boxmarker' data-headline='what comes next' style="left: 50px; top: 4500px; width: 1300px; height: 450px;">..</div>
-        <div class='boxmarker' data-headline="that dream he's never told me about" style="left: 784px; top: 3234px; width: 400px; height: 450px;">..</div>
-        <div class='notes' style="left: 500px; top: 500px;">the perspective's not right..</div>
-        <div class='notes alex' style="left: 500px; top: 535px;">it's fine really don't worry about it</div>
-        <div class='notes nathan' style="left: 900px; top: 675px;">hey are you free tomorrow?</div>
-        <div class='notes' style="left: 1000px; top: 900px;">i don't really know. i haven't been sure about much for a while.</div>
-        <div class='convo' style='top: 1350px; left: 400px'>
-            <div class='nathan'>it's nice to work on this with you.</div>
-            <div class='alex'>nice change of pace.</div>
-            <div class='nathan'>in another life we could just be doing this, you know?</div>
-        </div>
-        <div class='convo' style='top: 1550px; left: 300px'>
-            <div class='alex'>'another life'?</div>
-            <div class='nathan'>yeah. one nicer, more comfortable. one by the river.</div>
-            <div class='alex'>i mean, why would it need to be another life? we're doing this right now, aren't we?</div>
-            <div class='nathan'>well, it's not sustainable.</div>
-            <div class='alex'>it's a nice thought. but if you think it too much you'll spend all this time thinking about this imaginary life that you forget about your actual life. the one where we're just, doing the things you're dreaming of doing.</div>
-            <div class='nathan'>you're right, i guess.</div>
-        </div>
-        <div class='convo' style='top: 2021px; left: 700px'>
-            <div class='nathan'>you've been away a lot.</div>
-            <div class='alex'>i know, sorry. i just have a lot of plans.</div>
-            <div class="nathan">i mean if you ever needed any help you know i'm always there. and you know i could help if it's the same stuff.</div>
-            <div class="alex">i don't - it's just something i need to do alone. it's nothing personal, just gotta focus.</div>
-            <div class="nathan">i wasn't mad or anything. just worried.</div>
-            <br><br><br>
-            <div class="nathan">i kind of missed you.</div>
-        </div>
-        <div class='convo' style='top: 2280px; left: 282px'>
-            <div class='alex'>it's cold out here.</div>
-            <div class='nathan'>it is. do you wanna do this again sometime? but someplace else instead?</div>
-            <div class='alex'>mm, i don't know. i like the cold.</div>
-        </div>
-        <div class='convo' style='top: 2880px; left: 902px'>
-            <div class='alex'>i've got my eye on something again.</div>
-            <div class='nathan'>another abandoned?</div>
-            <div class='alex'>nope.</div>
-            <div class='nathan'>oh? are we doing it?</div>
-            <div class='alex'>yep.</div>
-            <div class="nathan">and you're sure?</div>
-            <div class="alex">i'm sure.</div>
-        </div>
-
-        <div class='convo' style='top: 3080px; left: 502px'>
-            <div class='nathan'>your hair's faded a bit.</div>
-            <div class='alex'>how does it look now?</div>
-            <div class='nathan'>it still looks good. a little less vibrant. it suits you.</div>
-        </div>
-
-        <div class='convo' style='top: 3280px; left: 102px'>
-            <div class='alex'>how much longer do we have left?</div>
-            <div class='nathan'>not long, it's almost done. how do you feel about it?</div>
-            <div class="alex">it's cute. there's so little space in here though.</div>
-            <div class="nathan">we'll steal a bigger car next time.</div>
-        </div>
-
-        <div class='convo' style="top:4013px; left: 619px;">
-            <div class='alex'>i missed you too.</div>
-        </div>
-    </div>
 
     
-    <svg id="debugline-cont" xmlns="http://www.w3.org/2000/svg" width="1920px" height="5000px"></svg>
+    <svg id="debugline-cont" xmlns="http://www.w3.org/2000/svg" width="3000px" height="5000px"></svg>
 
     <div style='top:-25px; left:50%; 'id="debug-title" onclick="debug_toggle()">DEBUG MODE</div>
 </body>
@@ -672,7 +550,7 @@ function helpme(elem, debug_elem, svgclass) {
             var m = (y2-y1)/(x2-x1)
             var b = y2 - m * x2
             x1 = -10
-            x2 = 2000
+            x2 = 5000
             y1 = m * x1 + b 
             y2 = m * x2 + b
             console.log(x1, y1, x2, y2)
@@ -782,26 +660,16 @@ draggableElements.forEach((element, index) => {
 });
 
 
-const rip = [...document.querySelectorAll('.test'), ...document.querySelectorAll('.disappearer'), document.getElementById('big-sphere'), ...document.querySelectorAll('li')]
-
 function debug_toggle() {
     var c = getComputedStyle(document.documentElement).getPropertyValue('--debug-color');
     if (c == 'lime') {
         document.documentElement.style.setProperty('--debug-color', 'transparent')
         debugs.style.opacity = 0;
         document.body.style.backgroundImage = 'url("starland/media/pg2.gif")'
-        for (const ripbg of rip) {
-            ripbg.classList.remove('plainbg')
-        }
-        document.getElementsByClassName('yep')[0].style.backgroundColor = 'rgba(255, 0, 0, 0.0)';
     } else {
         document.documentElement.style.setProperty('--debug-color', 'lime')
         debugs.style.opacity = 1;
         document.body.style.backgroundImage = 'url()';
-        for (const ripbg of rip) {
-            ripbg.classList.add('plainbg')
-        }
-        document.getElementsByClassName('yep')[0].style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
     }
 }
 
