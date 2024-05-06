@@ -11,7 +11,7 @@
 <!--so this is the most ambitious page as of writing-->
 <!--i'm unsure what i really wanted to do with this-->
 <body style="background-image: url('media/pg6.gif')">
-    <div class="main">
+    <div class="main" id="umm">
         <h1 style='text-align:center'>Insecticide</h1>
         <img src="media/grille.jpg" class="header-img bright-hover">
         <br><br>
@@ -74,34 +74,37 @@
         <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         <div id="roach-trigger"></div>
         <br><br>
-        <div id="roaches-container">
+    </div>
+    <div id="roaches-container">
             <div id="xxx" style="position: relative; width:100%;height:100%">
                 <div id="tooltips" class="gui"></div>
 
                 <!--bedroom-->
-                <div class="doors bedroom" style="top:25%; left:25%;">
+                <div class="doors bedroom" style="top:100px; left:250px;">
                     <img class='door roach-gif actionable' data-value="bathroom" onclick="change_location('bathroom')" src="media/omori door.png">
                     <img class='door roach-gif actionable' data-value="living room" onclick="change_location('living_room')" src="media/omori door.png">
-                    <img id='outside_door' class='door roach-gif' data-value='not here' src="media/omori door.png">
+                    <img id='outside_door' class='door roach-gif' data-value='find how to unlock me' src="media/omori door.png">
                   </div>
-                <img class="roach-gif bedroom actionable" data-value="friends" src="media/roach1.gif" onclick="type_into_main('They\'re in the pillowcases.')" style="left:25; bottom: 20;">
-                <img class="roach-gif actionable bedroom" data-value="what did he dream about"  onclick="type_into_main('In his dream you two had sex.')"src="media/blackwater.gif" style="left:-10; top:5;">
-                <img class="roach-gif actionable bedroom" data-value="text Alex" src="media/radar.gif" width=250 onclick="type_into_main('You find your phone, which has bugs on it, and find Alex\'s contact. The place where his picture would be is covered by bugs. You type in the letters, which have bugs on them, and they\'re crushed under your thumbs as you text him. Nothing comes out when they are crushed to death, no explosion of black viscera out onto your phone, no cockroach innards clinging onto your thumbs. They vanish underneath you. You send him a message asking if he has any insecticide. The message delivers with no response.')" style="right:45; bottom:15;">
-                <img class="roach-gif actionable bedroom" onclick="type_into_main('You do not want to do that.')"data-value="take the rock on the shelf" src="media/blood.gif" height=500 style="bottom:0;right:30%;">
-                <div class="question bedroom" style="bottom: 20px; left: 25%;">
+                <img class="roach-gif bedroom actionable" data-value="friends" src="media/roach1.gif" onclick="type_into_main('They\'re in the pillowcases.')" style="left:-50px; bottom: 100px; width:750px">
+                <img class="roach-gif actionable bedroom" data-value="what did he dream about"  onclick="type_into_main('In his dream you two had sex.')"src="media/blackwater.gif" style="left:-10px; top:5;">
+                <img class="roach-gif actionable bedroom" data-value="exploding head"  onclick="type_into_main('Sparks.')"src="media/sparkler.gif" style="left:600px; top:100px; height:740px">
+                <img class="roach-gif actionable bedroom" data-value="take a drink"  onclick="type_into_main('Tastes like ashes.')"src="media/shotglass.png" style="right:250px; bottom:100px; height:350px">
+                <img class="roach-gif actionable bedroom" data-value="text Alex" src="media/radar.gif" width=250 onclick="type_into_main('You find your phone, which has bugs on it, and find Alex\'s contact. The place where his picture would be is covered by bugs. You type in the letters, which have bugs on them, and they\'re crushed under your thumbs as you text him. You send him a message asking if he has any insecticide. The message delivers with no response.')" style="right:45; bottom:15;">
+                <img class="roach-gif actionable bedroom" onclick="type_into_main('You do not want to do that.')"data-value="take the rock on the shelf" src="media/blood.gif" height=750 style="bottom:0;right:550px;">
+                <div class="question bedroom" style="bottom: 20px; left: 175px;">
                     <h2>What is his favorite color?</h2>
                     <input type="text" data-value="lime">
                 </div>
 
 
                 <!--bathroom-->
-                <img class="roach-gif bathroom actionable" width=300 style="top:50%; left:-2%" data-value='hands' onclick="type_into_main('Your hands are brown. There are bugs in your fingernails. There are bugs in your skin. There are bugs in your skin. There are bugs in your skin.')" src="media/blackthumbs.gif">
-                <img class="roach-gif bathroom actionable" height="400" style="bottom:5%; left:20%" data-value='wash hands' onclick="type_into_main('Cockroach eggs come out of the tap. Your hair is dirty. Your face is itchy. Your shirt is torn. You are ugly.')" src="media/sink.png">
+                <img class="roach-gif bathroom actionable" width=750 style="top:500px; left:-10px" data-value='hands' onclick="type_into_main('Your hands are brown. There are bugs in your fingernails. There are bugs in your skin. There are bugs in your skin. There are bugs in your skin.')" src="media/blackthumbs.gif">
+                <img class="roach-gif bathroom actionable" height="400" style="bottom:20px; left:200px" data-value='wash hands' onclick="type_into_main('Cockroach eggs come out of the tap. Your hair is dirty. Your face is itchy. Your shirt is torn. You are ugly.')" src="media/sink.png">
                 <img class="roach-gif bathroom actionable" width="1000" style="top:5; left: 5;" data-value="think" onclick="type_into_main('You\'ve spent a lot of time with this boy. You\'ve looked at his skin, his hair, his body as he undressed by the river, his smile and his voice, and his laugh, and everything. You have seen him in dreams you want to remember and hate yourself for wanting to remember. How do you feel?', function() {return worm_think()})" src="media/worm.gif">
-                <img class="roach-gif bathroom actionable"  width=200 style="bottom: 5; right: 5;" data-value="look" onclick="type_into_main('Lumps move about in your skin. You open your mouth and insects pour out of it. You wish Alex was here.')"src="media/mirror.png">
-                <img class="roach-gif bathroom actionable" height="250" style="top: 5%; right:20%;" data-value="cure" onclick="type_into_main('empty')" src="media/insecticide.png">
-                <img class="roach-gif bathroom actionable" width="350" style="bottom:25px;left: 55%; transform:translateX(-50%);" data-value="text him again" onclick="type_into_main('There are insects in the charging port. There are squashed nymphs trapped in the phone case. You ask if he is free right now because you need some help. The text delivers with no response.')" src="media/bloodroaches.gif">
-                <div class="doors bathroom" style='bottom: 3%; right:20%'>
+                <img class="roach-gif bathroom actionable"  width=550 style="bottom: 5; right: 5;" data-value="look" onclick="type_into_main('Lumps move about in your skin. You open your mouth and insects pour out of it. You wish Alex was here.')"src="media/mirror.png">
+                <img class="roach-gif bathroom actionable" height="450" style="top: 50px; right:500px;" data-value="cure" onclick="type_into_main('empty')" src="media/insecticide.png">
+                <img class="roach-gif bathroom actionable" width="550" style="bottom:125px;left:1050px; transform:translateX(-50%);" data-value="text him again" onclick="type_into_main('There are insects in the charging port. There are squashed nymphs trapped in the phone case. You ask if he is free right now because you need some help. The text delivers with no response.')" src="media/bloodroaches.gif">
+                <div class="doors bathroom" style='bottom: 50px; right:150px'>
                     <img class='door roach-gif actionable' data-value="bedroom" onclick="change_location('bedroom')" src="media/omori door.png">
                     <img id='closetdoor' class='door roach-gif actionable' data-value="closet" onclick="type_into_main('locked')" src="media/omori door.png">
                 </div>
@@ -112,44 +115,43 @@
                     <img class='door roach-gif actionable' data-value="bedroom" onclick="change_location('bedroom')" src="media/omori door.png">
                     <img class='door roach-gif actionable' data-value="kitchen" onclick="change_location('kitchen')" src="media/omori door.png">
                 </div>
-                <img class='living_room actionable roach-gif' height="500" style="top:30%; left: 10%;" data-value="walk" src="media/movement.gif" onclick="type_into_main('They are in your socks. They are in between your toes. They are in your mouth.')">
-                <img class="living_room actionable roach-gif" width="400" style="right:20%; top: 20%;" data-value="look outside"  onclick="type_into_main('People are excellent at filling in gaps. Show a person the Mona Lisa with its eyes cut out - there will be no measurable difference to the observer. The eyes are there regardless. Throw a person into nothing and they will make something out of it. This is nothing. You live in nothing.')" src="media/window.png">
+                <img class='living_room actionable roach-gif' height="500" style="top:300px; left: -50px;" data-value="walk" src="media/movement.gif" onclick="type_into_main('They are in your socks. They are in between your toes. They are in your mouth.')">
+                <img class='living_room actionable roach-gif' height="500" style="bottom:-250px; left: 250px;" data-value="boats" src="media/river.png" onclick="type_into_main('The only one.')">
+                <img class="living_room actionable roach-gif" width="550" style="right:550px; top: 150px;" data-value="look outside"  onclick="type_into_main('This is nothing. You live in nothing.')" src="media/window.png">
                 <img class="living_room actionable roach-gif" width="350" style="top:10; left:10" data-value="towers" src="media/demolition.gif" onclick="type_into_main('It is beautiful, of course. It is spectacular and it is necessary. And it is right. It is right to do. The problem is cowardice. Not doing it enough. Not taking back what\'s rightfully yours. Putting something into nothing.')">
-                <img class="living_room actionable roach-gif" height:="700" style="top:20% ; left:30%" data-value="nothing" src="media/spine.gif" onclick="type_into_main('Nothing is the wrong word.')">
-                <img class="living_room actionable roach-gif" width="500" style="right:10%; bottom: 1%" data-value="text him again" src="media/shark.gif" onclick="type_into_main('No response.')">
+                <img class="living_room actionable roach-gif" height:="700" style="top:200px ; left:500px" data-value="nothing" src="media/spine.gif" onclick="type_into_main('Nothing is the wrong word.')">
+                <img class="living_room actionable roach-gif" width="750px" style="right:100px; bottom: 50px" data-value="text him again" src="media/shark.gif" onclick="type_into_main('No response.')">
 
                 <!--kitchen-->
                 <div class="doors kitchen" style="bottom:25; right: 25;">
                     <img class='door roach-gif actionable' data-value="living room" onclick="change_location('living_room')" src="media/omori door.png">
                 </div>
-                <img class="kitchen roach-gif actionable" src="media/water.gif" width="1000" style="top:50%; left:50%;transform:translate(-50%,-50%)" data-value="water" onclick="type_into_main('This has happened before and you know how to stop it. It is harder this time. No one is around. You are in hell. But you are smart.', function() {return spawn_bathroom_key()})">
+                <img class="kitchen roach-gif actionable" src="media/water.gif" width="1500" style="top:50%; left:50%;transform:translate(-50%,-50%)" data-value="water" onclick="type_into_main('This has happened before and you know how to stop it. It is harder this time. No one is around. You are in hell. But you are smart.', function() {return spawn_bathroom_key()})">
                 <img id="bathroom_key" class="roach-gif actionable" width=200 style="bottom:10px; left: 10px;"data-value="bathroom key" onclick="type_into_main('Key.', function() {return get_bathroom_key()})" src="media/key.png">
 
                 <!--closet-->
                 <div class="doors closet" style="top: 25; right: 25;">
                     <img class='door roach-gif actionable' data-value="bathroom" onclick="change_location('bathroom')" src="media/omori door.png">
                 </div>
-                <img src="media/pieta.png" class="closet roach-gif actionable" height="1000" data-value='car keys'style="top:5;left:5" onclick="type_into_main('You never learned how to quit. You are drowning here. Take the keys and go find him now. He is 10 minutes away. I unlocked the door for you. It will all be over soon.', function() {return unlock()})">
+                <img src="media/pieta.png" class="closet roach-gif actionable" height="1000" data-value='car keys'style="top:5;left:5" onclick="type_into_main('The front door is now unlocked.', function() {return unlock()})">
 
                 <!--outside-->
                 <img class="actionable outside roach-gif" src="media/road.gif" data-value="10 minutes" width=500 style="top:50%;left:50%;transform:translate(-50%,-50%)" onclick="type_into_main('Here we go. You\'ve gotten used to this now. Your feet know where to go, know how hard to press. The turns aren\'t so bad anymore. The sun hangs limp and you can see it through the front window. The window on the left is still shattered. Everything comes alive, everything\'s quiet. Once you get there it will all be okay.                                                              ', function() {return change_location('final_scene')})">
 
                 <!--final scene-->
-                <img id="fire" class="final_scene roach-gif" src="media/fire.gif" style="cursor:pointer; bottom:-450px; width:102vw;left:-25px" onclick="type_into_main('He\'s sitting by the curb.')" data-value="his apartment">
+                <img id="fire" class="final_scene roach-gif" src="media/fire.gif" style="cursor:pointer; bottom:-300px; width:2000px;left:-25px" onclick="type_into_main('He\'s sitting by the curb.')" data-value="his apartment">
 
                 <!--gui-->
                 <div class="gui textwall"></div>
-                <div id="objective" class="gui">Objective: Kill the bugs that are in your skin.</div>
+                <div id="objective" class="gui">Objective: Leave.</div>
                 <div id="main-text" class="gui"></div>
                 <div class="options">
                     <div class="worm-options" onclick="worm_reset(); type_into_main('You will not always feel this way. But you will for a long time.')">guilty</div>
                     <div class="worm-options" onclick="worm_reset(); type_into_main('It is natural to feel guilty. But sometimes just because it is natural, justifiable, does not mean it is right. It is not fair to you. Years of conditioning have undone the sheaths of your nerves, the coils of muscles wrapped tight around your bones, eaten it all up. It is not kind to you.')">guilty</div>
                 </div>
-                <img class="roach-gif gui" data-value="your ugly beating heart" src="media/heart.gif" style="right:10; bottom:250;">
+                <img class="roach-gif gui" data-value="your ugly beating heart" src="media/heart.gif" style="right: 50px; top: 50px; width:350px">
             </div>
-        </div>
     </div>
-        <br><br><br>
 </body>
 <style>
 
@@ -158,7 +160,7 @@
     }
 
     .options {
-        opacity: 1;
+        display: 'block';
         position: absolute;
         top: 65%;
         left: 50%;
@@ -231,7 +233,7 @@
         color:blue;
         z-index: 5;
         padding-inline: 5px;
-        opacity: 0;
+        display: none;
     }
 
     #main-text {
@@ -241,7 +243,7 @@
         transform:translate(-50%,-50%);
         background-color:black;
         color:white;
-        width:50%;
+        width:25%;
         display: inline-block;
         white-space: pre-wrap;
         text-align: left;
@@ -252,6 +254,9 @@
 
     }
 
+    body {
+        overflow: scroll;
+    }
     .roach-info {
         background-color:black;
         color:red;
@@ -282,16 +287,14 @@
     }
 
     #roaches-container {
-        opacity:0;
-        z-index:-100;
+        display: none;
         background-image:url('media/cockroach.gif');
-        position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
+        width: 1920px;
+        height: 1080px;
+        overflow-y: hidden;
         font-family:'Courier';
-        height: 100vh;
-        overflow: hidden;
     }
 
     #oops:hover{
@@ -403,9 +406,9 @@
         document.body.style.backgroundColor = 'black';
         change_location('nothing')
         setTimeout(function() {
-            background.style.zIndex = 1;
-            background.style.opacity = 1;
+            background.style.display = 'block';
             change_location('bedroom');
+            document.getElementById('umm').remove()
         }, 150)
     }
     });
@@ -477,8 +480,8 @@
 
     function spawn_bathroom_key() {
         bathroom_key.classList.add('kitchen')
-        bathroom_key.style.zIndex = 5;
-        bathroom_key.style.opacity = 1;
+        bathroom_key.style.display = 'block';
+        bathroom_key.style.zIndex = 1;
     }
 
     function get_bathroom_key() {
@@ -501,11 +504,11 @@
         // cut to black, then set backgrounds
         background.style.backgroundImage = 'url()';
         background.style.backgroundColor='black';
-        xxx.style.opacity = 0;
+        xxx.style.display = 'none';
         
         setTimeout(function() {
             background.style.backgroundImage = `url("media/${location_object['background_image']}")`;
-            xxx.style.opacity = 1;
+            xxx.style.display = 'block';
         }, 2500)
 
 
@@ -517,19 +520,19 @@
         // get all the new items
         for (const item of items) {
             if (item.classList.contains(room) || item.classList.contains('gui')) {
-                item.style.zIndex = 4; item.style.opacity = 1;
+                item.style.zIndex = 4; item.style.display = 'block';
                 if (item.classList.contains('gui')) {
                     if (room != 'outside' && room != 'final_scene' && room != 'nothing') {
-                        item.style.zIndex=5; item.style.opacity=1;
+                        item.style.zIndex=5; item.style.display = 'block';
                     } else {
-                        item.style.zIndex=-5; item.style.opacity=0;
+                        item.style.zIndex=-5; item.style.display = 'none';
                     }
                 }
                 if (item.classList.contains('textwall')) {item.style.zIndex = 1;}
                 if (item.id === 'tooltips') {item.style.zIndex = 7;}
                 if (item.classList.contains('doors')) {item.style.zIndex = 6;}
-                if (item.id === 'main-text') {item.style.zIndex=7; item.style.opacity = 1;}
-            } else {item.style.zIndex = -5; item.style.opacity = 0;}
+                if (item.id === 'main-text') {item.style.zIndex=7; item.style.display= 'block';}
+            } else {item.style.zIndex = -5; item.style.display = 'none';}
         }
     }
 
@@ -551,31 +554,31 @@
     }
 
     function worm_think() {
-        options.style.opacity = 1;
+        options.style.display = 'block';
         options.style.zIndex = 10;
     }
 
     function worm_reset() {
-        options.style.opacity = 0;
-        options.style.zIndex = -10;
+        options.style.display = 'none';
     }
+    
     function move_tooltips(event) {
         var mouseX = event.clientX;
         var mouseY = event.clientY;
 
-        tooltips.style.left=`${mouseX + 15}px`
-        tooltips.style.top=`${mouseY + 15}px`
+        tooltips.style.left=`${mouseX + 15 + window.pageXOffset}px`
+        tooltips.style.top=`${mouseY + 15 + window.pageYOffset}px`
     }
     
 
     roach_gifs.forEach(function(element) {
         element.addEventListener('mouseenter', function() {
-            tooltips.style.opacity = 1;
+            tooltips.style.display = 'block';
             tooltips.innerText = element.dataset.value;
             if (element.classList.contains('actionable')) {tooltips.style.backgroundColor='white';}                                      
         })
         element.addEventListener('mouseleave', function() {
-            tooltips.style.opacity = 0;
+            tooltips.style.display = 'none';
             tooltips.style.backgroundColor='black';
         })
     })
