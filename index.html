@@ -533,12 +533,10 @@
 
     <div class="overlaybox" id="overlaybox-others">
         <div class="sideline-box">OTHERS</div>
-        <div class="maintext" style="background-color:rgba(0,0,0,0.9);padding:5px;">related:<br><br>
-            coin locker babies<br>
-            monster<br>
-            omori<br>
-            stray dogs<br>
-            rebels of the neon god<br>
+        <div class="maintext" style="background-color:rgba(0,0,0,0.9);padding:5px;">other stuff:<br>
+            <a href="misc/monster.html">monster</a>
+            <a href="misc/nathan.html">nathan</a>
+            <a href="misc/heat.html">heat</a>
         </div>
         <button style='position: absolute;bottom: 20px; right: 20px; width: 50px; height: 35px; color: white; background-color: black;border-radius: 10px; cursor:pointer;' onclick="closeit(this)">close</button>
     </div>
@@ -584,8 +582,6 @@
 
     <span style="text-align: center; position: absolute; top: 90px; left: 1100px; font-family:'Consolas';color: white;">by <span data-debug="debug-em" style=" color: black; background-color: white;">nathan</span> v.</span>
 
-    <div data-debug = 'debug-stickright' class="stickright">MOON-SUN</div>
-
     <div data-debug='debug-box' id="box">
         <div style="position: relative; transform:scale(1.1); outline: 2px solid red; height: 100%; width: 100%; line-height:10px; font-family:'Consolas'; background-blend-mode:color-burn">everytime i look in the mirror i feel nauseous you could lose yourself you could take that risk what would you ask if you had one wish if you had the chance would you choose something</div>
     </div>
@@ -596,11 +592,10 @@
         <div style='top:478px; left:1300px;' class='debug' id="debug-domain">drop the hyphen?</div>
         <div style='top:170px; left: 1233px;' class='debug' id="debug-em">and me too, right? :P <br><span class='nathan'>yeah, of course alex</span></div>
         <div style='top:41px; left:650px' class='debug' id="debug-menus">why aren't these clickable</div>
-        <div style='top: 20px; left: 1500px; font-size:15px;' class='debug' id="debug-stickright">the m disappears?</div>
         <div style='top: 2000px; left:100px' class='debug' id="debug-box">window outside</div>
         <div style='top: 1000px; left:800px' class='debug' id="debug-floater">dad</div>
         <div class='boxmarker' data-headline='intended fx' id='intended-fx' style="left: 1290px; top: 361px; width: 220px; height: 150px;">..</div>
-        <div class='boxmarker' data-headline='vanishing pt.' id='vanish' style="left: 1317px; top: 50px; width: 50px; height: 50px;">..</div>
+        <div class='boxmarker' data-headline='vanishing pt.' id='vanish' style="transform:translate(-50%,-50%); width: 50px; height:50px;">..</div>
         <div class='boxmarker' data-headline='face' style="left:935px; top: 110px; width: 135px; height: 135px;">..</div>
         <div class='boxmarker' data-headline='his mattress in the mornings when i wake up' style="left: 123px; top: 2513px; width: 650px; height: 450px;">..</div>
         <div class='boxmarker' data-headline='him' id='seeme' style="left: 500px; top: 1110px; width: 300px; height: 100px;">..</div>
@@ -790,43 +785,48 @@ function draw_line(elem1, elem2, line) {
 const all_elems = document.querySelectorAll('*')
 const debugline_cont = document.getElementById('debugline-cont');
 
+var lines = []
+
 function helpme(elem, debug_elem, svgclass) {
     var scrollX = window.pageXOffset || document.documentElement.scrollLeft;
-        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
-        var rect1 = elem.getBoundingClientRect();
-        var rect2 = debug_elem.getBoundingClientRect();
-        var [x1, y1] = [(rect1.left+rect1.right) / 2 + window.pageXOffset, (rect1.top + rect1.bottom) / 2 + window.pageYOffset]
-        var [x2, y2] = [(rect2.left+rect2.right) / 2 + window.pageXOffset, (rect2.top + rect2.bottom) / 2 + window.pageYOffset]
-        if (svgclass === 'menu-line') {
-            // ermm what the scallop
-            var m = (y2-y1)/(x2-x1)
-            var b = y2 - m * x2
-            x1 = -10
-            x2 = 2000
-            y1 = m * x1 + b 
-            y2 = m * x2 + b
-            console.log(x1, y1, x2, y2)
-            // lol
-        }
-        var svgline = document.createElementNS("http://www.w3.org/2000/svg", "line")
-        svgline.setAttribute('x1', x1)
-        svgline.setAttribute('x2', x2)
-        svgline.setAttribute('y1', y1)
-        svgline.setAttribute('y2', y2)
-        svgline.setAttribute('class', svgclass);
-        debugline_cont.appendChild(svgline);
-        if (svgclass != 'menu-line') {
-        animation_objects.push({
-            'elem1': elem,
-            'elem2': debug_elem,
-            'line': svgline,
-            'x1': x1,
-            'x2': x2,
-            'y1': y1,
-            'y2': y2,
-        })
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    var rect1 = elem.getBoundingClientRect();
+    var rect2 = debug_elem.getBoundingClientRect();
+    var [x1, y1] = [(rect1.left+rect1.right) / 2 + window.pageXOffset, (rect1.top + rect1.bottom) / 2 + window.pageYOffset]
+    var [x2, y2] = [(rect2.left+rect2.right) / 2 + window.pageXOffset, (rect2.top + rect2.bottom) / 2 + window.pageYOffset]
+    var tempm, tempb = 0;
+    var intersect_x, intersect_y;
+    if (svgclass === 'menu-line') {
+        var m = (y2-y1)/(x2-x1)
+        var b = y2 - m * x2
+        x1 = -10
+        x2 = 2000
+        y1 = m * x1 + b 
+        y2 = m * x2 + b
+        lines.push([m, b])
     }
+    document.getElementById('vanish').style.top = `${intersect_x - 25}px`
+    document.getElementById('vanish').style.left = `${intersect_y - 25}px`
+    var svgline = document.createElementNS("http://www.w3.org/2000/svg", "line")
+    svgline.setAttribute('x1', x1)
+    svgline.setAttribute('x2', x2)
+    svgline.setAttribute('y1', y1)
+    svgline.setAttribute('y2', y2)
+    svgline.setAttribute('class', svgclass);
+    debugline_cont.appendChild(svgline);
+    if (svgclass != 'menu-line') {
+    animation_objects.push({
+        'elem1': elem,
+        'elem2': debug_elem,
+        'line': svgline,
+        'x1': x1,
+        'x2': x2,
+        'y1': y1,
+        'y2': y2,
+    })}
+
 }
+
 
 for (const elem of all_elems) {
     if (elem.dataset.debug != undefined) {
@@ -837,6 +837,17 @@ for (const elem of all_elems) {
         helpme(elem, elem2, 'menu-line');
     }
 }
+
+console.log(lines);
+var m1 = lines[1][0]
+var b1 = lines[1][1]
+var m2 = lines[2][0]
+var b2 = lines[2][1]
+var intersect_x = -(b2-b1)/(m2-m1)
+var intersect_y = m1 * intersect_x + b1
+console.log(intersect_x, intersect_y)
+document.getElementById('vanish').style.top = `${intersect_y-3}px`
+document.getElementById('vanish').style.left = `${intersect_x-3}px`
 
 var epsilon = 1;
 function change_lines() {
