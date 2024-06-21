@@ -1,0 +1,54 @@
+body {
+    background-image: url('media/blackmilk.gif');
+    color: white;
+    font-family:'Georgia';
+    text-shadow: 2px 2px #ff0000;
+}
+
+.problem {
+    margin: auto;
+    margin-block: 50px;
+    width: 50%;
+    border: 2px solid blue;
+    background-image: url('media/blackstatic.gif');
+    padding-inline: 20px;
+    padding-bottom:20px;
+}
+
+@media (max-width: 767px) {
+    .problem {
+        width: 80%; /* Adjusted width for smaller screens */
+    }
+}
+
+h2, h1 {
+    text-align:center;
+}
+
+h2 {
+    text-shadow: 2px 2px #0000ff;
+}
+
+.description {
+    text-shadow: 2px 2px #0000ff;
+    font-family:'Cambria';
+}
+
+code {
+    text-shadow: none;
+    color: black;
+    background-color:white;
+    white-space: nowrap;     /* Prevent wrapping */
+    overflow-x: auto;        /* Enable horizontal scroll */
+    display: block;          /* Ensure it behaves as a block element */
+    max-width: 100%;         /* Optionally limit width to container width */
+    padding: 10px;  
+    margin: 20px;         /* Add padding for better readability */
+}
+
+.description img {
+    width: 90%;
+    margin: auto;
+    margin-block: 20px;
+    display: block;
+}

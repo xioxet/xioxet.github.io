@@ -1,7 +1,13 @@
 .main {
-    width: 40%;
+    width: 45%;
     margin: auto;
     margin-top: 50px;
+}
+
+@media screen and (max-width: 768px) {
+  .main {
+    width: 75%;
+  }
 }
 
 .end {
@@ -20,12 +26,13 @@ body {
     color: white;
     background-repeat: repeat;
     font-family: 'Georgia';
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .nathan {
     color: rgb(255, 34, 34);
     text-align: justify;
+    transform:translateX(5%);
     margin: 8px 0;
 }
 
@@ -38,7 +45,6 @@ body {
 
 .narration {
     text-align: justify;
-    transform: translateX(20%);
     margin: 8px 0;
 }
 
