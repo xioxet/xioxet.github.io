@@ -1,5 +1,5 @@
 body {
-    background-image: url('media/blackmilk.gif');
+    background-image: url('media/futaba/allmessed.gif');
     color: white;
     font-family:'Georgia';
     text-shadow: 2px 2px #ff0000;
@@ -9,15 +9,19 @@ body {
     margin: auto;
     margin-block: 50px;
     width: 50%;
-    border: 2px solid blue;
+    border: 2px solid lime;
     background-image: url('media/blackstatic.gif');
     padding-inline: 20px;
     padding-bottom:20px;
+    font-size:20px;
 }
 
 @media (max-width: 767px) {
     .problem {
         width: 80%; /* Adjusted width for smaller screens */
+    }
+    .futabasticker {
+        opacity: 0.2;
     }
 }
 
@@ -26,11 +30,11 @@ h2, h1 {
 }
 
 h2 {
-    text-shadow: 2px 2px #0000ff;
+    text-shadow: 0.5px 0.5px lime;
 }
 
 .description {
-    text-shadow: 2px 2px #0000ff;
+    text-shadow: 0.5px 0.5px lime;
     font-family:'Cambria';
 }
 

@@ -1,0 +1,156 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>big fun</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <h2 style="font-size:75px; text-shadow: 2px 2px lime;background-color:black; margin-bottom:-20px;margin-top:40px;">navilog</h2>
+    <img src="media/futaba/futabagif.gif" class="futabasticker" style="position: fixed; left:10; bottom: 10; width: 100px;">
+    <div class="problem">
+        <h2>monitor</h2>
+        <div class="description">
+            moniter........<br>
+            this one was the first box i solved without asking anyone for hints. just me and my massive big brain against da world. so pretty happy abt it.
+            <h3>overview</h3>
+            <ol>
+                <li>get to wordpress page</li>
+                <li>exploit sqli to get admin creds</li>
+                <li>use plugin vuln to get rce (PAIN)</li>
+                <li>get user flag!</li>
+                <li>run linpeas</li>
+                <li>try literally the first exploit</li>
+                <li>root flag! :)</li>
+            </ol>
+
+            super easy right! alas i am stupid and took over 2 days on what should have taken me like, 2 hours max. but we love + we learn + we prosper and we live. 
+            
+            <hr>
+            <h2>zeroth step prayer to futaba</h2>
+            our mother who art in her room hallowed be thy swag thy kingdom come thy will be done manually as it is in msfconsole give us this day our daily shell and lead us not into the root account but deliver us from user. amen
+            <img src="media/futaba/futaba.png">
+            have YOU prayed to futaba today?
+            <h2>first step nmap scan</h2>
+            <img src="media/monitor/monitor1.png">
+            apache + ssh spotted, add monitor.htb to hosts and check it out - all you'll get is the default apache page with no indication of where to go so we ffuf this shit and try to find actual info
+            <img src="media/monitor/monitor2.png">
+            'blog' subdirectory, we go there and mmm yup there's the money...
+            <img src="media/monitor/monitor3.png">
+            site is honestly really barebones. there's not much to it, but it is a wordpress site, and wordpress sites are always shitty and exploitable so we run wpscan on this shit with extra juice and try to find exploitable plugin
+            <img src="media/monitor/monitor4.png">
+            <img src="media/monitor/monitor4half.png">
+            wpscan finds 2 different plugins, one requires admin login but gets you RCE, and the other is blind SQLI. so ok. seems like it is all laid out for us very simply: get credentials from sql injection, then get a shell from rce, then figure it out from there. simple!
+            <h2>second step the sqlmappening</h2>
+            <img src="media/monitor/monitor5.png">
+            so here's the exploit, let's just swap out our domain and try it out
+            <img src="media/monitor/monitor6.png">
+            ok pretty weird. you can tell it didn't work because the SLEEP(5) didn't go thru and we got our response back basically immediately. i got stuck here for 7 hours because i am stupid and dumb and do not understand sql injections. i would not understand a sqli payload if it hit me in the fucking head. but the problem is the slash before the ' in <b>x<span style='color:red'>/</span>' UNION SELECT...</b> just remove that and we're cooking.
+            <img src="media/monitor/monitor7.png">
+            shoutout to that single slash, which consumed 7 entire hours of my rapidly depleting life. anyways it works. so we send it to burp via proxy to save the request as a file we can run sqlmap with (i'm sure there's a far easier way to do this, i just.. don't know how to do it)
+            <img src="media/monitor/monitor8.png">
+            <img src="media/monitor/monitor9.png">
+            and here's five more hours of me trying to figure out how the fuck sqlmap worked - it wld just utterly refuse to find the correct payload vector no matter what i tried. cant really describe what i tried here. i just tinkered and tinkered and bashed my head until sqlmap spat out something nice.
+            <code>sqlmap -r again.sql -vvv --risk 3 --level 5 --time-sec=3 --technique=T -p wp_statistics_hit[search_query]
+            </code>
+            loosely:
+            <ul>
+                <li>vvv -> verbose lvl 3</li>
+                <li>--risk 3 -> max risk lvl</li>
+                <li>--level 5 -> max level</li>
+                <li>--technique=T : use only time-based blinds, because the proof-of-concept payload used a timebased blind</li>
+                <li>-p wp_statistics_hit[search_query] in the proof-of-concept payload, this parameter is injected, so might as well try it</li>
+            </ul>
+            <img src="media/monitor/monitor10.png">
+            the above image is the result of 5 wasted hrs of my life but sqlmap finally identifies the payload so yay!! now we can just dump the tables! hooray! yippee!
+            <br><br>
+            now this is where a smarter person, recognizing that we're using time-based sqli (incredibly fucking slow) would do some more optimization and try to find which specific table would be important to dump. i unfortunately am not smarter so i spent like a further 5 hours waiting for sqlmap to give me what i wanted by brute-forcing every fucking table, when i really couldve just googled 'wordpress tables' and made an educated guess.
+            <img src="media/monitor/monitor11.png">
+            also yeah, i am really fucking stupid, i cannot lie. what i haven't mentioned up til now is the amount of utter fucking <i>time</i> i wasted on exploits i should've known wouldnt have worked, such as:
+            <br><br>
+            this sqli exploit you need a nonce for (couldnt find it anywhere no matter how hard i tried, it 'says' unauthenticated but i think on this specific box you'd need authentication to get it to work)
+            <img src="media/monitor/monitor12.png">
+            and of course, just trying to bruteforce the wp login with rockyou
+            <img src="media/monitor/monitor13.png">
+            (honestly, probably would've gotten it had i left it overnight, it's only a million entries in - but forgive me for stopping at 100k requests, didn't want to try my luck)
+            <br><br>
+            anyways that was a nice digression into the I Am A Fucking Idiot Power Hour but let's get back into it. at this point you can either:
+            <ol>
+                <li>correctly deduce that you only need wp_users, spend maybe 30 minutes dumping that table and only that table</li>
+                <li>spend four hours dumping everything</li>
+            </ol>
+            can you guess which one i chose?
+            <br><br>
+            but whatever. here's what you'll get after the dumping.
+            <img src="media/monitor/monitor14.png">
+            le epic password hashes moment. add them to a text file, run john on that jawn, and wait.
+            <img src="media/monitor/monitor15.png">
+            aaand there's the credentials
+            <h3>admin:2fly4you</h3>
+            the astute among you may have noticed there are two accounts and only one cracked hash. i couldn't crack the 2nd one, i don't think it's possible with rockyou, i think it might be the same as the ssh credentials (which i also never figured out, fwiw)
+
+            <h2>threeth step: rce after getting admin credentials</h2>
+            godd this part fucking sucked lmfao
+            <img src="media/monitor/monitor16.png">
+            here's our admin page! i'll save you the trouble. it's basically entirely useless. you can't write or edit anything or make any new posts. all you need it for is access to the endpoint that's vulnerable to rce. 
+            <img src="media/monitor/monitor17.png">
+            well let's explain the rce, i guess - simply put for some reason this plugin has the functionality of dns resolving an ip address, but it doesn't properly sanitize the input you feed into it. so you can feed the specific endpoint a payload that consists of a url + a command you want executed, and it will just execute that command for you, ezclap
+            <img src="media/monitor/monitor18.png">
+            here's the specific form that's vulnerable to rce. but it doesn't work if you just send the form from there, so we need to specifically craft POST requests to that endpoint with our payloads to get the RCE cooking. i probably could've done this with burp repeater and had a way better time but i found the html page screenshotted above which sends the form for you with just one button click, and just manually changed the payload in inspectelement every time. it's hilariously, comically inefficient, especially with how much time i spent bashing my head against this step, but oh well.
+            <img src="media/monitor/monitor19.png">
+            here i've changed the payload to whoami, and when we hit send...
+            <br><br><br><br><br><br><br><br><br>
+            hmm this is where i'd usually take a screencap of a successful rce result! maybe a handy little whoami response or even a successful reverse shell established! well it'll come any time now. let's just wait.
+            <br><br><br><br><br><br><br><br><br><br><br><br>
+            huh. where's the picture?
+            <br><br><br><br><br><br><br><br><br><br><br><br>
+            sigh. FUCK you. there IS no picture. this rce vuln is SO goddamn bad and annoying and finicky i spent HOURS trying to wrangle a shell out of it, netcat listeners would get connections and even my fucking http servers would pick up on GET requests but only if i said the magic word and was really nice and kind or whatever. i still dont know what this fucking thing's problem is, man. i couldnt get a straightforward reverse shell with any of the payloads from my beloved <a href="https://revshells.com">revshells dot com</a>, i went deep into the hacktricks sauce and found this
+            <img src="media/monitor/monitor21.png">
+            i just downloaded the necessary files on both the target and the attacker (had to really plead with the rce on this one for it to just fucking download my stuff) but after HOURS of struggle..
+            <img src="media/monitor/monitor22.png">
+            <img src="media/monitor/monitor23.png">
+            [hacker voice] WE'RE IN.
+            <h2>three and a halfth step: the watchdog diversion</h2>
+            this www-data account is a piece of utter shit and can't write into many directories. but we find one we can write into anyway, and install pspy and run it
+            <img src="media/monitor/monitor24.png">
+            welp. ok thats about as obvious as anything we can get. too bad that purple user uid:1000 isn't actually root, it's a user named watchdog. but we check if we can modify any of the scripts it's running:
+            <img src="media/monitor/monitor25.png">
+            doBackup.sh doesn't even exist in this directory, but we can write to this directory so just make a file with that name that creates another reverse shell, like so:
+            <img src="media/monitor/monitor26.png">
+            then just set up a nc listener and Wait. a funny little thing about this box is that for some reason, there is a process run by root that deletes the doBackup.sh file every 10 minutes or so, just to fuck with you ig????????
+            <img src="media/monitor/monitor27.png">
+            so...  make sure you do backup doBackup.sh. lmfao its not even like, hard to deal with its just annoying? but whatever once you wait long enough you'll get your shell
+            <img src="media/monitor/monitor28.png">
+            now, what can you do with this account? no fucking idea. seems like a dead end to me tbqh, couldn't get anything useful out of it (granted, i didn't look very hard). but it's.. there, i guess? and it's good practice to know how to gain access to it.
+            <h2>fourth step: galvanized stainless linpeas with exploits from your aunt</h2>
+            time for everyones favorite privilege escalation script linpeas!! omg guys!! arent u excited!! anyways yeah just run it and read thru the output
+            <img src="media/monitor/monitor29.png">linpeas mascot understand that i would kill for you. understand that i desire you carnally. i need our flesh as one. i need you in a manner and ferocity as of yet undiscovered, untapped by the human race as a whole. a thousand suns burn in my chest for the ache of you.
+            <br><br>
+            ok anyways linpeas output is usually a lot of garbage among the treasure but this time around you dont need to search so hard for the treasure.
+            <img src="media/monitor/monitor30.png">
+            i've seen this cve before in a diff box and figured it would be a decent enough shot, so download it, get it on the machine, yadda yadda we're all adults here you dont need me to run you through how to do that
+            <img src="media/monitor/monitor31.png">
+            and in an utterly bewildering turn of events thats literally it. thats the entire privesc process. no wrangling with the exploit to get it to work, no weird kink to iron out, just... root. and we're done. ??? honestly it's, welcome, for sure, but i expected so much more resistance out of this after the hell that was the rce. but no complaints! we got our shit.
+            <h2>closing</h2>
+            this was fun i guess. huge fucking headache at times but we got there hintless. i did refer to some hackthebox writeups on <i>other boxes</i> that used wordpress just so i would know vaguely what to do, but most of this was all me baby.
+            <br><br>
+            overall learned
+            <ol>
+                <li>how to use wpscan</li>
+                <li>some more robust revshell techniques</li>
+                <li>what a blind sqli actually is</li>
+                <li>familiarity with sqlmap</li>
+                <li>to stop trying to fucking bruteforce the login pages that's never goign to fucking work tried it with all three boxes so far and it never worked RAHHHH you dumbshit</li>
+            </ol>
+            the remaining box i have left is repetitive, which i don't think i will bother with to be honest! maybe i will writeup pratai / whiskers when i have the time. ok anyways!! goodniteo oomfies
+            <br><br>
+            if somehow you're from my school and you found this after looking for a htb monitor writeup, well... that's your problem, not mine! talk to me though, be my friend !! you owe me that much.
+            <img src="media/futaba/futabadance.gif">
+        </div>
+    </div>
+
+</body>
+<script>hljs.highlightAll();</script>
+</html>
