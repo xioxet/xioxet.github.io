@@ -1,0 +1,197 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nainainai</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+</head>
+<body>
+
+    <div class="decocont">
+        <div class="deco" style="top:-250px; left:-100px">⇠</div>
+        <div class="deco" style="top:50px; left:-125px">↺</div>
+        <div class="deco" style="top:-325px; left:400px">⇊</div>
+        <div class="deco" style="top:25px; left:325px; transform:rotate(20deg);">☆</div>
+    </div>
+
+    <div style="perspective:9cm">
+        <div class="flatboard">
+            <div id="source" class="navibox green" style="left:200px; top:200px; width:325px;">
+                <div class="navibox-contents" style="height:250px;">
+                    <span class="text">NAVISOURCE</span>
+                    <ul style="margin-left:50px;">
+                        <li><span class="text sha">WORKSKILLS</span></li>
+                        <li><span class="text sha">HOBBYSTUFF</span></li>
+                        <li><span class="text sha">SOCIAL-ETC</span></li>
+                        <li><span class="text sha">INFO-AB-ME</span></li>
+                    </ul>
+                    <img class="sticker" src="ct/media/futaba/rennybaby.png">
+                </div>  
+            </div>
+
+            <div id="source/workskills" class="navibox black disabled" style="left:750px; top:100px; width:300px; height:275px">
+                <div class="navibox-contents">
+                    <span class="text">WORKSKILLS</span>
+                    <ul style="margin-left:50px;">
+                        <li><span class="text sha">PYTHONCODE</span></li>
+                        <li><span class="text sha">WEBDEVELOP</span></li>
+                        <li><span class="text sha">GOOGSHEETS</span></li>
+                        <li><span class="text sha">MISCELLANY</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function(){
+        $(function() {
+        $('.draggable').draggable();
+        });
+
+        var anim_active = false;
+        $('.text').mouseenter(function() {
+            if (anim_active) {return;}
+            anim_active = true;
+            var og_text = $(this).text()
+            console.log(og_text);
+            for (var i = 0; i < og_text.length; i++) {
+                setTimeout(function(index) {
+            var sc_alph = 'ᴀʙᴄᴅᴇꜰɢʜɪᴊʟᴋᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ';
+            var reg_alph = 'ABCDEFGHIJLKMNOPQRSTUVWXYZ';
+            var new_text = '';
+            for (var j = 0; j <= index; j++) {
+                var char = og_text[j];
+                var xa = false;
+                if (reg_alph.includes(char)) { xa = reg_alph; }
+                if (sc_alph.includes(char)) { xa = sc_alph; }
+                
+                if (j == 0) {new_text += reg_alph[xa.indexOf(char)]}
+                else {
+                    if (xa !== false) {
+                        var x = Math.random();
+                        if (x < 0.5) {
+                            new_text += sc_alph[xa.indexOf(char)];
+                        } else {
+                            new_text += reg_alph[xa.indexOf(char)];
+                        }
+                    } else {
+                        new_text += char;
+                    }
+                }
+            }
+            $(this).text(new_text + ".".repeat(og_text.length - new_text.length));
+        }.bind(this, i), i * 25); anim_active = false;
+
+        }    
+        })
+    });
+
+
+</script>
+
+<style>
+    body {
+        width: 2500px;
+        height: 2500px;
+        font-family:'Courier';
+        background-attachment: fixed;
+    }
+
+    .disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .sticker {
+        position: absolute;
+        bottom: -100px;
+        right: -100px;
+        width: 150px;
+    }
+    .deco {
+        text-shadow: 10px 10px 0px lime;
+        animation: 10s dc infinite;
+    }
+
+    @keyframes dc {
+        0% {font-size: 500px}
+        50% {font-size: 515px}
+        100% {font-size: 500px}
+    }
+
+    li {
+        margin-top: 10px;
+    }
+
+    .green {
+        background-image: url('ct/media/futaba/allmessed.gif');
+    }
+
+    .black {
+        background-image: url('ct/media/blackstatic.gif');
+    }
+    
+    .navibox {
+        position: absolute;
+        color: white;
+        font-family: 'Courier';
+        z-index: 2;
+        outline: 5px solid lime;
+        filter: drop-shadow(20px 20px 0px rgba(0, 0, 0, 0.5));
+    }   
+
+
+    .navibox-contents {
+        transform:translate(-20px, -20px);
+        font-size:30px;
+        font-weight: bold;
+        position: relative;
+    }
+
+    .flatboard {
+        transform:rotateX(1deg) rotateY(2deg);
+        transform-style:preserve-3d;
+        background-color:black;
+        margin-left: 250px;
+    }
+
+    .text {
+        background-color: lime;
+        transition: 0.3s;
+        z-index:5;
+        position: relative;
+        font-size:30px;
+        font-weight: bold;
+    }
+
+    .sha::before {
+        position: absolute;
+        content: "--";
+        width: 100%;
+        z-index:-1;
+        left:10px;
+        top:10px;
+        background-color:black;
+        filter: none !important;
+    }
+
+
+    .text:hover {
+        cursor: pointer;
+        background-image:url('new/static.gif')
+    }
+
+    .deco {
+        user-select: none;
+        position: fixed;
+        font-size: 500px;
+        z-index: 0;
+        pointer-events: none;
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+</style>
+</html>
