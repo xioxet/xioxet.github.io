@@ -1,0 +1,114 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <title>yes but no</title>
+</head>
+<body>
+    <br><br>
+
+    <div class="sidebar">
+        ...
+    </div>
+
+    <div class="main">
+
+        <h1>ybn: writeups</h1>
+        <h2>by cane (from puzzlehunts)</h2>
+
+        <p>
+            i participated in <a href="https://ctf.ybn.sg/">YBN CTF</a>, a singapore-based ctf that ran for 36 hours. i'd never done a proper-proper ctf before, so i was pretty happy to place in 8th alongside my team <i>rkfc</i>.
+        </p>
+
+        <p>
+            some background - i'm definitely new to this, but i've been cutting my teeth on puzzle shit ever since i was like 7, ARGs, puzzle hunts, crosswords, and i basically approached the challenges the same way i would a puzzlehunt puzzle. there's a specific aspect of these ctfs i'd like to cover, something i'd call the <b>Art of the Cheese</b>, which got me a handful of quick flags just by trying to use intuition and making some lucky guesses.
+        </p>
+
+        <p>
+            my overall thoughts on the CTF were that i enjoyed it a lot! there were a lot of great challenges which were very fun and well written, and diving headfirst into some of the categories i felt uncertain about taught me a lot of valuable information. i'd definitely participate in a further YBN, and i think they did a good job. :D
+        </p>
+
+        <p>now, onto the writeups...</p>
+
+        <h1>web</h1>
+        <h2>view source revenge</h2>
+
+        <p>this was one of my favorite challenges - i recognized what to do essentially immediately, as someone who has just enough experience in flask to understand the vulnerability present. it's also just really fun trying to pull off the given "exploit", a lot of pieces to puzzle over and fit together that ultimately culminate very satisfyingly.</p>
+
+        <div class="img-cont"><img src="images/viewsource1.png"></div>
+
+        <p>we start with the most obvious lfi attack ever. we quickly verify that the lfi does indeed work by typing in /etc/passwd:</p>
+
+        <div class="img-cont"><img src="images/viewsource2.png"></div>
+
+        <p>that is indeed lfi alright. however, if we try to leak any flag, we don't get a file-not-found error, we get a completely blank file instead. we can instead peek at the source code of the file, which for flask apps is typically <i>app.py</i>-</p>
+
+        <p>but wait, cane (from puzzlehunts), how are you so sure this is a flask app? i introduce the very cool and epic technique known as <b>fingerprinting through 404 pages</b>. different frameworks will have different 404 pages, and this is a very easy way to quickly gain footing with what you're working with.</p>
+
+        <p>just trigger a 404 and search the text:</p>
+
+        <div class="img-cont"><img src="images/viewsource3.png"></div>
+
+        <div class="img-cont"><img src="images/viewsource4.png"></div>
+
+        <p>so we know we're dealing with a flask app - we can inspect the source by using lfi for the <b>app.py</b> file.</p>
+
+    </div> 
+</body>
+</html>
+
+<style>
+
+    html {
+        background-color: rgb(0, 0, 44);
+        color: #ececec;
+        font-family:'Courier New';
+    }
+
+    .img-cont {
+        max-width: 80%;
+        padding-block: 5px;
+        margin: auto;
+        text-align: center;
+    }
+
+    img {
+        max-width: 100%;
+    }
+
+    p {
+        line-height: 25px;
+        font-size: 20px;
+    }
+
+    .main {
+        min-width: 500px;
+        max-width: 65%;
+        margin: auto;
+        text-align: justify;
+        font-family: 'Hind';
+        background-color: white;
+        color: black;
+        padding-inline: 30px;
+        padding-block: 20px;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Roboto Slab';
+        color: rgb(0, 0, 44);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        var scrollpos = localStorage.getItem('scrollpos');
+        if (scrollpos) window.scrollTo(0, scrollpos);
+    });
+
+    window.onbeforeunload = function(e) {
+        localStorage.setItem('scrollpos', window.scrollY);
+    };
+</script>

@@ -1,0 +1,136 @@
+body {
+    background-image: url('static-dark.gif');
+    color: #d2738a;
+    display: flex;
+    font-family: 'IBM Plex Sans';
+    font-weight: 250;
+}
+
+#lain {
+    position: fixed;
+    width: min(250px, 100%);
+    bottom: 0;
+    left: -50;
+}
+
+.x {
+    width: min(250px, 20%);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.y {
+    color: #d2738a;
+    font-size:50px;
+    text-align: center;
+    transform:scaleY(5) translateY(-10px);
+}
+
+.main {
+    font-size:30px;
+    margin-inline: 20px;
+    background-image: url('memory.gif');
+    background-color: rgba(0, 0, 0, 0.55);
+    background-blend-mode: darken;
+    margin-top:-10px;
+    font-weight: 300;
+    border-left: 10px solid #d2738a;
+    box-shadow: 250px 0px 0px 0px black;
+    max-width: 80%;
+}
+
+.main p {
+    padding-inline: 50px;
+    text-align: justify;
+}
+.topbar {
+    background-color: black;
+    width: 100%;
+    font-size: 25px;
+    display: flex;
+}
+
+pre {
+    border: 2px dashed #d2738a;
+    margin-left: 50px;
+    max-width: 80%;
+    width: fit-content;
+    min-width: 50%;
+    overflow-x: scroll;
+    font-size: 25px;
+}
+
+code {
+    max-width: 100%;
+}
+
+.button-bar {
+    padding-left: 50px;
+    background-color: #d2738a;
+}
+
+button {
+    font-size: 30px;
+    border: none;
+    padding-inline: 20px;
+    cursor: pointer;
+    background-color: inherit;
+    margin-block: 5px;
+    transition: 0.1s;
+    font-weight: 300;
+}
+
+.header {
+    background-color: #d2738a;
+    color: black;
+    font-size: 45px;
+    text-decoration: underline;
+}
+
+button:hover {
+    filter:invert(1);
+}
+
+b {
+    background-color: black;
+    padding: 5px;
+    text-decoration: underline;
+}
+
+#ratpark {
+    font-size: 150px;
+    font-weight: 500;
+    writing-mode: vertical-lr;
+    position: fixed;
+    left: 130;
+    top: 100;
+    transform: scale(-1, -1);
+}
+
+.frick {
+    display: none;
+}
+
+#sigma, #sigma:link, #sigma:visited {
+    background-color: #d2738a;
+    color: white;
+    font-size:35px;
+}
+
+#rota {
+    animation-name: spin;
+    animation-duration: 4000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    } to {
+        transform: rotate(360deg);
+    }
+}
