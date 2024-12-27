@@ -134,3 +134,20 @@ b {
         transform: rotate(360deg);
     }
 }
+
+.stop {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    body div, body img {
+        display: none;
+    }
+
+    body {
+        background-image: url('eva-title.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-color: black;
+    }
+}
