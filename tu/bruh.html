@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flex Container with Restricted Height</title>
+  <style>
+    .flex {
+      display: flex; /* Enable Flexbox */
+      align-items: flex-start; /* Align items to the top */
+      border: 2px solid red; /* Optional: Visualize the container */
+      overflow: hidden; /* Hide overflow from the longer child */
+    }
+
+    a {
+      background-color: lightblue;
+      padding: 10px;
+      width: 50%; /* Adjust as needed */
+      overflow: hidden; /* Hide overflow */
+    }
+
+    b {
+      background-color: lightgreen;
+      padding: 10px;
+      width: 50%; /* Adjust as needed */
+    }
+
+    /* Constrain the height of .flex to the height of <b> */
+    .flex {
+      height: fit-content; /* Match the height of the shorter child */
+    }
+  </style>
+</head>
+<body>
+  <div class="flex">
+    <a>
+      This is the longer content. Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+      Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    </a>
+    <b>
+      This is the shorter content.
+    </b>
+  </div>
+</body>
+</html>
