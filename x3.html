@@ -1,0 +1,274 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>wrenches.online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/gruvbox-dark-soft.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/haskell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/scala.min.js"></script>
+  </head>
+  <body class="bg-stone-900 text-stone-300">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <main class="relative mx-auto w-4/5 mt-10 text-xl mb-[75px]">
+        <div class="my-3 text-3xl font-bold text-orange-200 header">wrenches.online</div>
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">x3ctf</div>
+        <div class="my-3 text-1xl">
+            i didnt do too much for x3, but i scooped up some of the easier crypto my teammates didn't get to solving, which were <span class="font-mono">babyrng</span> and <span class="font-mono">mvm-1</span>. <span class="font-mono">babyrng</span> was a simple challenge about reversing Haskell's PRNG, and <span class="font-mono">mvm-1</span> was a challenge about biased nonces in a bugged JWT signing implementation.
+        </div>
+
+        <div class="my-3 text-1xl">
+            i have not much to say abt the ctf given i didnt do too much of it, but i enjoyed the little taste of it i did get, and im happy to have contributed a very vanishingly small number of points (like 300) for my team. my one note is that im fond of the web design for x3. css is a dying art, one i am indirectly contributing to the death of by making such a painfully boring boilerplate blog design. but its okay.<br><br>
+
+            <a href="https://www.youtube.com/watch?v=P_CSdxSGfaA">recommended listening</a>
+        </div>
+
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">babyrng</div>
+        <div class="my-3 text-1xl">haskell! monads, and monoids, and whatnot. we're given the source:</div>
+
+
+        <pre><code class="language-haskell">
+{-# LANGUAGE ScopedTypeVariables #-}
+import Control.Monad.State.Lazy (evalState, State, state)
+import Data.Bits (xor)
+import Data.Char (chr, ord)
+import Data.Word (Word64)
+import System.Random (getStdGen, StdGen, uniform, uniformR)
+import Text.Printf (printf)
+
+flag = "MVM{[REDACTED]}"
+
+shred :: String -> State StdGen String
+shred "" = return ""
+shred (c:cs) = do
+    k <- state $ uniformR (0, 255)
+    ((:) (chr $ (ord c) `xor` k)) <$> (shred cs)
+
+burryTreasure :: State StdGen String
+burryTreasure = do
+    shredded <- shred flag
+    x :: Word64 <- state uniform
+    y :: Word64 <- state uniform
+    return $ printf "The shredded flag (%s) has been buried at (%d, %d)" (shredded >>= (printf "%02x" :: Char -> String)) x y
+
+main :: IO ()
+main = do
+    rng <- getStdGen
+    putStrLn $ evalState burryTreasure rng                                                                                                            
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+            disclaimer - im stupid. i dont know haskell, dont speak a word of it. idk what a state is. but the code is pretty """simple""" to understand - it initializes an RNG object/state/whatever-term-haskell-uses, generates a few random numbers < 255, xors them with our flag, and prints the bytestrings. then, it gives us two values from the rng, x and y.
+        </div>
+
+        <div class="my-3 text-1xl">
+            clearly, the haskell PRNG must somehow be reverse-engineerable from just 2 inputs alone. this is similar to how mersenne twisters in Python's <span class="font-mono">random</span> module are fully breakable with 624 consecutive outputs. we just need to figure out what RNG implementation haskell uses.
+        </div>
+
+        <div class="my-3 text-1xl">
+            a bit of research leads us to <span class="font-mono">splitmix</span>, which is the algo used by haskell. the page on the docs comes with a very loud, bolded warning about how it's cryptographically insecure:
+
+            <ol class="p-2 px-5 my-5 border-l">
+              <li>
+                In particular, it should not be used for cryptographic or security applications, because generated sequences of pseudorandom values are too predictable (the mixing functions are easily inverted, and two successive outputs suffice to reconstruct the internal state).
+              </li>
+            </ol>
+
+            how serendipitous! we're provided two successive outputs, and have all we need to reconstruct the state. doing a bit more reading about splitmix (specifically, the paper that implements it), we see that literally everything we need is already pre-implemented. for some inexplicable reason, this implementation is in Scala, but we can just convert it to a normal language people actually use.
+        </div>
+
+        <pre><code class="language-scala">
+private static long unmix64(long z) {
+  z = (z ^ (z >>> 33)) * 0x9cb4b2f8129337dbL;
+  z = (z ^ (z >>> 33)) * 0x4f74430c22a54005L;
+  return z ^ (z >>> 33); }
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+          so, above is the source code for the <span class="font-mono">unmix()</span> function. essentially, the way <span class="font-mono">splitmix</span> works is that it generates two numbers <span class="font-mono">seed</span> and <span class="font-mono">gamma</span>, and for each successive output, <span class="font-mono">seed</span> is added to <span class="font-mono">gamma</span> (mod 2**64), and then <span class="font-mono">seed</span> is <span class="font-mono">mix()</span>'ed, which is our output. 
+        </div>
+
+        <div class="my-3 text-1xl">
+          <span class="font-mono">mix()</span> is so trivial to undo that they provide the code for you, and from two successive inputs <span class="font-mono">x, y</span> we can retrieve <span class="font-mono">gamma</span> as the difference between <span class="font-mono">x, y</span>, and <span class="font-mono">seed</span> is just y.
+        </div>
+
+        <div class="my-3 text-1xl">
+          the next step is to just jump back as many iterations as we need to line up with our shredded flag, which can be done by just counting the bits in the flag, and generating the xor'd outputs of the RNG. my code to do this is below, written in the normal language of Python, which i am sure is a breath of fresh air after all the fucking Haskell and Scala we've been reading.
+        </div>
+
+        <pre><code class="language-python">
+x, y = (7283898632471611723, 9620209372472646369)
+flag = bytes.fromhex("070dbb36be2b25fadda85ba68d791dd8ec4626d81ebd338cb13a4f318d98d7102bddd0fd2f22946138e4401fe006e4eb318cabfb034adfac4163e595f2442c7b")
+
+# directly pulled from https://gee.cs.oswego.edu/dl/papers/oopsla14.pdf
+def mix64(z):
+    z = z & 0xFFFFFFFFFFFFFFFF
+    z = ((z ^ (z >> 33)) * 0xFF51AFD7ED558CCD) & 0xFFFFFFFFFFFFFFFF
+    z = ((z ^ (z >> 33)) * 0xC4CEB9FE1A85EC53) & 0xFFFFFFFFFFFFFFFF
+    return (z ^ (z >> 33)) & 0xFFFFFFFFFFFFFFFF
+
+def unmix64(z):
+    z = z & 0xFFFFFFFFFFFFFFFF
+    z = ((z ^ (z >> 33)) * 0x9CB4B2F8129337DB) & 0xFFFFFFFFFFFFFFFF
+    z = ((z ^ (z >> 33)) * 0x4F74430C22A54005) & 0xFFFFFFFFFFFFFFFF
+    return (z ^ (z >> 33)) & 0xFFFFFFFFFFFFFFFF
+
+seed = unmix64(y)
+gamma = unmix64(y) - unmix64(x)
+#print(seed, gamma, log2(seed))
+#print(unmix64(mix64(y)), y)
+
+new_seed = (seed + gamma * -65) % (2 ** 64)
+decoded_flag = ""
+for i in range(len(flag)):
+    byt = flag[i]
+    k = mix64(new_seed) % 2**8
+    decoded_flag += chr(byt ^ k)
+    new_seed = (new_seed + gamma) % (2 ** 64)
+print(decoded_flag)
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+          running this, we get our flag:
+        </div>
+
+        <pre><code>
+┌──(navi@jinxed)-[~/Downloads/babyrng]
+└─$ python s.py        
+MVM{4_M0n4D_15_jU5t_4_m0N01d_1n_Th3_c4t3G0Ry_0f_3ND0FUNCT0R5_:D}
+        </code></pre>
+
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">mvm-1</div>
+
+        <div class="my-3 text-1xl">
+          cripes theres a lot of code in this thing. i will handwave away a lot of the other stuff and focus on the very important parts - the code rolls out its own method of signing and verifying JWTs with ECDSA. thanks to my teammate <span class="font-mono">scuffed</span> for bothering to read through the codebase and showing me the relevant parts so i could pick out the vulnerability, altho in this case it's not particularly difficult to find it.
+        </div>
+
+        <pre><code class="language-python">
+def generate_nonce(k):
+    """😇😇😇"""
+    return getrandbits(k)
+...
+
+@dataclass
+class ECDSA:
+    private_key: int
+    curve: Curve = P256
+
+    def sign(self, msg: bytes) -> tuple[int, int]:
+        z = int(sha256(msg).hexdigest(), 16) % N
+        k = generate_nonce(128)  # 😇😇😇
+        R = k * P256.G
+        r = R.x % N
+        s = (pow(k, -1, N) * (z + r * self.private_key)) % N
+        return (r, s)
+...
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+          they have very helpfully labelled the vulnerable lines with 😇😇😇 emotes. it might not be clear exactly what the vulnerability is - <span class="font-mono">getrandbits()</span> uses python's PRNG, 128 bits is a pretty big number and not brute-forceable, seems pretty solid.
+        </div>
+
+        <div class="my-3 text-1xl">
+          the key here is that <span class="font-mono">getrandbits(128)</span> always generates 128-bit numbers. in ECDSA, if any bias at all is introduced to generation of the nonces used to sign the JWTs, we only need a few sample JWTs (in this case, literally only two), to comfortably retrieve the private key. my understanding of this (and honestly, LLL as a whole) is pretty fuzzy, but this is in fact a known and fully solved problem.
+        </div>
+
+        <div class="my-3 text-1xl">
+          for brevity ill handwave over a lot of the code required to interact w the server, and post the code which solves our lattice here:
+        </div>
+
+        <pre><code>
+def recover_priv_key():
+    for _ in range(5):
+        session1 = requests.Session()
+        session2 = requests.Session()
+        session3 = requests.Session()
+
+        details1 = {
+            "email": "user@example.com",
+            "username": "whatthefrick",
+            "password": "whatthefrick"
+        }
+
+
+        #
+        requests.post(url + r"/api/auth/register", json.dumps(details1))
+
+        del details1["email"]
+
+        jwt1 = session1.post(url + r"/api/auth/login", json.dumps(details1)).cookies.get_dict()['mvmcryptionauthtoken']
+        time.sleep(1)
+        jwt2 = session2.post(url + r"/api/auth/login", json.dumps(details1)).cookies.get_dict()['mvmcryptionauthtoken']
+        time.sleep(1)
+        jwt3 = session3.post(url + r"/api/auth/login", json.dumps(details1)).cookies.get_dict()['mvmcryptionauthtoken']
+
+        vals = jwt1.split(".")[-2], jwt1.split(".")[-1], jwt2.split(".")[-2], jwt2.split(".")[-1], jwt3.split(".")[-2], jwt3.split(".")[-1]
+        #print(f'{vals = }')
+        r1, s1, r2, s2, r3, s3 = [bytes_to_long(decode(_)) for _ in vals]
+
+        m1, m2, m3 = jwt1.split(".")[0] + '==', jwt2.split(".")[0] + '==', jwt3.split(".")[0] + '=='
+        m1, m2, m3 = decode(m1), decode(m2), decode(m3)
+        m1, m2, m3 = int(sha256(m1).hexdigest(), 16), int(sha256(m2).hexdigest(), 16), int(sha256(m3).hexdigest(), 16)
+
+        s1_inv, s2_inv, s3_inv = pow(s1, -1, N), pow(s2, -1, N), pow(s3, -1, N)
+        m = Matrix([
+            [N, 0, 0, 0, 0],
+            [0, N, 0, 0, 0],
+            [0, 0, N, 0, 0],
+            [r1 * s1_inv, r2 * s2_inv, r3 * s3_inv, B/N, 0],
+            [m1 * s1_inv, m2 * s2_inv, m3 * s3_inv, 0, B]
+        ]).LLL()
+
+        for row in m:
+            try:
+                k = row[0]
+                priv_key = (pow(r1, -1, N) * ((k * s1) - m1)) % N
+                message = decode(jwt1.split(".")[0])
+                signed = sign(priv_key, int(k), message)
+                #print(f'{signed = }, {(r1, s1) = }')
+                if signed == (r1, s1):
+                    return priv_key
+            except:
+                pass
+        </code></pre>
+
+        <div class="my-3 text-xl">
+          this code is hideous but it sends three JWTs, gets their r, s values from the signature, and runs LLL on the values of the message. i collected 3 because with only 2 pieces of information LLL would occasionally fail to recover the token.
+          once we get our private key, we just make a simple request to our server:
+        </div>
+
+        <pre><code>
+  priv_key = recover_priv_key()
+  message = b'{"sub": 1, "exp": "2025-01-30T09:44:16.897288+00:00"}'
+  r, s = sign(priv_key, randint(2**127, 2**128), message)
+  r, s = encode(long_to_bytes(r)), encode(long_to_bytes(s))
+  token = ".".join([encode(message), r, s])
+  session = requests.Session()
+  print(token)
+  session.cookies.set("mvmcryptionauthtoken", token)
+  encrypted_flag = session.get(url + "/api/crypto/flag").text
+  flag = session.post(url + "/api/crypto/decrypt", encrypted_flag).text
+  print(flag)
+
+  #MVM{jus7_s0m3_n0rm4l_b1as3d_n0nce_3cds4_g01ng_brrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr~}
+      </code></pre>
+
+      <a class="float-right" href="/">back</a>
+
+      <footer class="mt-20 text-bases text-orange-200 italic text-right opacity-25">better a pig than a fascist. made w tailwind. 2024-2025</footer>
+
+    </main>
+
+    <div class="sticker">
+      <img src="images/images.gif">
+    </div>
+
+  </body>
+  <script>hljs.highlightAll();</script>
+</html>
