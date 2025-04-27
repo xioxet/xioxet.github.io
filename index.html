@@ -55,6 +55,12 @@
             <li><a href="x3.html">x3ctf</a> - 4th april 2025</li>
         </ol>
 
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">wall of tunes</div>
+        this functions as an about me section. pick one. some known, some obscure, all good.
+        <br><br>
+        <div id="tunewall" class="text-2xl flex flex-wrap">
+        </div>
 
         
         <hr class="my-10">
@@ -81,8 +87,82 @@
   </body>
 
   <script>
-      fetch("https://www.last.fm/user/empyreu")
-        .then(response => response.text())
-        .then(htmlstring => {console.log(htmlstring)})
+    var tunewall = document.getElementById('tunewall');
+    var lb = 8448
+    var ub = 10159
+    function rc(lb, ub) {
+      return lb + Math.floor(Math.random() * (ub-lb))
+    }
+
+    var links = [
+      "https://www.youtube.com/watch?v=X8X-V0Uqo3s",
+      "https://www.youtube.com/watch?v=qu2QXKDNoWs",
+      "https://www.youtube.com/watch?v=-qgXYvjVNvk",
+      "https://www.youtube.com/watch?v=CeA92xqw-QI",
+      "https://www.youtube.com/watch?v=POCNWhWgZcg",
+      "https://www.youtube.com/watch?v=8R_3mXZBsuU",
+      "https://www.youtube.com/watch?v=6U0jM2iXq3U",
+      "https://www.youtube.com/watch?v=eDwi-8n054s",
+      "https://www.youtube.com/watch?v=CsHiG-43Fzg",
+      "https://www.youtube.com/watch?v=5MgKQgQrv3Q",
+      "https://www.youtube.com/watch?v=rczCSbyksBg",
+      "https://www.youtube.com/watch?v=fNWDVmPOSdA",
+      "https://www.youtube.com/watch?v=uxNoOPetZ6g",
+      "https://www.youtube.com/watch?v=Tb0MC0jFv6M",
+      "https://www.youtube.com/watch?v=7nxWP9BhI7w",
+      "https://www.youtube.com/watch?v=1EdUjlawLJM",
+      "https://www.youtube.com/watch?v=LWz0JC7afNQ",
+      "https://www.youtube.com/watch?v=ZVgHPSyEIqk",
+      "https://www.youtube.com/watch?v=hSI_9P9rRt4",
+      "https://www.youtube.com/watch?v=TY5Hq_5FbT0",
+      "https://www.youtube.com/watch?v=uQvf5NQY7l8",
+      "https://www.youtube.com/watch?v=EXV6EmSBULY",
+      "https://www.youtube.com/watch?v=UuizNQUOFCI",
+      "https://www.youtube.com/watch?v=7s2_sTA-Gyk",
+      "https://www.youtube.com/watch?v=A3adFWKE9JE",
+      "https://www.youtube.com/watch?v=qZqPmUtQs2Q",
+      "https://www.youtube.com/watch?v=vl17IcTamMw",
+      "https://www.youtube.com/watch?v=jQpSJC-K4u4",
+      "https://www.youtube.com/watch?v=A3adFWKE9JE",
+      "https://www.youtube.com/watch?v=vRh-OVLOdcs",
+      "https://www.youtube.com/watch?v=DpHVA2PDYwY",
+      "https://www.youtube.com/watch?v=LgOcy0jr4wQ",
+      "https://www.youtube.com/watch?v=34AZFweOuYI",
+      "https://www.youtube.com/watch?v=N3gN9Up6hmc",  
+      "https://www.youtube.com/watch?v=mHNZcFClq3k",
+      "https://www.youtube.com/watch?v=wM8oUoCg56g",
+      "https://www.youtube.com/watch?v=7ZrcTh2-uvQ",
+      "https://www.youtube.com/watch?v=_r6dwpwqFq4",
+      "https://www.youtube.com/watch?v=9D8mgljZhk0",
+      "https://www.youtube.com/watch?v=hZXxmhok1AU",
+      "https://www.youtube.com/watch?v=U6f9BV-8yAw",
+      "https://www.youtube.com/watch?v=B-0Xgx0FFfQ",
+      "https://www.youtube.com/watch?v=4bbmK079bCs",
+      "https://www.youtube.com/watch?v=MbkugCPqxQY",
+      "https://www.youtube.com/watch?v=S8Y_6K6-ym0",
+      "https://www.youtube.com/watch?v=u_hDHm9MD0I",
+      "https://www.youtube.com/watch?v=jY6qjHrJJHQ"
+    ]
+
+    function shuffle(array) {
+      let currentIndex = array.length;
+      while (currentIndex != 0) {
+        let randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+          array[randomIndex], array[currentIndex]];
+      }
+    }
+
+    shuffle(links);
+
+    for (const link of links) {
+      var s = document.createElement('a');
+      s.innerText = String.fromCharCode(rc(lb, ub));
+      s.href = link
+      s.classList.add('mx-2')
+      tunewall.appendChild(s);
+    }
+
   </script>
 </html>
