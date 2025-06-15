@@ -1,0 +1,47 @@
+hr:before {
+    content:'bruh!';
+    color: white;
+    background-color: red;
+}
+
+* {
+    z-index: 5;
+}
+a {
+    color: lightblue !important;
+}
+
+hr {
+    border-color: rgb(254 215 170 / var(--tw-text-opacity, 1));
+}
+
+.header {
+    color: rgb(254 215 170);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.sticker {
+    filter: invert(81%) sepia(42%) saturate(352%) hue-rotate(332deg) brightness(104%) contrast(99%);
+    opacity: 0.1;
+    position: fixed;
+    bottom: 0;
+    right: -100px;
+    z-index: 1;
+}
+
+.text-1xl {
+    text-align: justify;
+}
+
+pre {
+    margin-block: 40px !important;
+    border: 2px solid rgb(254 215 170);
+    border-radius: 5px;
+}
+
+.font-mono {
+    color: rgb(254 215 170)
+}
