@@ -453,10 +453,10 @@ with open('payload.bin', 'wb') as file:
       <div class="my-3">CRT is the idea that given the following equations, knowledge of all given <span class="font-mono">k_i, m_i,</span> but with a secret <span class=font-mono>N</span>:</div>
 
       <pre><code>
-N === k_1 mod m_1
-N === k_2 mod m_2 
+N == k_1 mod m_1
+N == k_2 mod m_2 
 ...
-N === k_i mod m_i
+N == k_i mod m_i
       </code></pre>
 
       <div class="my-3">we can recover <span class=font-mono>N mod (m_1 * m_2 * m_3 * ... * m_i)</span>. the details of the algorithm used to derive it are irrelevant for now, we can just treat CRT as a black box that returns the value of <span class=font-mono>N</span> that we need. note that the ultimate goal most of the time is to recover <span class=font-mono>N</span> in its entirety, and this is typically only accomplishable if we have enough <span class=font-mono>m_i</span> such that <span class=font-mono>(m_1 * m_2 * m_3 * ... *  m_i)</span> is greater than <span class=font-mono>N</span>.</div>
@@ -487,12 +487,150 @@ print(f'{N = }')
 
       <div class="my-3">now let's talk about RSA as it is implemented usually, with two large primes that are mostly equal in size. i find it best to think of modular exponentiation over a non-prime N as the 'combination' of exponentiation over its two factors: simply put, if you want to calculate <span class=font-mono>a ** e mod N</span>, and <span class=font-mono>N = p * q</span>, you are essentially calculating <span class=font-mono>a ** e mod p</span> and <span class=font-mono>a ** e mod q</span> and then "combining" the two results from these calculations. i am stopping myself from using the word <span class=font-mono>subgroup</span> or <span class=font-mono>group</span> because a. i have no actual background in group theory, i'm just a dumb fucker who's done this too much, and b. it would scare beginners off.</div>
 
-      <div class="my-3">but for the ball-knowers out there essentially multiplication over some prime p is a cyclic group with order p-1, meaning that <span class="font-mono"> a * a * a ... * a</span> (<span class=font-mono>p-1</span> times) is always going to result in some number <span class=font-mono>pn + 1</span>, or in other words, <span class=font-mono>a**(p-1) mod p === 1</span>. those of you who watched numberphile videos in your youth might recognise this as fermat's little theorem. this is a concept that is completely not taught in (normal) schools over here so allow yourself a bit of grace if none of this makes any fucking sense.</div>
+      <div class="my-3">but for the ball-knowers out there essentially multiplication over some prime p is a cyclic group with order p-1, meaning that <span class="font-mono"> a * a * a ... * a</span> (<span class=font-mono>p-1</span> times) is always going to result in some number <span class=font-mono>pn + 1</span>, or in other words, <span class=font-mono>a**(p-1) mod p == 1</span>. those of you who watched numberphile videos in your youth might recognise this as fermat's little theorem. this is a concept that is completely not taught in (normal) schools over here so allow yourself a bit of grace if none of this makes any fucking sense.</div>
 
       <div class="my-3">so how does RSA decryption actually work? let's consider the following:</div>
 
-      <div class="my-3">todo...</div>
+      <pre><code>
+pt ** (p-1) == 1 mod p
+pt ** (1 mod p-1) == pt mod p
+-------
+pt ** e == ct mod p 
+      </code></pre>
 
+      <div class="my-3">think of this as walking in a circle every <span class=font-mono>(p-1)</span> steps. when we walk in our circle <span class=font-mono>K * (p-1)</span> steps for any <span class=font-mono>K</span>, we return back to our value of 1. then, another step will multiply our original plaintext by 1, resulting in just giving us the plaintext. therefore we just need to find some number <span class=font-mono>d</span> where <span class=font-mono>e * d == 1 mod (p-1)</span>. this is known as the modular multiplicative inverse of <span class=font-mono>e</span> with respect to te modulus <span class=font-mono>p - 1</span>.</div>
+
+    <pre><code>
+pt ** (p-1) == 1 mod p
+pt ** (1 mod p-1) == pt mod p
+-------
+pt ** e == ct mod p 
+pt ** (e * d) == pt mod p, where (e * d) == 1 mod (p-1).
+      </code></pre>
+
+      <div class="my-3">modular multiplicative inverses are easy to calculate, python has them builtin with <span class=font-mono>pow(e, -1, p-1)</span>. so that settles our decryption. anyways, to recap, our understanding of RSA decryption is that it is essentially the 'undoing' of this cyclic operation by going through the loop exactly a few times, and then just going one more step to return to our starting point. recall that in standard RSA, our N is the product of two different primes <span class=font-mono>p, q</span>, and thus the decryption occurs over the two subgroups with order <span class=font-mono>p-1</span>, <span class=font-mono>q-1</span>. the difficulty of RSA decryption relies in the fact that we cannot easily recover these primes because factorisation is hard and scary. however, what happens when N is made up of a lot of different small factors which we can recover?</div>
+
+      <pre><code>
+ct ** d_k1 == pt mod k1 
+ct ** d_k2 == pt mod k2 
+ct ** d_k3 == pt mod k3
+...
+ct ** d_k20 == pt mod k20
+
+where d_ki == pow(e, -1, ki-1)
+      </code></pre>
+
+      <div class="my-3">with the knowledge of our small factors we are able to invert <span class=font-mono>pt</span> mod many different values of <span class=font-mono>k</span>. we can now apply our trusty CRT algo to further recover <span class=font-mono>pt</span> mod the product of all of these <span class=font-mono>k</span> values, and therefore get our flag. right?</div>
+
+      <div class="my-3">
+        the problem is that <span class="font-mono">pt</span> is still greater than the product of those values (henceforth termed <span class=font-mono>K</span>)! <span class=font-mono>pt</span> is 647 bits, and the product of 20 32-bit primes would naturally only be 640 bits. we're missing 7 whole bits of info. the good thing is that 7 bits of brute force is entirely feasible for any computer made before the 1960s so as long as we don't have an ENIAC or something we're good. but how exactly do we recover the missing bits? remember the following:
+      </div>
+
+      <pre><code>
+a == b mod n
+is just equivalent to the equation
+a = b + nx for some value x
+      </code></pre>
+
+      <div class=my-3>by definition, our predicted value of x has to be at least 7 bits to make up for the missing difference. so, we just have to keep trying different values of x, incrementing every time, until we hit our flag. the source code below shows us how we do that.</div>
+
+      <pre><code class="language-python">
+from sympy.ntheory.modular import crt
+from Crypto.Util.number import long_to_bytes as ltb
+
+factors = [2249543951,2401983659,2403929377,2524683377,2538133879,2661823973,2862322829,3160654661,3215347301,3381074293,3420765949,3427181519,3432420917,3447786239,3516649061,3769183091,3794381879,3995881397,4107899623,4257964903]
+
+ct = # redacted for brevity
+
+
+crt_vals = []
+for i in factors:
+    d = pow(0x10001, -1, i-1)
+    crt_vals.append(pow(ct, d, i))
+
+small_crt_soln, add_val = crt(factors, crt_vals)
+new_pt = small_crt_soln
+print(small_crt_soln, add_val)
+print(small_crt_soln.bit_length())
+for i in range(1, 2**16):
+    new_pt += add_val
+    if b'NYP' in ltb(new_pt):
+        print(ltb(new_pt))
+      </code></pre>
+
+      <div class="my-3">running this code, we get our flag. anyways now onto constant-reactor-termination, which is actually much easier to explain:</div>
+
+      <pre><code class="language-python">
+import random
+from sympy import isprime
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import pad
+from secret import flag
+import os
+
+secret = random.getrandbits(256)
+polynomial = [secret] + [random.getrandbits(256) for i in range(512)] # 512-degree polynomial
+
+def compute_polynomial(x):
+    result = 0
+    for i in range(len(polynomial)):
+        result += polynomial[i] * x ** i
+    return result
+    
+output = open('values', 'w')
+for i in range(1, 400):
+    output.write(f'F({i}) = {compute_polynomial(i)}\n')
+
+iv = os.urandom(16)
+key = secret.to_bytes(32, byteorder='big')
+cipher = AES.new(key, AES.MODE_CBC, iv)
+enc = cipher.encrypt(pad(flag, AES.block_size))
+
+print(f'{enc.hex() = }, {iv.hex() = }')
+print(f'{secret = }')
+      </code></pre>
+
+      <div class="my-3">this is a formulation of Shamir's Secret Sharing. i'm going to briefly explain what this is, but knowledge of this concept is not necessary to solve the challenge. SSS is a construct where you can only recover a certain secret given enough shares held by different people. it's formulated as a polynomial, where our secret is the constant term, meaning that for some <span class=font-mono>f(x) = ax**n, bx**n-1 + ... + k</span>, our secret is k.</div>
+
+      <div class="my-3">the way SSS ordinarily works relies on the fact that you can only uniquely reconstruct a polynomial if you have n+1 points of it, where n is the degree. think of it this way: if you have 2 points on the Cartesian plane, you can uniquely recover the single line that must go through those two points, and there is no other possible line that can go through them. if you have 3, you can recover a parabola, with 4, a cubic, so on. this is a process known as Lagrange interpolation, a method i myself don't really understand.</div>
+
+      <div class="my-3">so in our problem formulation we have a 512 degree polynomial (yikes, big fuckass polynomial) and 400 points. we evidently don't have enough points to go about it the usual way, so what's the trick?</div>
+
+      <pre><code>
+f(x) mod x == k mod x
+      </code></pre>
+
+      <div class="my-3">the trick is that if our polynomial is <span class=font-mono>f(x) = ax**n, bx**n-1 + ... + k</span>, by taking whatever value we retrieve of <span class=font-mono>f(x)</span> and getting the remainder with respect to <span class="font-mono">x</span>, we are now left with only the secret term. ordinarily this does not work in regular SSS because the polynomial is taken over a finite field (a complicated way of saying we already do this modulus nonsense before we vend the output) but here we're not doing any such thing. so we can just retrieve multiple values of k mod x, and proceed with regular CRT. the code is below.</div>
+
+      <pre><code>
+from sympy import isprime
+from sympy.ntheory.modular import crt
+
+val = [int(x.split(' ')[-1]) for x in open('values', 'r').read().split('\n')]
+
+crt_vals = []
+crt_mods = []
+
+for i in range(1, 400):
+    if isprime(i):
+        crt_vals.append(val[i-1]%i)
+        crt_mods.append(i)
+
+secret, z = crt(crt_mods, crt_vals)
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+iv = bytes.fromhex('e6f9a61e847c507d2cd038bf421568b0')
+enc = bytes.fromhex('f2620444586e28b2a1fe09c2088c6fa1697e726791c1b05791a89f671664af27054c014b57ad4148e0f4ca5cbefa6ef08e965d65e5a9ba2936e03ad37a15579fc354f36873175f40b567a765cab98b567a308d91fb669fab0bb99094f2660e29')
+
+key = secret.to_bytes(32, byteorder='big')
+cipher = AES.new(key, AES.MODE_CBC, iv)
+dec = cipher.decrypt(enc)
+print(unpad(dec, AES.block_size))
+      </code></pre>
+
+      <div class=my-3>note the check that verifies if our values of x are prime first. CRT only works on coprime moduli, so we need to make sure they are all prime. but otherwise, there is not much else to the challenge.</div>
 
 
 
