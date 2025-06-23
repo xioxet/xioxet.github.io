@@ -622,7 +622,6 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 
 iv = bytes.fromhex('e6f9a61e847c507d2cd038bf421568b0')
-enc = bytes.fromhex('f2620444586e28b2a1fe09c2088c6fa1697e726791c1b05791a89f671664af27054c014b57ad4148e0f4ca5cbefa6ef08e965d65e5a9ba2936e03ad37a15579fc354f36873175f40b567a765cab98b567a308d91fb669fab0bb99094f2660e29')
 
 key = secret.to_bytes(32, byteorder='big')
 cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -632,8 +631,9 @@ print(unpad(dec, AES.block_size))
 
       <div class=my-3>note the check that verifies if our values of x are prime first. CRT only works on coprime moduli, so we need to make sure they are all prime. but otherwise, there is not much else to the challenge.</div>
 
+      <a class="float-right" href="/">back</a>
 
-
+            <footer class="mt-20 text-bases text-orange-200 italic text-right opacity-25">i am whole without god's love. 2024-2025</footer>
 
     </main>
 
